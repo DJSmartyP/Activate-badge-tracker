@@ -66,50 +66,63 @@
       <div id="badgeList" class="badge-list"></div>
     </section>
 
-    <section id="locations" class="view">
-      <div class="location-layout">
-        <div>
-          <div class="row between"><h2>Locations</h2><button class="btn primary" id="addLocation">+ Add</button></div>
-          <div id="locationList" class="stack"></div>
-        </div>
-        <div class="card">
-          <label class="label">Location name</label>
-          <input id="locationName" class="field">
-          <div class="section-title"><h2>Rooms available</h2></div>
-          <div id="locationRooms" class="toggle-grid"></div>
-          <div class="section-title"><h2>Games available</h2></div>
-          <div id="locationGames" class="toggle-grid"></div>
-          <div class="row wrap top-gap">
-            <button class="btn ghost" id="allRooms">Select all rooms</button>
-            <button class="btn ghost" id="clearRooms">Clear rooms</button>
-            <button class="btn ghost" id="allGames">Select all games</button>
-            <button class="btn ghost" id="clearGames">Clear games</button>
-            <button class="btn danger" id="deleteLocation">Delete location</button>
-          </div>
-        </div>
-      </div>
-    </section>
+    
+<section id="locations" class="view">
+  <div class="location-layout">
+    <div>
+      <div class="row between"><h2>Locations</h2><button class="btn primary" id="addLocation">+ Add</button></div>
+      <div id="locationList" class="stack"></div>
+    </div>
+    <div class="card">
+      <label class="label">Location name</label>
+      <input id="locationName" class="field">
 
-    <section id="venue" class="view">
-      <div class="venue-layout">
-        <div class="card">
-          <div class="label">Venue editor</div>
-          <h2>Room copies</h2>
-          <p class="sub">Set the number of each room at this venue. Entrance and Exit are always included.</p>
-          <div id="roomCopyControls" class="stack"></div>
-          <button class="btn primary top-gap" id="buildRoomCopies">Build room copies</button>
-        </div>
-        <div class="card">
-          <div class="label">Map from Entrance</div>
-          <h2>Front / Left / Right / Back</h2>
-          <p class="sub">Start at Entrance facing forward. Use Left or Right for alcoves, side corridors or corners.</p>
-          <select id="mapNode" class="field"></select>
-          <div id="mapEditor" class="map-grid top-gap"></div>
-          <div class="section-title"><h2>Summary</h2></div>
-          <div id="mapSummary" class="stack"></div>
-        </div>
+      <div class="section-title">
+        <h2>Rooms at this venue</h2>
+        <span class="sub">Choose room types here</span>
       </div>
-    </section>
+      <div id="locationRooms" class="toggle-grid"></div>
+
+      <div class="section-title">
+        <h2>Games available</h2>
+        <span class="sub">Optional fine-tuning</span>
+      </div>
+      <div id="locationGames" class="toggle-grid"></div>
+
+      <div class="row wrap top-gap">
+        <button class="btn ghost" id="allRooms">Select all rooms</button>
+        <button class="btn ghost" id="clearRooms">Clear rooms</button>
+        <button class="btn ghost" id="allGames">Select all games</button>
+        <button class="btn ghost" id="clearGames">Clear games</button>
+        <button class="btn danger" id="deleteLocation">Delete location</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+    
+<section id="venue" class="view">
+  <div class="venue-layout">
+    <div class="card">
+      <div class="label">Venue editor</div>
+      <h2>Duplicates</h2>
+      <p class="sub">Rooms are chosen in Locations. Here, only tell the app when a selected room has more than one copy.</p>
+      <div id="duplicateControls" class="stack"></div>
+      <button class="btn primary top-gap" id="buildRoomCopies">Build map rooms</button>
+    </div>
+    <div class="card">
+      <div class="label">Map from Entrance</div>
+      <h2>Front / Left / Right / Back</h2>
+      <p class="sub">Entrance starts facing forward. Duplicate rooms appear as Laser 1, Laser 2, etc. Single rooms keep their normal name.</p>
+      <select id="mapNode" class="field"></select>
+      <div id="mapEditor" class="map-grid top-gap"></div>
+      <div class="section-title"><h2>Summary</h2></div>
+      <div id="mapSummary" class="stack"></div>
+    </div>
+  </div>
+</section>
+
 
     <section id="focus" class="view">
       <div class="focus-setup">
@@ -140,7 +153,7 @@
     <section id="settings" class="view">
       <div class="card">
         <h2>Settings</h2>
-        <p class="sub">Version <strong>8.3.0</strong> — clean rebuild.</p>
+        <p class="sub">Version <strong>8.4.0</strong> — clean rebuild.</p>
         <div class="row wrap">
           <button class="btn primary" id="exportBackup">Export backup</button>
           <label class="btn">Restore backup<input id="importBackup" type="file" accept="application/json" hidden></label>

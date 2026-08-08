@@ -1,0 +1,21 @@
+SMARTY'S ACTIVATE TRACKER v8.4.0
+
+VENUE FLOW CHANGE
+- Locations tab: choose which room TYPES exist.
+- Venue tab: only mark selected rooms as duplicates when needed.
+- Single rooms keep their normal name.
+- Duplicate rooms become Room 1, Room 2, etc.
+- Selecting/removing rooms automatically updates venue availability.
+
+WHAT TO UPLOAD
+Upload EVERY file in this ZIP to the ROOT of your GitHub repository.
+Because your repository already has the v8 files, same-named files should be replaced.
+
+The key changed files are:
+- index.html
+- app.js
+- sw.js
+
+But upload the whole package so all files stay in sync.
+
+After committing to main, wait 1–3 minutes, then refresh your GitHub Pages site.

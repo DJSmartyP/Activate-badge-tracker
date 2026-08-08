@@ -1,7 +1,7 @@
 
 'use strict';
 
-const VERSION='8.3.0';
+const VERSION='8.4.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[];
@@ -113,13 +113,36 @@ function renderLocations(){
 
 function renderVenue(){
   const l=activeLocation();
-  $('roomCopyControls').innerHTML=ROOMS.map(r=>`<div class="item row between"><span>${esc(r)}</span><select class="field" style="max-width:100px" data-room-copy="${esc(r)}">${[0,1,2,3,4,5,6].map(n=>`<option value="${n}" ${Number(l.roomCopies[r]||0)===n?'selected':''}>${n}</option>`).join('')}</select></div>`).join('');
+  const selected=l.rooms||[];
+
+  $('duplicateControls').innerHTML=selected.length
+    ? selected.map(r=>{
+        const copies=Math.max(1,Number(l.roomCopies[r]||1));
+        return `<div class="item row between">
+          <div><b>${esc(r)}</b><div class="sub">${copies===1?'Single room':'Duplicate room'}</div></div>
+          <div class="row">
+            <label class="checkline" style="margin:0">
+              <input type="checkbox" data-dup-toggle="${esc(r)}" ${copies>1?'checked':''}>
+              <span>Duplicate</span>
+            </label>
+            <select class="field" style="max-width:92px" data-dup-count="${esc(r)}" ${copies>1?'':'disabled'}>
+              ${[2,3,4,5,6].map(n=>`<option value="${n}" ${copies===n?'selected':''}>${n}</option>`).join('')}
+            </select>
+          </div>
+        </div>`;
+      }).join('')
+    : '<div class="item sub">Choose rooms in the Locations tab first.</div>';
+
   const nodes=['Entrance',...l.roomInstances,'Exit'];
   const previous=$('mapNode').value;
   $('mapNode').innerHTML=nodes.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
   $('mapNode').value=nodes.includes(previous)?previous:'Entrance';
   renderMapEditor();
-  $('mapSummary').innerHTML=nodes.map(n=>{const m=l.venueMap[n]||{};const bits=[m.front&&`Front → ${m.front}`,m.left&&`Left → ${m.left}`,m.right&&`Right → ${m.right}`,m.back&&`Back → ${m.back}`].filter(Boolean);return `<div class="item"><b>${esc(n)}</b><div class="sub">${bits.length?esc(bits.join(' • ')):'No connections set'}</div></div>`}).join('');
+  $('mapSummary').innerHTML=nodes.map(n=>{
+    const m=l.venueMap[n]||{};
+    const bits=[m.front&&`Front → ${m.front}`,m.left&&`Left → ${m.left}`,m.right&&`Right → ${m.right}`,m.back&&`Back → ${m.back}`].filter(Boolean);
+    return `<div class="item"><b>${esc(n)}</b><div class="sub">${bits.length?esc(bits.join(' • ')):'No connections set'}</div></div>`;
+  }).join('');
 }
 
 function renderMapEditor(){
@@ -133,12 +156,21 @@ function renderMapEditor(){
 }
 
 function buildRoomCopies(){
-  const l=activeLocation(), old=l.venueMap;
+  const l=activeLocation(), old=l.venueMap||{};
   l.roomInstances=[];
-  ROOMS.forEach(r=>{for(let i=1;i<=Number(l.roomCopies[r]||0);i++)l.roomInstances.push(`${r} ${i}`)});
-  l.venueMap={Entrance:old.Entrance||{front:null,left:null,right:null,back:null},Exit:old.Exit||{front:null,left:null,right:null,back:null}};
+
+  (l.rooms||[]).forEach(r=>{
+    const copies=Math.max(1,Number(l.roomCopies[r]||1));
+    if(copies===1) l.roomInstances.push(r);
+    else for(let i=1;i<=copies;i++) l.roomInstances.push(`${r} ${i}`);
+  });
+
+  l.venueMap={
+    Entrance:old.Entrance||{front:null,left:null,right:null,back:null},
+    Exit:old.Exit||{front:null,left:null,right:null,back:null}
+  };
   l.roomInstances.forEach(n=>l.venueMap[n]=old[n]||{front:null,left:null,right:null,back:null});
-  save();renderAll();toast('Room copies rebuilt');
+  save();renderAll();toast('Map rooms updated');
 }
 
 function availableFocusRooms(){
@@ -237,16 +269,38 @@ function bindEvents(){
     const un=e.target.closest('[data-unpin]');if(un)return togglePin(Number(un.dataset.unpin));
     const of=e.target.closest('[data-open-focus]');if(of)return openFocusOverlay(Number(of.dataset.openFocus));
     const loc=e.target.closest('[data-location]');if(loc){state.activeLocation=loc.dataset.location;renderAll();return}
-    const rt=e.target.closest('[data-room-toggle]');if(rt){const l=activeLocation(),r=rt.dataset.roomToggle;l.rooms=l.rooms.includes(r)?l.rooms.filter(x=>x!==r):[...l.rooms,r];renderAll();return}
+    const rt=e.target.closest('[data-room-toggle]');if(rt){
+      const l=activeLocation(),r=rt.dataset.roomToggle;
+      if(l.rooms.includes(r)){
+        l.rooms=l.rooms.filter(x=>x!==r);
+        delete l.roomCopies[r];
+      }else{
+        l.rooms=[...l.rooms,r];
+        l.roomCopies[r]=l.roomCopies[r]||1;
+      }
+      buildRoomCopies();return
+    }
     const gt=e.target.closest('[data-game-toggle]');if(gt){const l=activeLocation(),g=gt.dataset.gameToggle;l.games=l.games.includes(g)?l.games.filter(x=>x!==g):[...l.games,g];renderAll();return}
   });
   $('badgeSearch').addEventListener('input',renderBadges);$('badgeStatus').addEventListener('change',renderBadges);$('badgeAvailability').addEventListener('change',renderBadges);
   $('locationName').addEventListener('input',e=>{activeLocation().name=e.target.value;save();renderHome()});
   $('addLocation').onclick=()=>{const id='loc_'+Date.now();state.locations.push({id,name:'New location',rooms:[],games:[],roomCopies:{},roomInstances:[],venueMap:{Entrance:{front:null,left:null,right:null,back:null},Exit:{front:null,left:null,right:null,back:null}}});state.activeLocation=id;renderAll()};
   $('deleteLocation').onclick=()=>{if(state.locations.length===1)return toast('Keep at least one location');state.locations=state.locations.filter(l=>l.id!==state.activeLocation);state.activeLocation=state.locations[0].id;renderAll()};
-  $('allRooms').onclick=()=>{activeLocation().rooms=[...ROOMS];renderAll()};$('clearRooms').onclick=()=>{activeLocation().rooms=[];renderAll()};
+  $('allRooms').onclick=()=>{const l=activeLocation();l.rooms=[...ROOMS];l.rooms.forEach(r=>l.roomCopies[r]=l.roomCopies[r]||1);buildRoomCopies()};$('clearRooms').onclick=()=>{const l=activeLocation();l.rooms=[];l.roomCopies={};buildRoomCopies()};
   $('allGames').onclick=()=>{activeLocation().games=[...GAMES];renderAll()};$('clearGames').onclick=()=>{activeLocation().games=[];renderAll()};
-  document.addEventListener('change',e=>{const c=e.target.closest('[data-room-copy]');if(c){activeLocation().roomCopies[c.dataset.roomCopy]=Number(c.value);save()}});
+  document.addEventListener('change',e=>{
+  const dt=e.target.closest('[data-dup-toggle]');
+  if(dt){
+    const r=dt.dataset.dupToggle;
+    activeLocation().roomCopies[r]=dt.checked?2:1;
+    save();renderVenue();return;
+  }
+  const dc=e.target.closest('[data-dup-count]');
+  if(dc){
+    activeLocation().roomCopies[dc.dataset.dupCount]=Number(dc.value);
+    save();renderVenue();return;
+  }
+});
   $('buildRoomCopies').onclick=buildRoomCopies;$('mapNode').onchange=renderMapEditor;
   $('focusRoom').onchange=renderFocusChoices;$('focusShowEarned').onchange=renderFocusChoices;
   $('closeModal').onclick=()=>$('badgeModal').classList.remove('open');$('badgeModal').onclick=e=>{if(e.target.id==='badgeModal')$('badgeModal').classList.remove('open')};
