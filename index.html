@@ -93,29 +93,40 @@ h1{font-size:20px;margin:0}.sub,.label{color:var(--muted);font-size:12px}.label{
 <section id="locations" class="view"><div class="locationGrid"><div><div class="row between" style="margin-bottom:8px"><h2 style="margin:0">Locations</h2><button class="btn primary" id="addLoc">+ Add</button></div><div id="locList" class="loclist"></div></div><div class="card"><div class="row between wrap"><div style="min-width:230px;flex:1"><label class="label">Location name</label><input id="activeLocName" class="field" style="margin-top:5px"></div><button class="btn danger" id="deleteLoc">Delete</button></div><div class="sectionTitle"><h2>Rooms at this location</h2><div><button class="btn ghost" id="allRooms">All</button> <button class="btn ghost" id="noRooms">Clear</button></div></div><div id="roomToggles" class="toggleGrid"></div><div class="sectionTitle"><h2>Games available</h2><div><button class="btn ghost" id="allGames">All</button> <button class="btn ghost" id="noGames">Clear</button></div></div><div id="gameToggles" class="toggleGrid"></div><div class="sectionTitle"><h2>Room walking order</h2><span class="sub">Manual, because the app does not know your venue floor plan</span></div><div id="roomOrder" class="routeList"></div></div></div></section>
 
 
+
 <section id="planner" class="view">
   <div class="planGrid">
     <div class="card">
-      <div class="label">Focus setup</div>
-      <h2>Choose your own pins</h2>
-      <p class="sub">Focus is optional. Choose a room, then pick the badges you want from that room. You can pin up to 5 badges in total across any rooms.</p>
+      <div class="label">Focus mode</div>
+      <h2>Choose badges for this room</h2>
+      <p class="sub">Pick a room, then choose the badges you want to focus on. Nothing is selected automatically. You can pin up to 5 badges total across any rooms.</p>
+
       <label class="label">Players today</label>
       <select id="players" class="field" style="margin:5px 0 10px">
         <option value="1">1 player</option><option value="2">2 players</option><option value="3">3 players</option><option value="4">4 players</option>
         <option value="5">5 players</option><option value="6">6 players</option><option value="7">7 players</option><option value="8">8 players</option>
       </select>
-      <label class="label">Choose room</label>
-      <select id="focusRoom" class="field" style="margin:5px 0 8px"><option value="all">Any room</option></select>
+
+      <label class="label">Room</label>
+      <select id="focusRoom" class="field" style="margin:5px 0 8px"><option value="">Choose a room…</option></select>
+
+      <label class="row" style="margin:8px 0 10px">
+        <input id="showEarnedFocus" type="checkbox">
+        <span class="sub">Show earned badges too</span>
+      </label>
+
       <div id="focusRoomBadges" class="pinList"></div>
     </div>
+
     <div>
       <div class="sectionTitle"><h2>Pinned <span id="pinCounter" class="pill">0 / 5</span></h2><span class="sub">Optional focus list</span></div>
       <div id="pinList" class="pinList"></div>
-      <div class="sectionTitle"><h2>Room-grouped route</h2><span class="sub">Uses your venue connections when available</span></div>
+      <div class="sectionTitle"><h2>Room-grouped route</h2><span class="sub">Only uses badges you selected</span></div>
       <div id="routePlan" class="routeList"></div>
     </div>
   </div>
 </section>
+
 
 
 <section id="stats" class="view"><div id="statsGrid" class="statsGrid"></div><div class="hero" style="margin-top:12px"><div class="card"><div class="sectionTitle" style="margin-top:0"><h2>Earned by room</h2></div><div id="roomStats" class="historyList"></div></div><div class="card"><div class="sectionTitle" style="margin-top:0"><h2>Recent achievements</h2></div><div id="history" class="historyList"></div></div></div></section>
@@ -157,7 +168,7 @@ h1{font-size:20px;margin:0}.sub,.label{color:var(--muted);font-size:12px}.label{
   </div>
 </section>
 
-<section id="settings" class="view"><div class="card"><h2 style="margin-top:0">Your data</h2><p class="sub">Progress is stored on this device. v6 automatically imports prior v5/v4/v3 local progress if it is in the same browser profile.</p><div class="row wrap"><button class="btn primary" id="exportBtn2">Export backup</button><label class="btn">Restore backup<input id="importFile" type="file" accept="application/json" hidden></label><button class="btn danger" id="resetBtn">Reset app</button></div></div><div class="card" style="margin-top:12px"><h2 style="margin-top:0">Install / offline</h2><p class="sub">For a true one-tap home-screen app, host the ZIP contents on HTTPS, open index.html once in Samsung Internet or Chrome, and choose Install app / Add to Home screen. v6 includes 192px and 512px app icons and an offline service worker.</p></div></section>
+<section id="settings" class="view"><div class="card"><h2 style="margin-top:0">Your data</h2><p class="sub">Progress is stored on this device. v6 automatically imports prior v5/v4/v3 local progress if it is in the same browser profile.</p><div class="row wrap"><button class="btn primary" id="exportBtn2">Export backup</button><label class="btn">Restore backup<input id="importFile" type="file" accept="application/json" hidden></label><button class="btn danger" id="resetBtn">Reset app</button></div></div><div class="card" style="margin-top:12px"><h2 style="margin-top:0">Regional trophy information</h2><p class="sub">Trophy prizes/rewards are intentionally not shown because they can vary by country and location.</p></div><div class="card" style="margin-top:12px"><h2 style="margin-top:0">Install / offline</h2><p class="sub">For a true one-tap home-screen app, host the ZIP contents on HTTPS, open index.html once in Samsung Internet or Chrome, and choose Install app / Add to Home screen. v6 includes 192px and 512px app icons and an offline service worker.</p></div></section>
 </main>
 
 <nav class="nav"><button class="active" data-view="dashboard">⌂<br>Home</button><button data-view="badges">◈<br>Badges</button><button data-view="locations">⌖<br>Locations</button><button data-view="planner">◎<br>Focus</button><button data-view="stats">▥<br>Stats</button><button data-view="venue">◇<br>Venue</button><button data-view="settings">⚙<br>Settings</button></nav>
@@ -201,7 +212,14 @@ function available(b){
 function completionLabel(i){const c=state.completion[i];if(!c)return'';const l=state.locations.find(x=>x.id===c.locationId);return l?.name||c.locationName||'Unknown location'}
 function toast(t){const x=document.querySelector('.toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1700)}
 function currentTrophy(n=earnedCount()){if(n>=BADGES.length)return'Platinum';if(n>=75)return'Gold';if(n>=50)return'Silver';if(n>=25)return'Bronze';return'None'}
-function trophyInfo(n){const total=BADGES.length;if(n>=total)return['Platinum','100%','50% off admission for life + physical replica trophy'];if(n>=75)return['Gold',`${total-n} to Platinum`,'500 coins'];if(n>=50)return['Silver',`${75-n} to Gold`,'250 coins'];if(n>=25)return['Bronze',`${50-n} to Silver`,'100 coins'];return['No trophy yet',`${25-n} to Bronze`,'']}
+function trophyInfo(n){
+ const total=BADGES.length;
+ if(n>=total)return['Platinum','100%',''];
+ if(n>=75)return['Gold',`${total-n} to Platinum`,''];
+ if(n>=50)return['Silver',`${75-n} to Gold`,''];
+ if(n>=25)return['Bronze',`${50-n} to Silver`,''];
+ return['No trophy yet',`${25-n} to Bronze`,'']
+} to Platinum`,''];if(n>=50)return['Silver',`${75-n} to Gold`,''];if(n>=25)return['Bronze',`${50-n} to Silver`,''];return['No trophy yet',`${25-n} to Bronze`,'']}
 function celebrate(title,body,icon='🏆'){document.getElementById('celebrateTitle').textContent=title;document.getElementById('celebrateBody').textContent=body;document.getElementById('celebrateIcon').textContent=icon;document.getElementById('celebrate').classList.add('open')}
 function maybeCelebrate(oldCount,newCount,badgeName){
  const oldT=currentTrophy(oldCount),newT=currentTrophy(newCount);
@@ -224,8 +242,8 @@ function toggleEarn(i){
 function renderDashboard(){
  const n=earnedCount(),total=BADGES.length,pct=Math.round(n/total*100),t=trophyInfo(n),loc=activeLoc();
  document.getElementById('dashHero').innerHTML=`<div class="label">Current trophy</div><div class="big">${esc(t[0])}</div><div class="sub">${esc(t[1])}</div><div class="progress" style="margin-top:14px"><span style="width:${pct}%"></span></div><div class="metrics"><div class="metric"><span class="label">Earned</span><b>${n}</b></div><div class="metric"><span class="label">Complete</span><b>${pct}%</b></div><div class="metric"><span class="label">Location</span><b style="font-size:15px">${esc(loc?.name||'All')}</b></div></div>`;
- const trophies=[['Bronze',25,'100 coins'],['Silver',50,'250 coins'],['Gold',75,'500 coins'],['Platinum',total,'50% off + replica']];
- document.getElementById('trophyGrid').innerHTML=trophies.map(([name,need,reward])=>`<div class="card trophy ${n>=need?'unlocked':'locked'}"><div class="row between"><span class="cup">🏆</span><span class="pill">${n>=need?'Unlocked':`${Math.max(0,need-n)} left`}</span></div><h3>${name}</h3><div class="sub">${need===total?'100% of badges':need+' badges'} • ${reward}</div><div class="progress" style="margin-top:10px"><span style="width:${Math.min(100,n/need*100)}%"></span></div></div>`).join('');
+ const trophies=[['Bronze',25],['Silver',50],['Gold',75],['Platinum',total]];
+ document.getElementById('trophyGrid').innerHTML=trophies.map(([name,need])=>`<div class="card trophy ${n>=need?'unlocked':'locked'}"><div class="row between"><span class="cup">🏆</span><span class="pill">${n>=need?'Unlocked':`${Math.max(0,need-n)} left`}</span></div><h3>${name}</h3><div class="sub">${need===total?'100% of tracked badges':need+' badges'}</div><div class="progress" style="margin-top:10px"><span style="width:${Math.min(100,n/need*100)}%"></span></div></div>`).join('');
  const pins=state.pins.slice(0,5);
  document.getElementById('dashPins').innerHTML=pins.length?pins.map(i=>`<div class="pinCard"><div><b>${esc(BADGES[i].name)}</b><div class="sub">${esc(BADGES[i].room||'Any room')}</div></div><div class="pinActions"><button class="mini" data-focusbadge="${i}">Focus</button><button class="mini" data-completepin="${i}">✓</button></div></div>`).join(''):'<div class="empty">Pin challenges before your session for instant in-room access.</div>';
  const rec=recommendBadges(5);
@@ -406,17 +424,57 @@ function renderMapNode(){
 }
 function renderFocusRoomPicker(){
   const sel=document.getElementById('focusRoom');if(!sel)return;
-  const chosen=sel.value||'all';
-  sel.innerHTML='<option value="all">Any room</option>'+ROOMS.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
-  sel.value=[...ROOMS,'all'].includes(chosen)?chosen:'all';
+  const chosen=sel.value||'';
+  const loc=activeLoc();
+
+  let availableRooms=[];
+  if(loc.roomInstances && loc.roomInstances.length){
+    availableRooms=[...new Set(loc.roomInstances.map(roomTypeFromInstance))];
+  } else if(loc.rooms && loc.rooms.length){
+    availableRooms=[...loc.rooms];
+  } else {
+    availableRooms=[...ROOMS];
+  }
+
+  sel.innerHTML='<option value="">Choose a room…</option>'+availableRooms.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
+  sel.value=availableRooms.includes(chosen)?chosen:'';
   renderFocusRoomBadges();
 }
+
 function renderFocusRoomBadges(){
   const box=document.getElementById('focusRoomBadges');if(!box)return;
-  const room=document.getElementById('focusRoom').value;
-  const candidates=BADGES.map((b,i)=>[b,i]).filter(([b,i])=>!state.earned[i]&&available(b)&&(room==='all'||(b.room||'').split(/\s*\/\s*/).includes(room)));
-  box.innerHTML=candidates.length?candidates.map(([b,i])=>`<div class="pinCard"><div><b>${esc(b.name)}</b><div class="sub">${esc(b.how)}</div></div><button class="mini" data-choosepin="${i}" ${state.pins.includes(i)?'disabled':''}>${state.pins.includes(i)?'Pinned':'Pin'}</button></div>`).join(''):'<div class="empty">No unearned badges for this room.</div>';
+  const room=document.getElementById('focusRoom')?.value||'';
+  const showEarned=!!document.getElementById('showEarnedFocus')?.checked;
+
+  if(!room){
+    box.innerHTML='<div class="empty">Choose a room to see its badges.</div>';
+    return;
+  }
+
+  const candidates=BADGES.map((b,i)=>[b,i]).filter(([b,i])=>{
+    const roomParts=(b.room||'').split(/\s*\/\s*/).map(x=>x.trim()).filter(Boolean);
+    const belongs=roomParts.includes(room);
+    if(!belongs)return false;
+    if(!available(b))return false;
+    if(!showEarned && state.earned[i])return false;
+    return true;
+  });
+
+  box.innerHTML=candidates.length?candidates.map(([b,i])=>{
+    const pinned=state.pins.includes(i);
+    const earned=!!state.earned[i];
+    return `<div class="pinCard">
+      <div>
+        <b>${earned?'✓ ':''}${esc(b.name)}</b>
+        <div class="sub">${esc(b.how)}${b.game?' • '+esc(b.game):''}${b.level?' • L'+esc(b.level):''}</div>
+      </div>
+      <button class="mini" data-choosepin="${i}" ${pinned||state.pins.length>=5?'disabled':''}>
+        ${pinned?'Pinned':(state.pins.length>=5?'Limit 5':'Pin')}
+      </button>
+    </div>`;
+  }).join(''):'<div class="empty">No matching badges for this room.</div>';
 }
+
 function venueDistance(start,targets){
   ensureVenueState();const l=activeLoc();if(!l.venueMap||!start)return null;
   const q=[[start,0]],seen=new Set([start]);
@@ -458,9 +516,10 @@ document.addEventListener('change',e=>{
   const cr=e.target.closest('[data-copyroom]');if(cr){activeLoc().roomCopies[cr.dataset.copyroom]=+cr.value;save()}
 });
 document.addEventListener('click',e=>{
-  const cp=e.target.closest('[data-choosepin]');if(cp){const i=+cp.dataset.choosepin;if(state.pins.includes(i))return;if(state.pins.length>=5){toast('You can pin up to 5 badges');return}state.pins.push(i);renderAll();toast('Pinned')}
+  const cp=e.target.closest('[data-choosepin]');if(cp){const i=+cp.dataset.choosepin;if(state.pins.includes(i))return;if(state.pins.length>=5){toast('Focus list is full — maximum 5 badges');return}state.pins.push(i);renderAll();toast('Pinned')}
 });
 document.getElementById('focusRoom')?.addEventListener('change',renderFocusRoomBadges);
+document.getElementById('showEarnedFocus')?.addEventListener('change',renderFocusRoomBadges);
 document.getElementById('rebuildInstances')?.addEventListener('click',rebuildRoomInstances);
 document.getElementById('mapNodeSelect')?.addEventListener('change',renderMapNode);
 document.getElementById('clearVenueMap')?.addEventListener('click',()=>{const l=activeLoc();l.venueMap={Entrance:{front:null,left:null,right:null,back:null},Exit:{front:null,left:null,right:null,back:null}};l.roomInstances.forEach(n=>l.venueMap[n]={front:null,left:null,right:null,back:null});save();renderVenue()});

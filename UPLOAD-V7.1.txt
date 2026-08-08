@@ -1,0 +1,15 @@
+ACTIVATE BADGE TRACKER v7.1 — UK PRIZE CLEANUP
+
+CHANGE:
+- Removed trophy coin/prize/reward text from the app.
+- Trophy progression still shows Bronze 25, Silver 50, Gold 75, Platinum 100% of tracked badges.
+- Added a note that rewards vary by region/location.
+
+UPLOAD:
+1. Unzip this ZIP.
+2. GitHub > Activate-badge-tracker > Code > Add file > Upload files.
+3. Upload ALL files inside.
+4. Commit directly to main.
+5. Wait 1–3 minutes for GitHub Pages to update.
+
+You do not need to empty the repository first.
