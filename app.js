@@ -1,7 +1,7 @@
 
 'use strict';
 
-const VERSION='10.4.0';
+const VERSION='10.5.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -115,11 +115,19 @@ function ensureLocationShape(l){
 
 function availableHere(b){
   if(isTrophy(b)) return true;
+
   const l=activeLocation();
   const rp=roomParts(b), gp=gameParts(b);
-  const roomOk=!l.rooms.length || !rp.length || rp.some(r=>l.rooms.includes(r));
+
+  // Global targets (no room requirement) are not venue-dependent.
+  // Room-specific targets default to unavailable until that room is selected.
+  const roomOk=!rp.length ? true : (l.rooms.length>0 && rp.some(r=>l.rooms.includes(r)));
+
+  // If the target names a game, that game must be enabled for the active venue.
+  // With no room selected, room-specific game targets therefore remain unavailable.
   const enabled=enabledGameNames(l);
-  const gameOk=!gp.length || !l.rooms.length || gp.some(g=>enabled.includes(g));
+  const gameOk=!gp.length ? true : gp.some(g=>enabled.includes(g));
+
   return roomOk && gameOk;
 }
 

@@ -1,0 +1,16 @@
+SMARTY'S ACTIVATE TRACKER v10.5.0 — TARGET AVAILABILITY FIX
+
+CHANGE
+- Room-specific targets now default to UNAVAILABLE.
+- A room-specific target only becomes Available Here after the relevant room is selected for the active venue.
+- Game-specific targets also require that the inferred game is available at the venue.
+- Global targets with no room requirement remain available globally.
+- Trophies remain global.
+
+UPLOAD THESE FILES ONLY
+- index.html
+- app.js
+- sw.js
+
+Upload them to the ROOT of the GitHub repository and replace the existing files.
+Your artwork and CSS do not need to be changed.
