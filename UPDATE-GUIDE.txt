@@ -1,0 +1,51 @@
+NEON BRANDING UPDATE — SIMPLE GITHUB GUIDE
+
+You do NOT need to delete your repository or create a new one.
+
+1. Download Activate-Badge-Tracker-v6-Neon-Update.zip.
+2. On your phone/computer, unzip it.
+3. Open your GitHub repository:
+   djsmartyp / Activate-badge-tracker
+4. Go to the Code tab.
+5. Choose Add file > Upload files.
+6. Upload ALL files from the unzipped folder.
+   Important: upload the files themselves, not the ZIP.
+7. GitHub will warn that files with the same names already exist. That is expected.
+   The new files should replace/update:
+   index.html
+   manifest.webmanifest
+   sw.js
+   icon-192.png
+   icon-512.png
+   plus add:
+   icon-maskable-512.png
+   icon-1024.png
+   favicon-64.png
+   splash-portrait.png
+   splash-landscape.png
+8. At the bottom, enter a commit message such as:
+   Update neon branding and splash screens
+9. Choose Commit directly to the main branch.
+10. Tap Commit changes.
+11. Wait about 1-3 minutes for GitHub Pages to redeploy.
+12. Open:
+   https://djsmartyp.github.io/Activate-badge-tracker/
+13. If the old icon/design still appears:
+   - fully close the installed app/browser
+   - reopen it
+   - if still old, uninstall the home-screen app and install it again
+   Android often caches PWA icons aggressively.
+
+INSTALL ON GALAXY FOLD
+In Samsung Internet or Chrome:
+- Open the GitHub Pages URL.
+- Menu > Add to Home screen / Install app.
+- Accept “Badge Tracker”.
+- The neon trophy icon should be used.
+- When launched, a neon portrait or landscape splash appears briefly.
+- It then opens the tracker in standalone app mode.
+
+DO NOT WORRY ABOUT YOUR BADGES
+Replacing the hosted app files does not normally erase your badge progress.
+Your progress is stored in local browser/app storage.
+Still, use Settings > Export backup first if you have already entered a lot of data.

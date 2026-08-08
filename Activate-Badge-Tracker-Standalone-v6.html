@@ -68,6 +68,16 @@ h1{font-size:20px;margin:0}.sub,.label{color:var(--muted);font-size:12px}.label{
 .launchSplash.hide{opacity:0;visibility:hidden}
 @media(orientation:landscape){.launchSplash{background-image:url('splash-landscape.png')}}
 .launchSplash span{position:absolute;left:-9999px}
+
+.venueSetup{display:grid;grid-template-columns:320px 1fr;gap:12px}
+.instanceList,.mapList{display:grid;gap:8px}
+.instanceRow,.mapRow{padding:12px;border:1px solid var(--line);border-radius:15px;background:#101521}
+.instanceRow.active{border-color:var(--purple)}
+.mapGrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:end}
+.mapGrid .wide{grid-column:1/-1}
+.stepHint{padding:12px;border-radius:14px;background:rgba(117,69,255,.08);border:1px solid rgba(117,69,255,.25);color:#d9d2ff}
+.directionLabel{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+@media(max-width:780px){.venueSetup{grid-template-columns:1fr}.mapGrid{grid-template-columns:1fr}}
 </style></head><body><div id="launchSplash" class="launchSplash" aria-label="Badge Tracker loading"><span>Badge Tracker loading</span></div>
 <div class="toast" aria-live="polite"></div>
 <main class="app"><header class="topbar"><div class="brand"><img src="icon-192.png" alt=""><div><h1>Badge Tracker</h1><div class="sub">Activate-inspired personal companion</div></div></div><button class="iconbtn" id="exportBtn">Backup</button></header>
@@ -82,14 +92,75 @@ h1{font-size:20px;margin:0}.sub,.label{color:var(--muted);font-size:12px}.label{
 
 <section id="locations" class="view"><div class="locationGrid"><div><div class="row between" style="margin-bottom:8px"><h2 style="margin:0">Locations</h2><button class="btn primary" id="addLoc">+ Add</button></div><div id="locList" class="loclist"></div></div><div class="card"><div class="row between wrap"><div style="min-width:230px;flex:1"><label class="label">Location name</label><input id="activeLocName" class="field" style="margin-top:5px"></div><button class="btn danger" id="deleteLoc">Delete</button></div><div class="sectionTitle"><h2>Rooms at this location</h2><div><button class="btn ghost" id="allRooms">All</button> <button class="btn ghost" id="noRooms">Clear</button></div></div><div id="roomToggles" class="toggleGrid"></div><div class="sectionTitle"><h2>Games available</h2><div><button class="btn ghost" id="allGames">All</button> <button class="btn ghost" id="noGames">Clear</button></div></div><div id="gameToggles" class="toggleGrid"></div><div class="sectionTitle"><h2>Room walking order</h2><span class="sub">Manual, because the app does not know your venue floor plan</span></div><div id="roomOrder" class="routeList"></div></div></div></section>
 
-<section id="planner" class="view"><div class="planGrid"><div class="card"><div class="label">Session setup</div><h2>Focus mode</h2><p class="sub">Set your player count, pin targets, then use the large in-room screen. Complete & Next records the badge, removes its pin and loads the next challenge.</p><label class="label">Players today</label><select id="players" class="field" style="margin:5px 0 10px"><option value="1">1 player</option><option value="2">2 players</option><option value="3">3 players</option><option value="4">4 players</option><option value="5">5 players</option><option value="6">6 players</option><option value="7">7 players</option><option value="8">8 players</option></select><label class="label">Quick-pin available badges</label><select id="planRoom" class="field" style="margin:5px 0 8px"><option value="all">Any room</option><option>Arena</option><option>Climb</option><option>Control</option><option>Grid</option><option>Grip</option><option>Hide</option><option>Hoops</option><option>Laser</option><option>Mega Grid</option><option>Mega Laser</option><option>Pipes</option><option>Portals</option><option>Press</option><option>Push</option><option>Scan</option><option>Strike</option><option>Trench</option><option>Photo</option></select><button id="pinAvailable" class="btn primary" style="width:100%">Pin up to 10 available</button></div><div><div id="pinList" class="pinList"></div><div class="sectionTitle"><h2>Room-grouped route</h2><span class="sub">Uses your manual room order</span></div><div id="routePlan" class="routeList"></div></div></div></section>
+
+<section id="planner" class="view">
+  <div class="planGrid">
+    <div class="card">
+      <div class="label">Focus setup</div>
+      <h2>Choose your own pins</h2>
+      <p class="sub">Focus is optional. Choose a room, then pick the badges you want from that room. You can pin up to 5 badges in total across any rooms.</p>
+      <label class="label">Players today</label>
+      <select id="players" class="field" style="margin:5px 0 10px">
+        <option value="1">1 player</option><option value="2">2 players</option><option value="3">3 players</option><option value="4">4 players</option>
+        <option value="5">5 players</option><option value="6">6 players</option><option value="7">7 players</option><option value="8">8 players</option>
+      </select>
+      <label class="label">Choose room</label>
+      <select id="focusRoom" class="field" style="margin:5px 0 8px"><option value="all">Any room</option></select>
+      <div id="focusRoomBadges" class="pinList"></div>
+    </div>
+    <div>
+      <div class="sectionTitle"><h2>Pinned <span id="pinCounter" class="pill">0 / 5</span></h2><span class="sub">Optional focus list</span></div>
+      <div id="pinList" class="pinList"></div>
+      <div class="sectionTitle"><h2>Room-grouped route</h2><span class="sub">Uses your venue connections when available</span></div>
+      <div id="routePlan" class="routeList"></div>
+    </div>
+  </div>
+</section>
+
 
 <section id="stats" class="view"><div id="statsGrid" class="statsGrid"></div><div class="hero" style="margin-top:12px"><div class="card"><div class="sectionTitle" style="margin-top:0"><h2>Earned by room</h2></div><div id="roomStats" class="historyList"></div></div><div class="card"><div class="sectionTitle" style="margin-top:0"><h2>Recent achievements</h2></div><div id="history" class="historyList"></div></div></div></section>
+
+
+<section id="venue" class="view">
+  <div class="venueSetup">
+    <div>
+      <div class="card">
+        <div class="label">Venue editor</div>
+        <h2>Room copies</h2>
+        <p class="sub">Choose how many copies of each room exist at this location. The app creates Laser 1, Laser 2, Strike 1, etc.</p>
+        <div id="roomCopyControls" class="instanceList"></div>
+        <div class="row wrap" style="margin-top:10px">
+          <button id="rebuildInstances" class="btn primary">Build room copies</button>
+          <button id="clearVenueMap" class="btn ghost">Clear map</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="label">Start point</div>
+        <h2>Entrance orientation</h2>
+        <p class="sub">The venue map always starts at the Entrance facing forward into the venue.</p>
+        <div class="stepHint">Forward means continue in the direction you are currently facing. Left and Right are only for an alcove, side corridor or a turn.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row between wrap">
+        <div>
+          <div class="label">Map connections</div>
+          <h2 style="margin:4px 0">Connect each room instance</h2>
+        </div>
+        <select id="mapNodeSelect" class="field" style="max-width:280px"></select>
+      </div>
+      <div id="mapEditor" style="margin-top:12px"></div>
+      <div class="sectionTitle"><h2>Venue summary</h2><span class="sub">Entrance and Exit are always available</span></div>
+      <div id="venueSummary" class="mapList"></div>
+    </div>
+  </div>
+</section>
 
 <section id="settings" class="view"><div class="card"><h2 style="margin-top:0">Your data</h2><p class="sub">Progress is stored on this device. v6 automatically imports prior v5/v4/v3 local progress if it is in the same browser profile.</p><div class="row wrap"><button class="btn primary" id="exportBtn2">Export backup</button><label class="btn">Restore backup<input id="importFile" type="file" accept="application/json" hidden></label><button class="btn danger" id="resetBtn">Reset app</button></div></div><div class="card" style="margin-top:12px"><h2 style="margin-top:0">Install / offline</h2><p class="sub">For a true one-tap home-screen app, host the ZIP contents on HTTPS, open index.html once in Samsung Internet or Chrome, and choose Install app / Add to Home screen. v6 includes 192px and 512px app icons and an offline service worker.</p></div></section>
 </main>
 
-<nav class="nav"><button class="active" data-view="dashboard">⌂<br>Home</button><button data-view="badges">◈<br>Badges</button><button data-view="locations">⌖<br>Locations</button><button data-view="planner">◎<br>Focus</button><button data-view="stats">▥<br>Stats</button><button data-view="settings">⚙<br>Settings</button></nav>
+<nav class="nav"><button class="active" data-view="dashboard">⌂<br>Home</button><button data-view="badges">◈<br>Badges</button><button data-view="locations">⌖<br>Locations</button><button data-view="planner">◎<br>Focus</button><button data-view="stats">▥<br>Stats</button><button data-view="venue">◇<br>Venue</button><button data-view="settings">⚙<br>Settings</button></nav>
 
 <div id="detailModal" class="modal"><div class="sheet"><div class="row between"><h2 id="detailTitle"></h2><button class="iconbtn" id="closeDetail">✕</button></div><div id="detailBody"></div><div class="row wrap" style="margin-top:14px"><button class="btn success" id="detailEarn"></button><button class="btn" id="detailPin"></button><button class="btn" id="detailFav"></button><button class="btn primary" id="focusFromDetail">Open Focus mode</button></div></div></div>
 
@@ -204,7 +275,7 @@ function renderStats(){
  document.getElementById('roomStats').innerHTML=Object.entries(byRoom).sort((a,b)=>b[1]-a[1]).map(([r,c])=>`<div class="historyItem row between"><span>${esc(r)}</span><b>${c}</b></div>`).join('');
  document.getElementById('history').innerHTML=state.history.slice(0,20).map(h=>{const b=BADGES[h.badge],c=state.completion[h.badge]||{},l=state.locations.find(x=>x.id===c.locationId);return `<div class="historyItem"><b>${esc(b?.name||'Badge')}</b><div class="sub">${esc(c.date||h.date||'')} • ${esc(l?.name||c.locationName||'Unknown location')}${c.players?' • '+c.players+' players':''}</div></div>`}).join('')||'<div class="empty">Your recent completed badges will appear here.</div>';
 }
-function renderAll(){renderDashboard();renderBadges();renderLocations();renderPins();renderStats();save()}
+function renderAll(){renderDashboard();renderBadges();renderLocations();renderPins();renderStats();renderVenue();save()}
 function openBadge(i){
  selectedBadge=i;const b=BADGES[i],c=state.completion[i]||{};
  document.getElementById('detailTitle').textContent=b.name;
@@ -269,8 +340,131 @@ function exportData(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'
 document.getElementById('exportBtn').onclick=exportData;document.getElementById('exportBtn2').onclick=exportData;
 document.getElementById('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state=Object.assign({},defaultState,JSON.parse(r.result));renderAll();toast('Backup restored')}catch{toast('Could not read backup')}};r.readAsText(f)};
 document.getElementById('resetBtn').onclick=()=>{if(confirm('Reset all badge progress, locations, pins, favourites and notes?')){state=structuredClone(defaultState);renderAll()}};
-document.getElementById('pinAvailable').onclick=()=>{const room=document.getElementById('planRoom').value;const picks=BADGES.map((b,i)=>[b,i]).filter(([b,i])=>!state.earned[i]&&available(b)&&(room==='all'||(b.room||'').includes(room))).slice(0,10).map(x=>x[1]);state.pins=[...new Set([...state.pins,...picks])];renderAll();toast(`${picks.length} available badges added to pins`)};
 document.getElementById('celebrateClose').onclick=()=>document.getElementById('celebrate').classList.remove('open');
+
+// ===== v7 Venue / Focus extensions =====
+function ensureVenueState(){
+  state.locations.forEach(l=>{
+    l.roomCopies=l.roomCopies||{};
+    l.roomInstances=l.roomInstances||[];
+    l.venueMap=l.venueMap||{};
+    l.venueMap.Entrance=l.venueMap.Entrance||{front:null,left:null,right:null,back:null};
+    l.venueMap.Exit=l.venueMap.Exit||{front:null,left:null,right:null,back:null};
+  });
+}
+function roomTypeFromInstance(name){
+  if(name==='Entrance'||name==='Exit')return name;
+  return name.replace(/\s+\d+$/,'');
+}
+function rebuildRoomInstances(){
+  const l=activeLoc(); ensureVenueState();
+  const instances=[];
+  ROOMS.forEach(r=>{
+    const count=+(l.roomCopies[r]||0);
+    for(let i=1;i<=count;i++)instances.push(`${r} ${i}`);
+  });
+  const oldMap=l.venueMap||{};
+  l.roomInstances=instances;
+  l.venueMap={Entrance:oldMap.Entrance||{front:null,left:null,right:null,back:null},Exit:oldMap.Exit||{front:null,left:null,right:null,back:null}};
+  instances.forEach(n=>l.venueMap[n]=oldMap[n]||{front:null,left:null,right:null,back:null});
+  save();renderVenue();renderFocusRoomPicker();renderRoute();
+}
+function nodeOptions(current){
+  const l=activeLoc();const nodes=['Entrance',...l.roomInstances,'Exit'];
+  return `<option value="">None</option>`+nodes.filter(n=>n!==current).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+}
+function renderVenue(){
+  ensureVenueState();const l=activeLoc();
+  const copies=document.getElementById('roomCopyControls');
+  if(!copies)return;
+  copies.innerHTML=ROOMS.map(r=>`<div class="instanceRow row between"><span>${esc(r)}</span><select class="field" style="max-width:100px" data-copyroom="${esc(r)}">${[0,1,2,3,4,5,6].map(n=>`<option value="${n}" ${+(l.roomCopies[r]||0)===n?'selected':''}>${n}</option>`).join('')}</select></div>`).join('');
+  const sel=document.getElementById('mapNodeSelect');
+  const nodes=['Entrance',...l.roomInstances,'Exit'];
+  const prev=sel.value||'Entrance';
+  sel.innerHTML=nodes.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  sel.value=nodes.includes(prev)?prev:'Entrance';
+  renderMapNode();
+  document.getElementById('venueSummary').innerHTML=nodes.map(n=>{
+    const m=l.venueMap[n]||{};
+    const bits=[m.front&&`Front → ${m.front}`,m.left&&`Left → ${m.left}`,m.right&&`Right → ${m.right}`,m.back&&`Back → ${m.back}`].filter(Boolean);
+    return `<div class="mapRow"><b>${esc(n)}</b><div class="sub">${bits.length?esc(bits.join(' • ')):'No connections set'}</div></div>`
+  }).join('');
+}
+function renderMapNode(){
+  ensureVenueState();const l=activeLoc(),node=document.getElementById('mapNodeSelect').value||'Entrance',m=l.venueMap[node]||{front:null,left:null,right:null,back:null};
+  const editor=document.getElementById('mapEditor');
+  if(!editor)return;
+  const opts=nodeOptions(node);
+  editor.innerHTML=`<div class="mapGrid">
+    <div><div class="directionLabel">Left</div><select class="field" data-dir="left">${opts}</select></div>
+    <div><div class="directionLabel">Front</div><select class="field" data-dir="front">${opts}</select></div>
+    <div><div class="directionLabel">Right</div><select class="field" data-dir="right">${opts}</select></div>
+    <div class="wide"><div class="directionLabel">Back</div><select class="field" data-dir="back">${opts}</select></div>
+  </div>`;
+  ['left','front','right','back'].forEach(d=>editor.querySelector(`[data-dir="${d}"]`).value=m[d]||'');
+  editor.querySelectorAll('[data-dir]').forEach(s=>s.onchange=()=>{l.venueMap[node]=l.venueMap[node]||{};l.venueMap[node][s.dataset.dir]=s.value||null;save();renderVenue()});
+}
+function renderFocusRoomPicker(){
+  const sel=document.getElementById('focusRoom');if(!sel)return;
+  const chosen=sel.value||'all';
+  sel.innerHTML='<option value="all">Any room</option>'+ROOMS.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
+  sel.value=[...ROOMS,'all'].includes(chosen)?chosen:'all';
+  renderFocusRoomBadges();
+}
+function renderFocusRoomBadges(){
+  const box=document.getElementById('focusRoomBadges');if(!box)return;
+  const room=document.getElementById('focusRoom').value;
+  const candidates=BADGES.map((b,i)=>[b,i]).filter(([b,i])=>!state.earned[i]&&available(b)&&(room==='all'||(b.room||'').split(/\s*\/\s*/).includes(room)));
+  box.innerHTML=candidates.length?candidates.map(([b,i])=>`<div class="pinCard"><div><b>${esc(b.name)}</b><div class="sub">${esc(b.how)}</div></div><button class="mini" data-choosepin="${i}" ${state.pins.includes(i)?'disabled':''}>${state.pins.includes(i)?'Pinned':'Pin'}</button></div>`).join(''):'<div class="empty">No unearned badges for this room.</div>';
+}
+function venueDistance(start,targets){
+  ensureVenueState();const l=activeLoc();if(!l.venueMap||!start)return null;
+  const q=[[start,0]],seen=new Set([start]);
+  while(q.length){
+    const [n,d]=q.shift();if(targets.includes(n))return d;
+    const m=l.venueMap[n]||{};
+    for(const nxt of [m.front,m.left,m.right,m.back])if(nxt&&!seen.has(nxt)){seen.add(nxt);q.push([nxt,d+1])}
+  }
+  return null;
+}
+function renderRoute(){
+  const box=document.getElementById('routePlan');if(!box)return;
+  ensureVenueState();const l=activeLoc();
+  if(!state.pins.length){box.innerHTML='<div class="empty">No pinned badges.</div>';return}
+  const grouped={};
+  state.pins.forEach(i=>{const room=(BADGES[i].room||'General').split(/\s*\/\s*/)[0];(grouped[room]??=[]).push(i)});
+  let current='Entrance',order=[];
+  const remaining=new Set(Object.keys(grouped));
+  while(remaining.size){
+    let best=null,bestD=1e9,bestInst=null;
+    for(const r of remaining){
+      const inst=l.roomInstances.filter(x=>roomTypeFromInstance(x)===r);
+      if(!inst.length){if(best===null){best=r;bestInst=null}continue}
+      const d=venueDistance(current,inst);
+      if(d!==null&&d<bestD){best=r;bestD=d;bestInst=inst.find(x=>venueDistance(current,[x])===d)}
+    }
+    if(best===null)best=[...remaining][0];
+    order.push([best,bestInst]);remaining.delete(best);if(bestInst)current=bestInst;
+  }
+  box.innerHTML=order.map(([r,inst],idx)=>`<div class="routeItem"><div class="routeNum">${idx+1}</div><div><b>${esc(inst||r)}</b><div class="sub">${grouped[r].length} pinned challenge${grouped[r].length===1?'':'s'} • ${grouped[r].map(i=>BADGES[i].name).join(', ')}</div></div><button class="mini" data-focusbadge="${grouped[r][0]}">Focus</button></div>`).join('');
+}
+function renderPins(){
+  const pins=state.pins;const counter=document.getElementById('pinCounter');if(counter)counter.textContent=`${pins.length} / 5`;
+  const list=document.getElementById('pinList');if(list)list.innerHTML=pins.length?pins.map((i,idx)=>{const b=BADGES[i];return `<div class="pinCard"><div><b>${esc(b.name)}</b><div class="sub">${esc(b.room||'Any room')}${b.game?' • '+esc(b.game):''}${b.level?' • L'+esc(b.level):''}</div></div><div class="pinActions"><button class="btn success" data-completepin="${i}">✓ Complete & remove</button><button class="mini" data-focus="${idx}">Focus</button><button class="mini" data-unpin="${i}">✕</button></div></div>`}).join(''):'<div class="empty">No pinned badges.</div>';
+  renderFocusRoomPicker();renderRoute();
+}
+ensureVenueState();
+document.addEventListener('change',e=>{
+  const cr=e.target.closest('[data-copyroom]');if(cr){activeLoc().roomCopies[cr.dataset.copyroom]=+cr.value;save()}
+});
+document.addEventListener('click',e=>{
+  const cp=e.target.closest('[data-choosepin]');if(cp){const i=+cp.dataset.choosepin;if(state.pins.includes(i))return;if(state.pins.length>=5){toast('You can pin up to 5 badges');return}state.pins.push(i);renderAll();toast('Pinned')}
+});
+document.getElementById('focusRoom')?.addEventListener('change',renderFocusRoomBadges);
+document.getElementById('rebuildInstances')?.addEventListener('click',rebuildRoomInstances);
+document.getElementById('mapNodeSelect')?.addEventListener('change',renderMapNode);
+document.getElementById('clearVenueMap')?.addEventListener('click',()=>{const l=activeLoc();l.venueMap={Entrance:{front:null,left:null,right:null,back:null},Exit:{front:null,left:null,right:null,back:null}};l.roomInstances.forEach(n=>l.venueMap[n]={front:null,left:null,right:null,back:null});save();renderVenue()});
+
 if('serviceWorker' in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('./sw.js').catch(()=>{});
 renderAll();
 </script><script>
