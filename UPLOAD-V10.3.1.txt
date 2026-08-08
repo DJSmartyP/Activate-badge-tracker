@@ -1,0 +1,15 @@
+SMARTY'S ACTIVATE TRACKER v10.3.1 — SPLASH RELEASE HOTFIX
+
+BUG FIX
+- v10.3 correctly enforced the 4-second splash hold but did not release the splash on a successful app load.
+- This hotfix adds one controlled release function.
+- Splash remains visible for a minimum of 4 seconds, then hides once the app is ready.
+- Error states also release the splash after the same minimum hold.
+
+UPLOAD THESE FILES ONLY
+- index.html
+- app.js
+- sw.js
+
+Upload to the ROOT of your GitHub repository and replace the existing files.
+Your graphics and style.css do not need to be changed.

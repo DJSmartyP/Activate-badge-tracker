@@ -3,7 +3,7 @@ const APP_BOOT_STARTED=Date.now();
 
 'use strict';
 
-const VERSION='10.3.0';
+const VERSION='10.3.1';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -332,16 +332,25 @@ function exportBackup(){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='activate-badge-backup-v8.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 
+
+function releaseSplash(){
+  const remaining=Math.max(0,SPLASH_MIN_MS-(Date.now()-APP_BOOT_STARTED));
+  setTimeout(()=>{
+    const splash=$('splash');
+    if(splash)splash.classList.add('hide');
+  },remaining);
+}
+
 async function init(){
   try{
     const [badgeRes,roomRes]=await Promise.all([fetch('badges.json',{cache:'no-store'}),fetch('rooms.json',{cache:'no-store'})]);
     if(!badgeRes.ok||!roomRes.ok)throw new Error('Data files failed to load');
     BADGES=await badgeRes.json();addTrophyTargets();
     const roomData=await roomRes.json();ROOMS=roomData.rooms||[];GAMES=roomData.games||[];GAME_CATALOG=roomData.catalog||{};COMPETITIVE_INFO=roomData.competitiveInfo||{};
-    loadState();syncTrophyEarned();bindEvents();renderAll();
+    loadState();syncTrophyEarned();bindEvents();renderAll();releaseSplash();
 }catch(err){
     console.error(err);
-    setTimeout(()=>{$('splash').classList.add('hide')},Math.max(0,SPLASH_MIN_MS-(Date.now()-APP_BOOT_STARTED)));
+    releaseSplash();
     document.body.insertAdjacentHTML('afterbegin',`<div style="padding:16px;background:#5b1125;color:white">App failed to load: ${esc(err.message)}. Refresh the page after GitHub Pages finishes deploying.</div>`);
   }
 }
