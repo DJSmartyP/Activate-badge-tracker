@@ -5,7 +5,7 @@
   inset:0;
   z-index:500;
   background-color:#03040a;
-  background-image:url('splash-portrait.png');
+  background-image:url('splash-portrait.png?v=108');
   background-position:center;
   background-repeat:no-repeat;
   background-size:cover;
@@ -180,14 +180,14 @@ linear-gradient(65deg,transparent 0 57%,rgba(0,230,255,.03) 58% 59%,transparent 
    Inner display artwork: 4:3 landscape */
 @media (orientation:portrait){
   .launch-splash{
-    background-image:url('splash-portrait.png');
+    background-image:url('splash-portrait.png?v=108');
     aspect-ratio:auto;
     background-size:cover;
   }
 }
 @media (orientation:landscape){
   .launch-splash{
-    background-image:url('splash-landscape.png');
+    background-image:url('splash-landscape.png?v=108');
     background-size:cover;
   }
 }
@@ -207,33 +207,4 @@ linear-gradient(65deg,transparent 0 57%,rgba(0,230,255,.03) 58% 59%,transparent 
   .launch-splash{background-size:100% auto}
 }
 
-.splash-enter{
-  position:absolute;
-  left:50%;
-  bottom:max(34px,env(safe-area-inset-bottom));
-  transform:translateX(-50%);
-  width:min(78vw,360px);
-  padding:14px 22px;
-  border-radius:999px;
-  border:1px solid rgba(0,229,255,.72);
-  background:rgba(5,8,18,.82);
-  color:#eafdff;
-  font-weight:900;
-  letter-spacing:.12em;
-  box-shadow:
-    0 0 0 1px rgba(255,0,200,.16),
-    0 0 20px rgba(0,229,255,.25),
-    0 0 38px rgba(255,0,200,.16);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-  text-shadow:0 0 10px rgba(0,229,255,.65);
-}
-.splash-enter:active{
-  transform:translateX(-50%) scale(.97);
-}
-@media (orientation:landscape){
-  .splash-enter{
-    bottom:max(24px,env(safe-area-inset-bottom));
-    width:min(40vw,380px);
-  }
-}
+

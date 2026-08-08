@@ -1,0 +1,25 @@
+ACTIVATE TRACKER v10.8.0 — ARTWORK CACHE FIX
+
+ROOT CAUSE
+The service worker was using cache-first behaviour for PNG files. Replacing a PNG in GitHub
+under the same filename did not force the installed app to fetch it again.
+
+FIX
+- New service-worker cache namespace.
+- Artwork is now network-first, with cached fallback for offline use.
+- Splash and icon URLs have a ?v=108 cache-busting suffix.
+- Future PNG replacements should update much more reliably.
+
+UPLOAD THESE FILES ONLY
+- index.html
+- style.css
+- manifest.webmanifest
+- sw.js
+
+Your PNG files are already in GitHub and do NOT need to be uploaded again for this fix.
+
+After GitHub Pages redeploys:
+1. Open the website once in Chrome.
+2. Wait about 10 seconds.
+3. Reload once.
+4. Then reopen the installed PWA.

@@ -1,5 +1,51 @@
-const CACHE='activate-tracker-v10-7-0';
-const ASSETS=['./','index.html','style.css','app.js','badges.json','rooms.json','manifest.webmanifest','icon-192.png','icon-512.png','icon-maskable-512.png','favicon-64.png','splash-portrait.png','splash-landscape.png'];
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
-self.addEventListener('activate',e=>e.waitUntil(Promise.all([self.clients.claim(),caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))])));
-self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{const copy=res.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));return res}))));
+const CACHE='activate-tracker-v10-8-0';
+const ASSETS=[
+  './','index.html','style.css','app.js','badges.json','rooms.json','manifest.webmanifest',
+  'icon-192.png?v=108','icon-512.png?v=108','icon-maskable-512.png?v=108',
+  'favicon-64.png?v=108','splash-portrait.png?v=108','splash-landscape.png?v=108'
+];
+
+self.addEventListener('install', event => {
+  self.skipWaiting();
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)));
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)));
+    await self.clients.claim();
+  })());
+});
+
+self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+  const isArtwork = /\.(png|jpg|jpeg|webp)$/i.test(url.pathname);
+
+  if (isArtwork) {
+    // Network-first so replacing an image in GitHub is visible immediately.
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(event.request, {cache:'no-store'});
+        const cache = await caches.open(CACHE);
+        cache.put(event.request, fresh.clone());
+        return fresh;
+      } catch (err) {
+        return (await caches.match(event.request)) || Response.error();
+      }
+    })());
+    return;
+  }
+
+  // App shell: network first, cached fallback.
+  event.respondWith((async () => {
+    try {
+      const fresh = await fetch(event.request);
+      const cache = await caches.open(CACHE);
+      cache.put(event.request, fresh.clone());
+      return fresh;
+    } catch (err) {
+      return (await caches.match(event.request)) || Response.error();
+    }
+  })());
+});
