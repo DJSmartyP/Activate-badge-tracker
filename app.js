@@ -1,7 +1,7 @@
 
 'use strict';
 
-const VERSION='9.1.0';
+const VERSION='9.2.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -218,13 +218,27 @@ function availableFocusRooms(){
 
 
 function renderCompetitive(){
-  const rows=competitiveEntries();
-  $('competitiveCount').textContent=`${rows.length} games`;
+  const all=competitiveEntries();
+  const roomSel=$('competitiveRoom');
+  const currentRoom=roomSel.value||'';
+  const rooms=[...new Set(all.map(x=>x.room))].sort((a,b)=>a.localeCompare(b));
+  roomSel.innerHTML='<option value="">All rooms</option>'+rooms.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
+  roomSel.value=rooms.includes(currentRoom)?currentRoom:'';
+
+  const q=($('competitiveSearch').value||'').trim().toLowerCase();
+  const room=roomSel.value;
+  const rows=all.filter(x=>{
+    const nameOk=!q||x.game.toLowerCase().includes(q);
+    const roomOk=!room||x.room===room;
+    return nameOk&&roomOk;
+  });
+
+  $('competitiveCount').textContent=`${rows.length} game${rows.length===1?'':'s'}`;
   $('competitiveList').innerHTML=rows.length?rows.map(x=>`<article class="badge comp-game" data-comp-room="${esc(x.room)}" data-comp-game="${esc(x.game)}">
     <div class="checkbtn">⚔</div>
     <div><h3>${esc(x.game)}</h3><p>Tap to see how the game is played.</p><div class="tags"><span class="tag">${esc(x.room)}</span><span class="tag ok">Competitive</span></div></div>
     <div><button class="mini" data-comp-room="${esc(x.room)}" data-comp-game="${esc(x.game)}">›</button></div>
-  </article>`).join(''):'<div class="item sub">No competitive games are listed for the rooms selected at this location.</div>';
+  </article>`).join(''):'<div class="item sub">No competitive games match those filters.</div>';
 }
 
 function openCompetitiveGame(room,game){
@@ -330,7 +344,7 @@ function bindEvents(){
     }
     const gt=e.target.closest('[data-game-toggle]');if(gt){const l=activeLocation(),g=gt.dataset.gameToggle;l.games=l.games.includes(g)?l.games.filter(x=>x!==g):[...l.games,g];renderAll();return}
   });
-  $('badgeSearch').addEventListener('input',renderBadges);$('targetRoom').addEventListener('change',renderBadges);$('badgeStatus').addEventListener('change',renderBadges);$('badgeAvailability').addEventListener('change',renderBadges);
+  $('badgeSearch').addEventListener('input',renderBadges);$('competitiveSearch').addEventListener('input',renderCompetitive);$('competitiveRoom').addEventListener('change',renderCompetitive);$('targetRoom').addEventListener('change',renderBadges);$('badgeStatus').addEventListener('change',renderBadges);$('badgeAvailability').addEventListener('change',renderBadges);
   $('locationName').addEventListener('input',e=>{activeLocation().name=e.target.value;save();renderHome()});
   $('addLocation').onclick=()=>{const id='loc_'+Date.now();state.locations.push({id,name:'New location',rooms:[],games:[],roomCopies:{},roomInstances:[],venueMap:{Entrance:{front:null,left:null,right:null,back:null},Exit:{front:null,left:null,right:null,back:null}}});state.activeLocation=id;renderAll()};
   $('deleteLocation').onclick=()=>{if(state.locations.length===1)return toast('Keep at least one location');state.locations=state.locations.filter(l=>l.id!==state.activeLocation);state.activeLocation=state.locations[0].id;renderAll()};

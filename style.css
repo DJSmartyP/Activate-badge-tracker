@@ -38,3 +38,5 @@ linear-gradient(65deg,transparent 0 57%,rgba(0,230,255,.03) 58% 59%,transparent 
 .game-card-room{font-size:14px;color:var(--cyan);margin-bottom:14px}
 .game-how{font-size:clamp(18px,3vw,26px);line-height:1.45;padding:18px;border-radius:18px;background:linear-gradient(180deg,rgba(22,28,45,.96),rgba(12,16,27,.96));border:1px solid rgba(0,230,255,.22)}
 .game-how strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px}
+
+.comp-toolbar{grid-template-columns:1fr 180px}@media(max-width:780px){.comp-toolbar{grid-template-columns:1fr}}

@@ -1,0 +1,11 @@
+SMARTY'S ACTIVATE TRACKER v9.2.0 — COMPETITIVE FILTERS
+
+NEW
+- Competitive menu can be filtered by GAME NAME using a search box.
+- Competitive menu can also be filtered by ROOM.
+- Both filters work together.
+- Competitive game cards still open the full 'How to play' explanation.
+
+UPLOAD
+Unzip this package and upload EVERY file inside to the ROOT of your GitHub repository.
+Replace same-named files, commit to main, wait 1–3 minutes, then refresh the app.
