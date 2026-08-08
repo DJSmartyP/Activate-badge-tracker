@@ -33,10 +33,10 @@
         <div class="card">
           <div class="row between">
             <div>
-              <div class="label">Focus</div>
+              <div class="label">Pinned targets</div>
               <h2>Pinned badges</h2>
             </div>
-            <button class="btn primary" data-view="focus">Open</button>
+            <button class="btn primary" data-view="badges">Open</button>
           </div>
           <div id="homePins" class="stack"></div>
         </div>
@@ -47,24 +47,39 @@
       <div id="recent" class="stack"></div>
     </section>
 
-    <section id="badges" class="view">
-      <div class="toolbar">
-        <input id="badgeSearch" class="field" type="search" placeholder="Search badge, room or game">
-        <select id="badgeStatus" class="field">
-          <option value="all">All badges</option>
-          <option value="todo">Not earned</option>
-          <option value="done">Earned</option>
-          <option value="pinned">Pinned</option>
-        </select>
-        <select id="badgeAvailability" class="field">
-          <option value="all">All locations</option>
-          <option value="here">Available here</option>
-          <option value="away">Other location</option>
-        </select>
-      </div>
-      <div class="section-title"><h2>Badges & Trophies</h2><span id="badgeCount" class="sub"></span></div>
-      <div id="badgeList" class="badge-list"></div>
-    </section>
+    
+<section id="badges" class="view">
+  <div class="toolbar">
+    <input id="badgeSearch" class="field" type="search" placeholder="Search target, room or game">
+
+    <select id="targetRoom" class="field">
+      <option value="">All targets</option>
+    </select>
+
+    <select id="badgeStatus" class="field">
+      <option value="all">All status</option>
+      <option value="todo">Not earned</option>
+      <option value="done">Earned</option>
+      <option value="pinned">Pinned</option>
+    </select>
+
+    <select id="badgeAvailability" class="field">
+      <option value="all">All availability</option>
+      <option value="here">Available here</option>
+      <option value="away">Other location</option>
+    </select>
+  </div>
+
+  <div class="section-title">
+    <h2>Pinned targets <span id="pinCount" class="pill">0 / 5</span></h2>
+    <span class="sub">Tap Open for large in-room instructions</span>
+  </div>
+  <div id="pinList" class="stack"></div>
+
+  <div class="section-title"><h2>Targets</h2><span id="badgeCount" class="sub"></span></div>
+  <div id="badgeList" class="badge-list"></div>
+</section>
+
 
     
 
@@ -99,25 +114,6 @@
     </div>
   </div>
 </section>
-<section id="focus" class="view">
-      <div class="focus-setup">
-        <div class="card">
-          <div class="label">Focus mode</div>
-          <h2>Choose what to focus on</h2>
-          <p class="sub">Nothing is selected automatically. Leave the room filter on All Targets to see everything, or choose a room to see only targets that specifically require that room. Pin up to 5 total.</p>
-          <label class="label">Room</label>
-          <select id="focusRoom" class="field"><option value="">All targets</option></select>
-          <label class="checkline"><input id="focusShowEarned" type="checkbox"> <span>Show earned badges too</span></label>
-          <div id="focusChoices" class="stack"></div>
-        </div>
-        <div>
-          <div class="section-title"><h2>Pinned <span id="pinCount" class="pill">0 / 5</span></h2></div>
-          <div id="pinList" class="stack"></div>
-        </div>
-      </div>
-    </section>
-
-    
 <section id="competitive" class="view">
   <div class="section-title">
     <div><div class="label">Competitive games</div><h2>Available at this location</h2></div>
@@ -138,7 +134,7 @@
     <section id="settings" class="view">
       <div class="card">
         <h2>Settings</h2>
-        <p class="sub">Version <strong>8.9.0</strong> — clean rebuild.</p>
+        <p class="sub">Version <strong>9.0.0</strong> — clean rebuild.</p>
         <div class="row wrap">
           <button class="btn primary" id="exportBackup">Export backup</button>
           <label class="btn">Restore backup<input id="importBackup" type="file" accept="application/json" hidden></label>
@@ -156,7 +152,6 @@
     <button class="active" data-view="home">⌂<br>Home</button>
     <button data-view="badges">◈<br>Targets</button>
     <button data-view="locations">⌖<br>Locations</button>
-    <button data-view="focus">◎<br>Focus</button>
     <button data-view="competitive">⚔<br>Comp</button>
     <button data-view="stats">▥<br>Stats</button>
     <button data-view="settings">⚙<br>Settings</button>

@@ -1,7 +1,7 @@
 
 'use strict';
 
-const VERSION='8.9.0';
+const VERSION='9.0.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, BASE_BADGE_COUNT=0;
@@ -149,20 +149,44 @@ function renderHome(){
 }
 
 function renderBadges(){
-  const q=$('badgeSearch').value.trim().toLowerCase(), status=$('badgeStatus').value, avail=$('badgeAvailability').value;
+  syncTrophyEarned();
+  const rooms=availableFocusRooms();
+  const roomSel=$('targetRoom');
+  const chosen=roomSel.value||'';
+  roomSel.innerHTML='<option value="">All targets</option>'+rooms.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
+  roomSel.value=rooms.includes(chosen)?chosen:'';
+
+  const room=roomSel.value;
+  const q=$('badgeSearch').value.trim().toLowerCase();
+  const status=$('badgeStatus').value;
+  const avail=$('badgeAvailability').value;
+
   const rows=BADGES.map((b,i)=>[b,i]).filter(([b,i])=>{
     const text=JSON.stringify(b).toLowerCase();
     const qok=!q||text.includes(q);
+    const roomOk=!room || (!isTrophy(b) && roomParts(b).includes(room));
     const sok=status==='all'||(status==='todo'&&!state.earned[i])||(status==='done'&&state.earned[i])||(status==='pinned'&&state.pins.includes(i));
     const aok=avail==='all'||(avail==='here'&&availableHere(b))||(avail==='away'&&!availableHere(b));
-    return qok&&sok&&aok;
+    return qok&&roomOk&&sok&&aok;
   });
+
+  $('pinCount').textContent=`${state.pins.length} / ${MAX_PINS}`;
+  $('pinList').innerHTML=state.pins.length?state.pins.map((i,idx)=>`<div class="item row between">
+    <div><b>${esc(BADGES[i].name)}</b><div class="sub">${isTrophy(BADGES[i])?'Trophy':esc(BADGES[i].room||'Global')} • ${esc(BADGES[i].how)}</div></div>
+    <div class="row"><button class="mini" data-open-focus="${idx}">Open</button><button class="mini" data-unpin="${i}">✕</button></div>
+  </div>`).join(''):'<div class="item sub">No pinned targets.</div>';
+
   $('badgeCount').textContent=`${rows.length} shown`;
   $('badgeList').innerHTML=rows.length?rows.map(([b,i])=>`<article class="badge ${state.earned[i]?'done':''}">
-    <button class="checkbtn" data-toggle-earned="${i}">${state.earned[i]?'✓':''}</button>
-    <div><h3>${esc(b.name)}</h3><p>${esc(b.how)}</p><div class="tags"><span class="tag">${isTrophy(b)?'Trophy':'Badge'}</span>${b.room?`<span class="tag">${esc(b.room)}</span>`:''}${b.game?`<span class="tag">${esc(b.game)}${b.level?' • L'+esc(b.level):''}</span>`:''}${!isTrophy(b)?`<span class="tag ${availableHere(b)?'ok':'away'}">${availableHere(b)?'Available here':'Other location'}</span>`:''}</div></div>
+    <button class="checkbtn" data-toggle-earned="${i}" ${isTrophy(b)?'disabled':''}>${state.earned[i]?'✓':''}</button>
+    <div><h3>${esc(b.name)}</h3><p>${esc(b.how)}</p><div class="tags">
+      <span class="tag">${isTrophy(b)?'Trophy':'Badge'}</span>
+      ${b.room?`<span class="tag">${esc(b.room)}</span>`:''}
+      ${b.game?`<span class="tag">${esc(b.game)}${b.level?' • L'+esc(b.level):''}</span>`:''}
+      ${!isTrophy(b)?`<span class="tag ${availableHere(b)?'ok':'away'}">${availableHere(b)?'Available here':'Other location'}</span>`:''}
+    </div></div>
     <div class="row"><button class="mini" data-pin="${i}">${state.pins.includes(i)?'📌':'📍'}</button><button class="mini" data-open-badge="${i}">›</button></div>
-  </article>`).join(''):'<div class="item sub">No badges match those filters.</div>';
+  </article>`).join(''):'<div class="item sub">No targets match those filters.</div>';
 }
 
 function renderLocations(){
@@ -191,36 +215,7 @@ function availableFocusRooms(){
   return [...ROOMS];
 }
 
-function renderFocus(){
-  syncTrophyEarned();
-  const rooms=availableFocusRooms(), chosen=$('focusRoom').value;
-  $('focusRoom').innerHTML='<option value="">All targets</option>'+rooms.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
-  $('focusRoom').value=rooms.includes(chosen)?chosen:'';
-  $('pinCount').textContent=`${state.pins.length} / ${MAX_PINS}`;
-  renderFocusChoices();
-  $('pinList').innerHTML=state.pins.length?state.pins.map((i,idx)=>`<div class="item row between"><div><b>${esc(BADGES[i].name)}</b><div class="sub">${isTrophy(BADGES[i])?'Trophy':esc(BADGES[i].room||'Global')} • ${esc(BADGES[i].how)}</div></div><div class="row"><button class="mini" data-open-focus="${idx}">Open</button><button class="mini" data-unpin="${i}">✕</button></div></div>`).join(''):'<div class="item sub">No pinned targets.</div>';
-}
 
-function renderFocusChoices(){
-  syncTrophyEarned();
-  const room=$('focusRoom').value, showEarned=$('focusShowEarned').checked;
-  const rows=BADGES.map((b,i)=>[b,i]).filter(([b,i])=>{
-    if(room){
-      if(isTrophy(b)) return false;
-      if(!roomParts(b).includes(room)) return false;
-    }
-    if(!availableHere(b)) return false;
-    if(!showEarned && state.earned[i]) return false;
-    return true;
-  });
-
-  $('focusChoices').innerHTML=rows.length?rows.map(([b,i])=>{
-    const pinned=state.pins.includes(i), full=state.pins.length>=MAX_PINS&&!pinned;
-    const kind=isTrophy(b)?'Trophy':'Badge';
-    const scope=b.room?b.room:'Global';
-    return `<div class="item row between"><div><b>${state.earned[i]?'✓ ':''}${esc(b.name)}</b><div class="sub">${kind} • ${esc(scope)} • ${esc(b.how)}${b.game?' • '+esc(b.game):''}${b.level?' • L'+esc(b.level):''}</div></div><button class="mini" data-focus-pin="${i}" ${pinned||full?'disabled':''}>${pinned?'Pinned':full?'Limit 5':'Pin'}</button></div>`;
-  }).join(''):'<div class="item sub">No applicable targets for this filter.</div>';
-}
 
 function renderCompetitive(){
   const rows=competitiveEntries();
@@ -240,7 +235,7 @@ function renderStats(){
   $('historyList').innerHTML=state.history.map(h=>`<div class="item"><b>${esc(BADGES[h.badge]?.name||'Badge')}</b><div class="sub">${esc(h.date||'')}</div></div>`).join('')||'<div class="item sub">No history yet.</div>';
 }
 
-function renderAll(){renderHome();renderBadges();renderLocations();renderFocus();renderCompetitive();renderStats();save()}
+function renderAll(){renderHome();renderBadges();renderLocations();renderCompetitive();renderStats();save()}
 
 function toggleEarn(i){
   if(isTrophy(BADGES[i])){toast('Trophies unlock automatically from badge progress');return}
@@ -325,13 +320,12 @@ function bindEvents(){
     }
     const gt=e.target.closest('[data-game-toggle]');if(gt){const l=activeLocation(),g=gt.dataset.gameToggle;l.games=l.games.includes(g)?l.games.filter(x=>x!==g):[...l.games,g];renderAll();return}
   });
-  $('badgeSearch').addEventListener('input',renderBadges);$('badgeStatus').addEventListener('change',renderBadges);$('badgeAvailability').addEventListener('change',renderBadges);
+  $('badgeSearch').addEventListener('input',renderBadges);$('targetRoom').addEventListener('change',renderBadges);$('badgeStatus').addEventListener('change',renderBadges);$('badgeAvailability').addEventListener('change',renderBadges);
   $('locationName').addEventListener('input',e=>{activeLocation().name=e.target.value;save();renderHome()});
   $('addLocation').onclick=()=>{const id='loc_'+Date.now();state.locations.push({id,name:'New location',rooms:[],games:[],roomCopies:{},roomInstances:[],venueMap:{Entrance:{front:null,left:null,right:null,back:null},Exit:{front:null,left:null,right:null,back:null}}});state.activeLocation=id;renderAll()};
   $('deleteLocation').onclick=()=>{if(state.locations.length===1)return toast('Keep at least one location');state.locations=state.locations.filter(l=>l.id!==state.activeLocation);state.activeLocation=state.locations[0].id;renderAll()};
   $('allRooms').onclick=()=>{activeLocation().rooms=[...ROOMS];renderAll()};
   $('clearRooms').onclick=()=>{const l=activeLocation();l.rooms=[];l.excludedGames=[];renderAll()};
-  $('focusRoom').onchange=renderFocusChoices;$('focusShowEarned').onchange=renderFocusChoices;
   $('closeModal').onclick=()=>$('badgeModal').classList.remove('open');$('badgeModal').onclick=e=>{if(e.target.id==='badgeModal')$('badgeModal').classList.remove('open')};
   $('modalEarn').onclick=()=>{toggleEarn(modalBadgeIndex);openBadge(modalBadgeIndex)};$('modalPin').onclick=()=>{togglePin(modalBadgeIndex);openBadge(modalBadgeIndex)};
   $('closeFocusOverlay').onclick=()=>$('focusOverlay').classList.remove('open');

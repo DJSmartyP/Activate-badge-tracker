@@ -1,0 +1,22 @@
+SMARTY'S ACTIVATE TRACKER v9.0.0 — TARGETS + FOCUS MERGED
+
+CHANGE
+- Separate Focus page removed.
+- Targets page now includes the room filter.
+- "All targets" shows everything.
+- Selecting a room shows only badges/targets that explicitly require that room.
+- Pinned targets are displayed at the top of Targets.
+- Up to 5 pins total.
+- Open on a pinned target launches the SAME large full-screen in-room instruction view.
+- Complete & Remove, Next and Previous remain in the large pinned-target view.
+- Home "Pinned targets" button now opens Targets.
+
+UNCHANGED
+- Locations = room types only.
+- Games automatically inferred from rooms; games can be marked unavailable.
+- Competitive page uses location availability.
+- Mapping remains removed.
+
+UPLOAD
+Unzip and upload EVERY file to the ROOT of your GitHub repository.
+Replace same-named files, commit to main, wait 1–3 minutes, then refresh.
