@@ -1,0 +1,19 @@
+SMARTY'S ACTIVATE TRACKER v8.9.0 — MAPPING REMOVED
+
+CHANGE
+- Venue mapping has been removed completely.
+- The Venue button/page has been removed.
+- Focus mode is unchanged from the current pinned-target design.
+- Focus remains about keeping the selected badge/trophy instructions large and visible while playing.
+- Locations still controls which room types are present.
+- Games are still inferred automatically from selected rooms.
+- Games can still be manually marked unavailable.
+- Competitive Games still uses the selected location's room/game availability.
+
+UPLOAD
+Unzip this package and upload EVERY file inside to the ROOT of the GitHub repository.
+Replace same-named files, commit to main, wait 1–3 minutes, then refresh the web app.
+
+Because this build has a new service-worker cache version, it should fetch the updated app.
+If an installed home-screen copy still shows the old Venue tab, remove the installed app,
+refresh the GitHub Pages site once, and reinstall it.

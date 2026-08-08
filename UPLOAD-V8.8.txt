@@ -1,0 +1,26 @@
+SMARTY'S ACTIVATE TRACKER v8.8.0 — VENUE MAPPER UX UPDATE
+
+NEW:
+- Save & Stay
+  Records the connection but keeps your current position unchanged.
+  Ideal for side rooms / alcoves branching from the main corridor.
+
+- Save & Move
+  Records the connection and moves your current position to the next room.
+  Ideal when continuing along the route.
+
+EXAMPLE:
+Current: Strike
+Direction: Right
+Next: Laser
+Save & Stay
+
+Then:
+Current: Strike
+Direction: Front
+Next: Mega Grid
+Save & Move
+
+UPLOAD:
+Unzip this package and upload EVERY file inside to the ROOT of your GitHub repository.
+Replace same-named files, commit to main, wait 1–3 minutes, then refresh the web app.

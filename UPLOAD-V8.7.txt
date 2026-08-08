@@ -1,0 +1,29 @@
+SMARTY'S ACTIVATE TRACKER v8.7.0 — COMPLETE GITHUB BUILD
+
+LOCATIONS
+- Only asks which ROOM TYPES are present.
+- Games are inferred automatically from the room/game catalogue.
+- All known games for a selected room are assumed available by default.
+- If a game is missing/broken/removed at that venue, tap "Mark unavailable".
+- Removing a room also removes it from availability/mapping.
+
+COMPETITIVE
+- New Comp section.
+- Automatically lists competitive games for the selected venue rooms.
+- Respects games manually marked unavailable.
+
+VENUE
+- Designed to configure while physically walking the venue.
+- Starts at Entrance.
+- Choose Direction + Next Room from dropdown, then Save & Move.
+- Rooms already mapped remain selectable.
+- "+ Another Laser", "+ Another Strike", etc creates duplicate room copies automatically.
+- The first duplicate is renamed Laser 1, with the next created as Laser 2.
+- No separate duplicate-management screen.
+
+FOCUS
+- Keeps v8.6 universal Focus behaviour.
+
+UPLOAD
+Unzip and upload EVERY file to the ROOT of the GitHub repository.
+Replace same-named files, commit to main, wait 1–3 minutes, then refresh the web app.

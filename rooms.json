@@ -20,25 +20,48 @@
     "Photo"
   ],
   "games": [
+    "100",
     "15 Green",
+    "Airlocked",
     "Asteroids",
     "Barrage",
     "Blast",
+    "Blitz",
+    "Boom!",
     "Bop",
+    "Bop Clock",
     "Bullet Train",
+    "Bumper",
+    "Camo",
+    "Canyon Cross",
+    "Chopper",
+    "Clockstoppers",
+    "Collect",
+    "Colosseum",
+    "Danger Zones",
     "Dartmouth",
+    "Darvill Dash",
     "Defuse",
     "Digby",
+    "Flash Fight",
+    "Flash Fire",
+    "Flash Mines",
     "Flip",
+    "Frequency",
     "Gauntlet",
+    "Gem Rush",
     "Gems",
     "Grid",
+    "Gridlock",
     "Hunt",
     "Inside Out",
     "Jigsaw",
+    "Jumble",
     "Labyrinth",
+    "Laser Maze",
     "Laser Relay",
     "Link",
+    "Lollipop",
     "Match",
     "Maze",
     "Mega Grid",
@@ -46,28 +69,251 @@
     "Mega Zones",
     "Memory",
     "Mines",
+    "Mosh Pit",
     "Numbers",
+    "Odd One Out",
+    "Oddball",
     "Order Up",
+    "Paris",
     "Photon Rush",
     "Piperooni",
     "Press-cision",
+    "Quick Grab",
+    "Quick Step",
     "Relay",
+    "Reveal",
     "Rings",
+    "Runner",
     "Scramble",
+    "Sectors",
+    "Seeker",
     "Sequence",
+    "Sets",
+    "Sharpshooter",
+    "Shot Clock",
+    "Simon Says",
+    "Sneak",
     "Spellinator",
     "Spot",
     "Statues",
     "Stopwatch",
+    "Strategy",
     "Supermarket",
+    "Swat",
+    "Switch",
     "Tails",
     "Technique",
     "Terminal",
+    "Tile Relay",
+    "Trip Wire",
     "Trivial",
-    "Whack-a-Hold",
+    "Undercover",
+    "Whack-A-Hold",
     "Words",
     "Wormholes",
     "Zap",
     "Zones"
-  ]
+  ],
+  "catalog": {
+    "Arena": {
+      "competitive": [
+        "Digby",
+        "Reveal",
+        "Sectors",
+        "Sets",
+        "Swat"
+      ],
+      "cooperative": [
+        "Digby",
+        "Hunt",
+        "Memory",
+        "Swat"
+      ]
+    },
+    "Climb": {
+      "competitive": [
+        "Canyon Cross",
+        "Quick Grab"
+      ],
+      "cooperative": [
+        "Technique",
+        "Whack-A-Hold"
+      ]
+    },
+    "Control": {
+      "competitive": [
+        "Bop Clock",
+        "Frequency",
+        "Tails"
+      ],
+      "cooperative": [
+        "Bop",
+        "Labyrinth",
+        "Runner",
+        "Bumper",
+        "Collect"
+      ]
+    },
+    "Grid": {
+      "competitive": [
+        "Colosseum",
+        "Danger Zones",
+        "Quick Step"
+      ],
+      "cooperative": [
+        "Flash Mines",
+        "Grid",
+        "Strategy",
+        "Zones",
+        "Tile Relay"
+      ]
+    },
+    "Grip": {
+      "competitive": [],
+      "cooperative": []
+    },
+    "Hide": {
+      "competitive": [
+        "Numbers"
+      ],
+      "cooperative": [
+        "Numbers",
+        "Relay",
+        "Sequence",
+        "Spellinator",
+        "Words"
+      ]
+    },
+    "Hoops": {
+      "competitive": [
+        "Barrage",
+        "Shot Clock",
+        "Switch"
+      ],
+      "cooperative": [
+        "15 Green",
+        "Barrage",
+        "Simon Says",
+        "Trivial"
+      ]
+    },
+    "Laser": {
+      "competitive": [
+        "Trip Wire"
+      ],
+      "cooperative": [
+        "Chopper",
+        "Sneak",
+        "Laser Maze",
+        "Photon Rush"
+      ]
+    },
+    "Mega Grid": {
+      "competitive": [
+        "100",
+        "Darvill Dash",
+        "Lollipop"
+      ],
+      "cooperative": [
+        "Gridlock",
+        "Jigsaw",
+        "Mega Grid",
+        "Mega Relay",
+        "Mega Zones",
+        "Order Up",
+        "Sharpshooter",
+        "Statues"
+      ]
+    },
+    "Mega Laser": {
+      "competitive": [
+        "Blitz",
+        "Flash Fight"
+      ],
+      "cooperative": [
+        "Defuse",
+        "Gauntlet",
+        "Laser Relay",
+        "Maze",
+        "Zap"
+      ]
+    },
+    "Pipes": {
+      "competitive": [],
+      "cooperative": [
+        "Clockstoppers",
+        "Odd One Out",
+        "Piperooni",
+        "Scramble"
+      ]
+    },
+    "Portals": {
+      "competitive": [],
+      "cooperative": [
+        "Jumble",
+        "Oddball",
+        "Stopwatch",
+        "Wormholes"
+      ]
+    },
+    "Press": {
+      "competitive": [
+        "Gem Rush",
+        "Mosh Pit",
+        "Paris"
+      ],
+      "cooperative": [
+        "Bullet Train",
+        "Gems",
+        "Link",
+        "Mines",
+        "Undercover"
+      ]
+    },
+    "Push": {
+      "competitive": [],
+      "cooperative": [
+        "Blast",
+        "Camo",
+        "Match",
+        "Press-cision",
+        "Rings"
+      ]
+    },
+    "Scan": {
+      "competitive": [],
+      "cooperative": [
+        "Inside Out",
+        "Spot",
+        "Supermarket"
+      ]
+    },
+    "Strike": {
+      "competitive": [
+        "Airlocked",
+        "Boom!"
+      ],
+      "cooperative": [
+        "Asteroids",
+        "Dartmouth",
+        "Flip",
+        "Seeker",
+        "Terminal"
+      ]
+    },
+    "Trench": {
+      "competitive": [
+        "Flash Fight",
+        "Zap"
+      ],
+      "cooperative": [
+        "Defuse",
+        "Flash Fire"
+      ]
+    },
+    "Photo": {
+      "competitive": [],
+      "cooperative": []
+    }
+  }
 }

@@ -1,10 +1,10 @@
 
 'use strict';
 
-const VERSION='8.6.0';
+const VERSION='8.9.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
-let BADGES=[], ROOMS=[], GAMES=[], BASE_BADGE_COUNT=0;
+let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, BASE_BADGE_COUNT=0;
 let state=null;
 let modalBadgeIndex=null;
 let focusIndex=0;
@@ -28,6 +28,40 @@ const roomTypeFromInstance=n=>n==='Entrance'||n==='Exit'?n:n.replace(/\s+\d+$/,'
 const roomParts=b=>(b.room||'').split(/\s*\/\s*/).map(x=>x.trim()).filter(Boolean);
 const gameParts=b=>(b.game||'').split(/\s*\/\s*/).map(x=>x.trim()).filter(Boolean);
 
+function roomGameEntries(room){
+  const c=GAME_CATALOG[room]||{competitive:[],cooperative:[]};
+  const out=[];
+  (c.competitive||[]).forEach(g=>out.push({game:g,mode:'Competitive'}));
+  (c.cooperative||[]).forEach(g=>{
+    if(!out.some(x=>x.game===g)) out.push({game:g,mode:'Cooperative'});
+    else out.find(x=>x.game===g).mode='Competitive + Cooperative';
+  });
+  return out;
+}
+function inferredGamesForLocation(l=activeLocation()){
+  const entries=[];
+  (l.rooms||[]).forEach(r=>roomGameEntries(r).forEach(x=>{
+    if(!entries.some(e=>e.game===x.game&&e.room===r))entries.push({...x,room:r});
+  }));
+  return entries;
+}
+function enabledGameNames(l=activeLocation()){
+  const excluded=new Set(l.excludedGames||[]);
+  return [...new Set(inferredGamesForLocation(l).filter(x=>!excluded.has(x.game)).map(x=>x.game))];
+}
+function competitiveEntries(l=activeLocation()){
+  const excluded=new Set(l.excludedGames||[]);
+  const rows=[];
+  (l.rooms||[]).forEach(r=>{
+    const c=GAME_CATALOG[r]||{};
+    (c.competitive||[]).forEach(g=>{
+      if(!excluded.has(g))rows.push({room:r,game:g});
+    });
+  });
+  return rows;
+}
+
+
 const isTrophy=b=>b && b.type==='trophy';
 function addTrophyTargets(){
   BASE_BADGE_COUNT=BADGES.length;
@@ -50,13 +84,7 @@ function syncTrophyEarned(){
 
 
 function gamesForSelectedRooms(){
-  const selected=new Set(activeLocation().rooms||[]);
-  const result=new Set();
-  BADGES.forEach(b=>{
-    const br=roomParts(b), bg=gameParts(b);
-    if(br.some(r=>selected.has(r))) bg.forEach(g=>result.add(g));
-  });
-  return [...result].sort((a,b)=>a.localeCompare(b));
+  return enabledGameNames();
 }
 
 
@@ -76,6 +104,7 @@ function loadState(){
 function ensureLocationShape(l){
   l.rooms=Array.isArray(l.rooms)?l.rooms:[];
   l.games=Array.isArray(l.games)?l.games:[];
+  l.excludedGames=Array.isArray(l.excludedGames)?l.excludedGames:[];
   l.roomCopies=l.roomCopies||{};
   l.roomInstances=Array.isArray(l.roomInstances)?l.roomInstances:[];
   l.venueMap=l.venueMap||{};
@@ -88,7 +117,8 @@ function availableHere(b){
   const l=activeLocation();
   const rp=roomParts(b), gp=gameParts(b);
   const roomOk=!l.rooms.length || !rp.length || rp.some(r=>l.rooms.includes(r));
-  const gameOk=!l.games.length || !gp.length || gp.some(g=>l.games.includes(g));
+  const enabled=enabledGameNames(l);
+  const gameOk=!gp.length || !l.rooms.length || gp.some(g=>enabled.includes(g));
   return roomOk && gameOk;
 }
 
@@ -137,102 +167,23 @@ function renderBadges(){
 
 function renderLocations(){
   const l=activeLocation();
-  $('locationList').innerHTML=state.locations.map(x=>`<button class="item ${x.id===l.id?'active':''}" data-location="${x.id}"><b>${esc(x.name)}</b><div class="sub">${x.rooms.length} rooms • ${x.games.length} games selected</div></button>`).join('');
+  $('locationList').innerHTML=state.locations.map(x=>`<button class="item ${x.id===l.id?'active':''}" data-location="${x.id}"><b>${esc(x.name)}</b><div class="sub">${x.rooms.length} rooms • ${enabledGameNames(x).length} games available</div></button>`).join('');
   $('locationName').value=l.name;
   $('locationRooms').innerHTML=ROOMS.map(r=>`<button class="toggle ${l.rooms.includes(r)?'on':''}" data-room-toggle="${esc(r)}">${esc(r)}</button>`).join('');
 
-  const applicable=gamesForSelectedRooms();
-  // Drop game selections that no longer apply after room changes.
-  l.games=(l.games||[]).filter(g=>applicable.includes(g));
-
-  $('locationGames').innerHTML=applicable.length
-    ? applicable.map(g=>`<button class="toggle ${l.games.includes(g)?'on':''}" data-game-toggle="${esc(g)}">${esc(g)}</button>`).join('')
-    : '<div class="item sub">Select one or more rooms first. Games tied to those rooms will appear here.</div>';
-}
-
-function renderVenue(){
-  const l=activeLocation();
-  const selected=l.rooms||[];
-
-  $('duplicateControls').innerHTML=selected.length
-    ? selected.map(r=>{
-        const copies=Math.max(1,Number(l.roomCopies[r]||1));
-        return `<div class="item row between">
-          <div><b>${esc(r)}</b><div class="sub">${copies===1?'Single room':copies+' copies'}</div></div>
-          <div class="row">
-            <label class="checkline" style="margin:0">
-              <input type="checkbox" data-dup-toggle="${esc(r)}" ${copies>1?'checked':''}>
-              <span>Duplicate</span>
-            </label>
-            <select class="field" style="max-width:92px" data-dup-count="${esc(r)}" ${copies>1?'':'disabled'}>
-              ${[2,3,4,5,6].map(n=>`<option value="${n}" ${copies===n?'selected':''}>${n}</option>`).join('')}
-            </select>
-          </div>
-        </div>`;
-      }).join('')
-    : '<div class="item sub">Choose rooms in Locations first.</div>';
-
-  const nodes=['Entrance',...l.roomInstances,'Exit'];
-  const current=$('walkCurrent');
-  const previous=current?.value||'Entrance';
-  current.innerHTML=nodes.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
-  current.value=nodes.includes(previous)?previous:'Entrance';
-
-  renderWalkNextOptions();
-
-  $('mapSummary').innerHTML=nodes.map(n=>{
-    const m=l.venueMap[n]||{};
-    const bits=[m.front&&`Front → ${m.front}`,m.left&&`Left → ${m.left}`,m.right&&`Right → ${m.right}`,m.back&&`Back → ${m.back}`].filter(Boolean);
-    return `<div class="item"><b>${esc(n)}</b><div class="sub">${bits.length?esc(bits.join(' • ')):'No connections set'}</div></div>`;
-  }).join('');
-}
-
-function renderWalkNextOptions(){
-  const l=activeLocation();
-  const current=$('walkCurrent')?.value||'Entrance';
-  const nodes=['Entrance',...l.roomInstances,'Exit'].filter(n=>n!==current);
-  $('walkNext').innerHTML='<option value="">Choose next room…</option>'+nodes.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
-}
-
-function saveWalkStep(){
-  const l=activeLocation();
-  const current=$('walkCurrent').value;
-  const direction=$('walkDirection').value;
-  const next=$('walkNext').value;
-  if(!next){toast('Choose the next room');return}
-
-  l.venueMap[current]=l.venueMap[current]||{front:null,left:null,right:null,back:null};
-  l.venueMap[next]=l.venueMap[next]||{front:null,left:null,right:null,back:null};
-  l.venueMap[current][direction]=next;
-
-  // Create a simple return link where possible. It can be overwritten later.
-  if(!l.venueMap[next].back) l.venueMap[next].back=current;
-
-  save();
-  renderVenue();
-  $('walkCurrent').value=next;
-  renderWalkNextOptions();
-  toast(`${current} → ${next} saved`);
+  const entries=inferredGamesForLocation(l);
+  const excluded=new Set(l.excludedGames||[]);
+  $('locationGamesAuto').innerHTML=entries.length?entries.map(x=>`<div class="item game-auto ${excluded.has(x.game)?'off':''}">
+    <div><b>${esc(x.game)}</b><div class="sub">${esc(x.room)} • ${esc(x.mode)}</div></div>
+    <button class="mini" data-exclude-game="${esc(x.game)}">${excluded.has(x.game)?'Restore':'Mark unavailable'}</button>
+  </div>`).join(''):'<div class="item sub">Select the rooms at this venue and the game list will appear automatically.</div>';
 }
 
 
-function buildRoomCopies(){
-  const l=activeLocation(), old=l.venueMap||{};
-  l.roomInstances=[];
 
-  (l.rooms||[]).forEach(r=>{
-    const copies=Math.max(1,Number(l.roomCopies[r]||1));
-    if(copies===1) l.roomInstances.push(r);
-    else for(let i=1;i<=copies;i++) l.roomInstances.push(`${r} ${i}`);
-  });
 
-  l.venueMap={
-    Entrance:old.Entrance||{front:null,left:null,right:null,back:null},
-    Exit:old.Exit||{front:null,left:null,right:null,back:null}
-  };
-  l.roomInstances.forEach(n=>l.venueMap[n]=old[n]||{front:null,left:null,right:null,back:null});
-  save();renderAll();toast('Map rooms updated');
-}
+
+
 
 function availableFocusRooms(){
   const l=activeLocation();
@@ -271,6 +222,16 @@ function renderFocusChoices(){
   }).join(''):'<div class="item sub">No applicable targets for this filter.</div>';
 }
 
+function renderCompetitive(){
+  const rows=competitiveEntries();
+  $('competitiveCount').textContent=`${rows.length} games`;
+  $('competitiveList').innerHTML=rows.length?rows.map(x=>`<article class="badge">
+    <div class="checkbtn">⚔</div>
+    <div><h3>${esc(x.game)}</h3><p>Competitive game</p><div class="tags"><span class="tag">${esc(x.room)}</span><span class="tag ok">Available here</span></div></div>
+    <div></div>
+  </article>`).join(''):'<div class="item sub">No competitive games are listed for the rooms selected at this location.</div>';
+}
+
 function renderStats(){
   const n=earnedCount(), here=BADGES.filter((b,i)=>availableHere(b)&&!state.earned[i]).length, away=BADGES.filter((b,i)=>!availableHere(b)&&!state.earned[i]).length;
   $('statsCards').innerHTML=`<div class="stat"><span class="label">Earned</span><b>${n}</b></div><div class="stat"><span class="label">Available here</span><b>${here}</b></div><div class="stat"><span class="label">Other location</span><b>${away}</b></div><div class="stat"><span class="label">Pinned</span><b>${state.pins.length}</b></div>`;
@@ -279,7 +240,7 @@ function renderStats(){
   $('historyList').innerHTML=state.history.map(h=>`<div class="item"><b>${esc(BADGES[h.badge]?.name||'Badge')}</b><div class="sub">${esc(h.date||'')}</div></div>`).join('')||'<div class="item sub">No history yet.</div>';
 }
 
-function renderAll(){renderHome();renderBadges();renderLocations();renderVenue();renderFocus();renderStats();save()}
+function renderAll(){renderHome();renderBadges();renderLocations();renderFocus();renderCompetitive();renderStats();save()}
 
 function toggleEarn(i){
   if(isTrophy(BADGES[i])){toast('Trophies unlock automatically from badge progress');return}
@@ -326,7 +287,7 @@ async function init(){
     const [badgeRes,roomRes]=await Promise.all([fetch('badges.json',{cache:'no-store'}),fetch('rooms.json',{cache:'no-store'})]);
     if(!badgeRes.ok||!roomRes.ok)throw new Error('Data files failed to load');
     BADGES=await badgeRes.json();addTrophyTargets();
-    const roomData=await roomRes.json();ROOMS=roomData.rooms||[];GAMES=roomData.games||[];
+    const roomData=await roomRes.json();ROOMS=roomData.rooms||[];GAMES=roomData.games||[];GAME_CATALOG=roomData.catalog||{};
     loadState();syncTrophyEarned();bindEvents();renderAll();
     setTimeout(()=>$('splash').classList.add('hide'),350);
   }catch(err){
@@ -345,17 +306,22 @@ function bindEvents(){
     const fp=e.target.closest('[data-focus-pin]');if(fp)return togglePin(Number(fp.dataset.focusPin));
     const un=e.target.closest('[data-unpin]');if(un)return togglePin(Number(un.dataset.unpin));
     const of=e.target.closest('[data-open-focus]');if(of)return openFocusOverlay(Number(of.dataset.openFocus));
+    const exg=e.target.closest('[data-exclude-game]');if(exg){
+      const l=activeLocation(),g=exg.dataset.excludeGame;
+      l.excludedGames=l.excludedGames||[];
+      l.excludedGames=l.excludedGames.includes(g)?l.excludedGames.filter(x=>x!==g):[...l.excludedGames,g];
+      renderAll();return
+    }
     const loc=e.target.closest('[data-location]');if(loc){state.activeLocation=loc.dataset.location;renderAll();return}
     const rt=e.target.closest('[data-room-toggle]');if(rt){
       const l=activeLocation(),r=rt.dataset.roomToggle;
       if(l.rooms.includes(r)){
         l.rooms=l.rooms.filter(x=>x!==r);
-        delete l.roomCopies[r];
+        l.excludedGames=(l.excludedGames||[]).filter(g=>inferredGamesForLocation(l).some(e=>e.game===g));
       }else{
         l.rooms=[...l.rooms,r];
-        l.roomCopies[r]=l.roomCopies[r]||1;
       }
-      buildRoomCopies();return
+      renderAll();return
     }
     const gt=e.target.closest('[data-game-toggle]');if(gt){const l=activeLocation(),g=gt.dataset.gameToggle;l.games=l.games.includes(g)?l.games.filter(x=>x!==g):[...l.games,g];renderAll();return}
   });
@@ -363,22 +329,8 @@ function bindEvents(){
   $('locationName').addEventListener('input',e=>{activeLocation().name=e.target.value;save();renderHome()});
   $('addLocation').onclick=()=>{const id='loc_'+Date.now();state.locations.push({id,name:'New location',rooms:[],games:[],roomCopies:{},roomInstances:[],venueMap:{Entrance:{front:null,left:null,right:null,back:null},Exit:{front:null,left:null,right:null,back:null}}});state.activeLocation=id;renderAll()};
   $('deleteLocation').onclick=()=>{if(state.locations.length===1)return toast('Keep at least one location');state.locations=state.locations.filter(l=>l.id!==state.activeLocation);state.activeLocation=state.locations[0].id;renderAll()};
-  $('allRooms').onclick=()=>{const l=activeLocation();l.rooms=[...ROOMS];l.rooms.forEach(r=>l.roomCopies[r]=l.roomCopies[r]||1);buildRoomCopies()};$('clearRooms').onclick=()=>{const l=activeLocation();l.rooms=[];l.roomCopies={};buildRoomCopies()};
-  $('allGames').onclick=()=>{activeLocation().games=[...gamesForSelectedRooms()];renderAll()};$('clearGames').onclick=()=>{activeLocation().games=[];renderAll()};
-  document.addEventListener('change',e=>{
-  const dt=e.target.closest('[data-dup-toggle]');
-  if(dt){
-    const r=dt.dataset.dupToggle;
-    activeLocation().roomCopies[r]=dt.checked?2:1;
-    save();renderVenue();return;
-  }
-  const dc=e.target.closest('[data-dup-count]');
-  if(dc){
-    activeLocation().roomCopies[dc.dataset.dupCount]=Number(dc.value);
-    save();renderVenue();return;
-  }
-});
-  $('buildRoomCopies').onclick=buildRoomCopies;$('walkCurrent').onchange=renderWalkNextOptions;$('saveWalkStep').onclick=saveWalkStep;$('resetWalkToEntrance').onclick=()=>{$('walkCurrent').value='Entrance';renderWalkNextOptions()};
+  $('allRooms').onclick=()=>{activeLocation().rooms=[...ROOMS];renderAll()};
+  $('clearRooms').onclick=()=>{const l=activeLocation();l.rooms=[];l.excludedGames=[];renderAll()};
   $('focusRoom').onchange=renderFocusChoices;$('focusShowEarned').onchange=renderFocusChoices;
   $('closeModal').onclick=()=>$('badgeModal').classList.remove('open');$('badgeModal').onclick=e=>{if(e.target.id==='badgeModal')$('badgeModal').classList.remove('open')};
   $('modalEarn').onclick=()=>{toggleEarn(modalBadgeIndex);openBadge(modalBadgeIndex)};$('modalPin').onclick=()=>{togglePin(modalBadgeIndex);openBadge(modalBadgeIndex)};

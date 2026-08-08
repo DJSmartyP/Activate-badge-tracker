@@ -24,3 +24,9 @@ linear-gradient(65deg,transparent 0 57%,rgba(0,230,255,.03) 58% 59%,transparent 
 .checkbtn{box-shadow:inset 0 0 12px rgba(0,230,255,.04)}
 .toggle.on{box-shadow:0 0 16px rgba(0,230,255,.10)}
 .launch-splash{background-color:#03040a}
+
+.venue-walk-grid{display:grid;grid-template-columns:1fr 160px 1fr;gap:10px}
+.game-auto{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+.game-auto.off{opacity:.55}
+.game-kind{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+@media(max-width:780px){.venue-walk-grid{grid-template-columns:1fr}.nav{overflow-x:auto;justify-content:flex-start}}

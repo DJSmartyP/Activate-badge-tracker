@@ -67,6 +67,7 @@
     </section>
 
     
+
 <section id="locations" class="view">
   <div class="location-layout">
     <div>
@@ -78,77 +79,27 @@
       <input id="locationName" class="field">
 
       <div class="section-title">
-        <h2>Rooms at this venue</h2>
-        <span class="sub">Choose room types here</span>
+        <h2>Which rooms are here?</h2>
+        <span class="sub">That is all you normally need to set</span>
       </div>
       <div id="locationRooms" class="toggle-grid"></div>
 
       <div class="section-title">
-        <h2>Games available</h2>
-        <span class="sub">Only games linked to your selected rooms are shown</span>
+        <h2>Games assumed available</h2>
+        <span class="sub">Automatically inferred from those rooms</span>
       </div>
-      <div id="locationGames" class="toggle-grid"></div>
+      <p class="sub">All known games for a selected room are assumed available. Tap a game only if it has been removed or is unavailable at this venue.</p>
+      <div id="locationGamesAuto" class="stack"></div>
 
       <div class="row wrap top-gap">
         <button class="btn ghost" id="allRooms">Select all rooms</button>
         <button class="btn ghost" id="clearRooms">Clear rooms</button>
-        <button class="btn ghost" id="allGames">Select all games</button>
-        <button class="btn ghost" id="clearGames">Clear games</button>
         <button class="btn danger" id="deleteLocation">Delete location</button>
       </div>
     </div>
   </div>
 </section>
-
-
-    
-
-<section id="venue" class="view">
-  <div class="venue-layout">
-    <div class="card">
-      <div class="label">Venue editor</div>
-      <h2>Duplicates</h2>
-      <p class="sub">Rooms are selected in Locations. Only change a room here if the venue has more than one copy.</p>
-      <div id="duplicateControls" class="stack"></div>
-      <button class="btn primary top-gap" id="buildRoomCopies">Update room list</button>
-    </div>
-
-    <div class="card">
-      <div class="label">Walk the venue</div>
-      <h2>Map it one step at a time</h2>
-      <p class="sub">Start at Entrance facing forward. For each step, choose the direction and the next room from the dropdown, then tap Save & Move. Repeat as you walk.</p>
-
-      <label class="label">I am currently at</label>
-      <select id="walkCurrent" class="field"></select>
-
-      <div class="row wrap top-gap">
-        <div style="flex:1;min-width:150px">
-          <label class="label">Direction</label>
-          <select id="walkDirection" class="field">
-            <option value="front">Front</option>
-            <option value="left">Left</option>
-            <option value="right">Right</option>
-            <option value="back">Back</option>
-          </select>
-        </div>
-        <div style="flex:2;min-width:190px">
-          <label class="label">Next room</label>
-          <select id="walkNext" class="field"></select>
-        </div>
-      </div>
-
-      <button id="saveWalkStep" class="btn success top-gap" style="width:100%">Save & Move to Next Room</button>
-      <button id="resetWalkToEntrance" class="btn ghost top-gap" style="width:100%">Jump back to Entrance</button>
-
-      <div class="section-title"><h2>Mapped connections</h2></div>
-      <div id="mapSummary" class="stack"></div>
-    </div>
-  </div>
-</section>
-
-
-
-    <section id="focus" class="view">
+<section id="focus" class="view">
       <div class="focus-setup">
         <div class="card">
           <div class="label">Focus mode</div>
@@ -166,7 +117,17 @@
       </div>
     </section>
 
-    <section id="stats" class="view">
+    
+<section id="competitive" class="view">
+  <div class="section-title">
+    <div><div class="label">Competitive games</div><h2>Available at this location</h2></div>
+    <span id="competitiveCount" class="pill"></span>
+  </div>
+  <p class="sub">Built automatically from the rooms selected for this location. Games manually marked unavailable in Locations are excluded.</p>
+  <div id="competitiveList" class="badge-list"></div>
+</section>
+
+<section id="stats" class="view">
       <div id="statsCards" class="stats-grid"></div>
       <div class="hero top-gap">
         <div class="card"><h2>Earned by room</h2><div id="roomStats" class="stack"></div></div>
@@ -177,7 +138,7 @@
     <section id="settings" class="view">
       <div class="card">
         <h2>Settings</h2>
-        <p class="sub">Version <strong>8.6.0</strong> — clean rebuild.</p>
+        <p class="sub">Version <strong>8.9.0</strong> — clean rebuild.</p>
         <div class="row wrap">
           <button class="btn primary" id="exportBackup">Export backup</button>
           <label class="btn">Restore backup<input id="importBackup" type="file" accept="application/json" hidden></label>
@@ -195,8 +156,8 @@
     <button class="active" data-view="home">⌂<br>Home</button>
     <button data-view="badges">◈<br>Targets</button>
     <button data-view="locations">⌖<br>Locations</button>
-    <button data-view="venue">◇<br>Venue</button>
     <button data-view="focus">◎<br>Focus</button>
+    <button data-view="competitive">⚔<br>Comp</button>
     <button data-view="stats">▥<br>Stats</button>
     <button data-view="settings">⚙<br>Settings</button>
   </nav>
