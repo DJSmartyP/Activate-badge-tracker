@@ -1,0 +1,16 @@
+SMARTY'S ACTIVATE TRACKER v10.2.0 — SELECTED VENUE CLARITY
+
+CHANGE
+- Locations page now shows a "Current venue" banner.
+- The selected venue card has a stronger cyan/green neon border and glow.
+- The active venue also shows a clear SELECTED pill.
+- Unselected venues remain visually quieter.
+
+UPLOAD THESE FILES ONLY
+- index.html
+- app.js
+- style.css
+- sw.js
+
+Upload to the ROOT of your GitHub repository and replace the existing same-named files.
+Your graphics are NOT included and will not be overwritten.

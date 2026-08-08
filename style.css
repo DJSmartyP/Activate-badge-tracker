@@ -100,3 +100,42 @@ linear-gradient(65deg,transparent 0 57%,rgba(0,230,255,.03) 58% 59%,transparent 
   border-color:rgba(0,230,255,.42);
   box-shadow:0 0 12px rgba(0,230,255,.12);
 }
+
+/* v10.2 selected venue clarity */
+.selected-venue-banner{
+  margin:10px 0 12px;
+  padding:12px 14px;
+  border-radius:16px;
+  background:linear-gradient(135deg,rgba(0,230,255,.10),rgba(80,255,155,.08));
+  border:1px solid rgba(0,230,255,.30);
+  box-shadow:0 0 22px rgba(0,230,255,.08);
+}
+.selected-venue-banner .label{
+  display:block;
+  margin-bottom:4px;
+}
+.selected-venue-banner strong{
+  font-size:18px;
+  color:#b8fbff;
+  text-shadow:0 0 10px rgba(0,230,255,.32);
+}
+.location-choice{
+  text-align:left;
+}
+.location-choice.selected-location{
+  border-color:rgba(0,230,255,.56);
+  background:linear-gradient(135deg,rgba(0,230,255,.10),rgba(80,255,155,.06));
+  box-shadow:0 0 0 1px rgba(0,230,255,.18),0 0 24px rgba(0,230,255,.12);
+}
+.selected-pill{
+  flex:0 0 auto;
+  padding:5px 8px;
+  border-radius:999px;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.12em;
+  color:#b8fbff;
+  border:1px solid rgba(0,230,255,.44);
+  background:rgba(0,230,255,.10);
+  box-shadow:0 0 10px rgba(0,230,255,.10);
+}

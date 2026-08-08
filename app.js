@@ -1,7 +1,9 @@
+const SPLASH_MIN_MS=3500;
+const APP_BOOT_STARTED=Date.now();
 
 'use strict';
 
-const VERSION='10.0.0';
+const VERSION='10.2.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -210,7 +212,19 @@ function renderBadges(){
 
 function renderLocations(){
   const l=activeLocation();
-  $('locationList').innerHTML=state.locations.map(x=>`<button class="item ${x.id===l.id?'active':''}" data-location="${x.id}"><b>${esc(x.name)}</b><div class="sub">${x.rooms.length} rooms • ${enabledGameNames(x).length} games available</div></button>`).join('');
+
+  $('selectedVenueBanner').innerHTML=`<span class="label">Current venue</span><strong>${esc(l.name)}</strong>`;
+
+  $('locationList').innerHTML=state.locations.map(x=>`<button class="item location-choice ${x.id===l.id?'active selected-location':''}" data-location="${x.id}">
+    <div class="row between">
+      <div>
+        <b>${esc(x.name)}</b>
+        <div class="sub">${x.rooms.length} rooms • ${enabledGameNames(x).length} games available</div>
+      </div>
+      ${x.id===l.id?'<span class="selected-pill">SELECTED</span>':''}
+    </div>
+  </button>`).join('');
+
   $('locationName').value=l.name;
   $('locationRooms').innerHTML=ROOMS.map(r=>`<button class="toggle ${l.rooms.includes(r)?'on':''}" data-room-toggle="${esc(r)}">${esc(r)}</button>`).join('');
 
@@ -328,7 +342,7 @@ async function init(){
     setTimeout(()=>$('splash').classList.add('hide'),350);
   }catch(err){
     console.error(err);
-    $('splash').classList.add('hide');
+    setTimeout(()=>{$('splash').classList.add('hide')},Math.max(0,SPLASH_MIN_MS-(Date.now()-APP_BOOT_STARTED)));
     document.body.insertAdjacentHTML('afterbegin',`<div style="padding:16px;background:#5b1125;color:white">App failed to load: ${esc(err.message)}. Refresh the page after GitHub Pages finishes deploying.</div>`);
   }
 }
