@@ -1,7 +1,7 @@
 
 'use strict';
 
-const VERSION='9.2.0';
+const VERSION='9.4.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -63,6 +63,7 @@ function competitiveEntries(l=activeLocation()){
 
 
 const isTrophy=b=>b && b.type==='trophy';
+const isEasterEggBadge=b=>!isTrophy(b) && /^Easter Egg\b/i.test(b?.name||'');
 function addTrophyTargets(){
   BASE_BADGE_COUNT=BADGES.length;
   BADGES=[
@@ -140,9 +141,27 @@ function nextTrophyText(){
   return '100% complete';
 }
 
+function trophyProgress(){
+  const n=earnedCount();
+  if(n<25) return {name:'Bronze', current:n, target:25, remaining:25-n};
+  if(n<50) return {name:'Silver', current:n, target:50, remaining:50-n};
+  if(n<75) return {name:'Gold', current:n, target:75, remaining:75-n};
+  if(n<BASE_BADGE_COUNT) return {name:'Platinum', current:n, target:BASE_BADGE_COUNT, remaining:BASE_BADGE_COUNT-n};
+  return {name:'Platinum', current:BASE_BADGE_COUNT, target:BASE_BADGE_COUNT, remaining:0};
+}
+
 function renderHome(){
   const n=earnedCount(), total=BASE_BADGE_COUNT, pct=total?Math.round(n/total*100):0, l=activeLocation();
-  $('homeSummary').innerHTML=`<div class="label">Current trophy</div><div class="big">${esc(currentTrophy())}</div><div class="sub">${esc(nextTrophyText())}</div><div class="progress top-gap"><span style="width:${pct}%"></span></div><div class="metrics"><div class="metric"><span class="label">Earned</span><b>${n}</b></div><div class="metric"><span class="label">Complete</span><b>${pct}%</b></div><div class="metric"><span class="label">Location</span><b style="font-size:15px">${esc(l.name)}</b></div></div>`;
+  const tp=trophyProgress();
+  $('homeSummary').innerHTML=`<div class="label">Trophy progress</div>
+    <div class="big">${esc(tp.name)}</div>
+    <div class="sub">${tp.remaining?`${tp.current} / ${tp.target} badges • ${tp.remaining} to unlock`:'Unlocked • 100% complete'}</div>
+    <div class="progress top-gap"><span style="width:${tp.target?Math.min(100,tp.current/tp.target*100):100}%"></span></div>
+    <div class="metrics">
+      <div class="metric"><span class="label">Earned</span><b>${n}</b></div>
+      <div class="metric"><span class="label">Overall</span><b>${pct}%</b></div>
+      <div class="metric"><span class="label">Location</span><b style="font-size:15px">${esc(l.name)}</b></div>
+    </div>`;
   $('trophies').innerHTML=[['Bronze',25],['Silver',50],['Gold',75],['Platinum',total]].map(([name,need])=>`<div class="card trophy ${n>=need?'':'locked'}"><div class="row between"><span class="cup">🏆</span><span class="pill">${n>=need?'Unlocked':`${Math.max(0,need-n)} left`}</span></div><h3>${name}</h3><div class="sub">${name==='Platinum'?'100% of tracked badges':`${need} badges`}</div><div class="progress top-gap"><span style="width:${need?Math.min(100,n/need*100):0}%"></span></div></div>`).join('');
   $('homePins').innerHTML=state.pins.length?state.pins.map((i,idx)=>`<div class="item row between"><div><b>${esc(BADGES[i].name)}</b><div class="sub">${esc(BADGES[i].room||'Any room')}</div></div><button class="mini" data-open-focus="${idx}">Open</button></div>`).join(''):'<div class="item sub">No pinned badges.</div>';
   $('recent').innerHTML=state.history.length?state.history.slice(0,8).map(h=>`<div class="item"><b>${esc(BADGES[h.badge]?.name||'Badge')}</b><div class="sub">${esc(h.date||'')}</div></div>`).join(''):'<div class="item sub">No achievements recorded yet.</div>';
@@ -157,6 +176,7 @@ function renderBadges(){
   roomSel.value=rooms.includes(chosen)?chosen:'';
 
   const room=roomSel.value;
+  const type=$('targetType').value;
   const q=$('badgeSearch').value.trim().toLowerCase();
   const status=$('badgeStatus').value;
   const avail=$('badgeAvailability').value;
@@ -165,9 +185,13 @@ function renderBadges(){
     const text=JSON.stringify(b).toLowerCase();
     const qok=!q||text.includes(q);
     const roomOk=!room || (!isTrophy(b) && roomParts(b).includes(room));
+    const typeOk=type==='all'
+      || (type==='badge' && !isTrophy(b))
+      || (type==='trophy' && isTrophy(b))
+      || (type==='easter' && isEasterEggBadge(b));
     const sok=status==='all'||(status==='todo'&&!state.earned[i])||(status==='done'&&state.earned[i])||(status==='pinned'&&state.pins.includes(i));
     const aok=avail==='all'||(avail==='here'&&availableHere(b))||(avail==='away'&&!availableHere(b));
-    return qok&&roomOk&&sok&&aok;
+    return qok&&roomOk&&typeOk&&sok&&aok;
   });
 
   $('pinCount').textContent=`${state.pins.length} / ${MAX_PINS}`;
@@ -180,7 +204,7 @@ function renderBadges(){
   $('badgeList').innerHTML=rows.length?rows.map(([b,i])=>`<article class="badge ${state.earned[i]?'done':''}">
     <button class="checkbtn" data-toggle-earned="${i}" ${isTrophy(b)?'disabled':''}>${state.earned[i]?'✓':''}</button>
     <div><h3>${esc(b.name)}</h3><p>${esc(b.how)}</p><div class="tags">
-      <span class="tag">${isTrophy(b)?'Trophy':'Badge'}</span>
+      <span class="tag">${isTrophy(b)?'Trophy':isEasterEggBadge(b)?'Badge • Easter Egg':'Badge'}</span>
       ${b.room?`<span class="tag">${esc(b.room)}</span>`:''}
       ${b.game?`<span class="tag">${esc(b.game)}${b.level?' • L'+esc(b.level):''}</span>`:''}
       ${!isTrophy(b)?`<span class="tag ${availableHere(b)?'ok':'away'}">${availableHere(b)?'Available here':'Other location'}</span>`:''}

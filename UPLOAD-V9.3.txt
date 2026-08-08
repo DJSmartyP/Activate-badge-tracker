@@ -1,0 +1,13 @@
+SMARTY'S ACTIVATE TRACKER v9.3.0 — DASHBOARD TROPHY PROGRESS
+
+CHANGE
+- Dashboard no longer shows a static-looking "Current trophy".
+- It now shows the NEXT trophy you are working toward.
+- Example: Bronze — 17 / 25 badges • 8 to unlock.
+- After Bronze unlocks, it automatically switches to Silver progress.
+- Then Gold, then Platinum.
+- The progress bar is calculated against the current trophy target, so it visibly moves with every badge earned.
+
+UPLOAD
+Unzip and upload EVERY file inside to the ROOT of your GitHub repository.
+Replace same-named files, commit to main, wait 1–3 minutes, then refresh.

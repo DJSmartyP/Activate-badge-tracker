@@ -1,0 +1,24 @@
+SMARTY'S ACTIVATE TRACKER v9.4.0 — BADGE / EASTER EGG CORRECTION
+
+CORRECTION
+- Easter Eggs are NOT a third collectible type.
+- Every Easter Egg item is a normal BADGE.
+- They count in the main badge total.
+- Completing one increments trophy progression exactly like any other badge.
+- Bronze / Silver / Gold / Platinum progress uses the full badges.json count, including Easter Egg badges.
+
+TARGETS
+- Added a convenient "Easter Egg badges" filter.
+- This is only a view/filter; it does NOT create separate progression.
+- The app currently contains 8 explicitly named Easter Egg badges:
+  Easter Egg Barrage, Easter Egg Flip, Easter Egg Mega Grid, Easter Egg Numbers, Easter Egg Statues, Easter Egg Stopwatch, Easter Egg Trivial, Easter Egg Words
+
+UNCHANGED
+- Trophies remain automatic milestone targets.
+- Pins and large in-room target view remain.
+- Competitive filters/cards remain.
+- Locations still infer games from rooms.
+
+UPLOAD
+Unzip and upload EVERY file inside to the ROOT of your GitHub repository.
+Replace same-named files, commit to main, wait 1–3 minutes, then refresh the app.
