@@ -1,0 +1,23 @@
+SMARTY'S ACTIVATE TRACKER v8.6.0 — COMPLETE BUILD
+
+FOCUS
+- Focus now works for EVERYTHING.
+- "All targets" shows badges AND trophies.
+- Selecting a room filters to only targets that explicitly require that room.
+- Global trophies are therefore shown in All Targets, but not under a room they do not require.
+- Pin any mix of up to 5 targets.
+- Trophy completion is automatic from badge progress.
+
+SPLASH SCREENS
+- Brand-new portrait splash: exact 1080x1920 (9:16).
+- Brand-new landscape splash: exact 1920x1080 (16:9).
+- Neon corridor / Smarty's Activate Tracker branding retained.
+
+UPLOAD
+1. Unzip this package.
+2. Upload EVERY file inside to the ROOT of the GitHub repository.
+3. Replace same-named files.
+4. Commit to main.
+5. Wait 1–3 minutes for GitHub Pages.
+6. Refresh the web page first.
+7. If the installed PWA shows old assets, remove it from the home screen and install again after refreshing.

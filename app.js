@@ -1,10 +1,10 @@
 
 'use strict';
 
-const VERSION='8.4.0';
+const VERSION='8.6.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
-let BADGES=[], ROOMS=[], GAMES=[];
+let BADGES=[], ROOMS=[], GAMES=[], BASE_BADGE_COUNT=0;
 let state=null;
 let modalBadgeIndex=null;
 let focusIndex=0;
@@ -23,10 +23,42 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const save=()=>localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
 const toast=msg=>{const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600)};
 const activeLocation=()=>state.locations.find(l=>l.id===state.activeLocation)||state.locations[0];
-const earnedCount=()=>BADGES.filter((_,i)=>state.earned[i]).length;
+const earnedCount=()=>BADGES.slice(0,BASE_BADGE_COUNT||BADGES.length).filter((_,i)=>state.earned[i]).length;
 const roomTypeFromInstance=n=>n==='Entrance'||n==='Exit'?n:n.replace(/\s+\d+$/,'');
 const roomParts=b=>(b.room||'').split(/\s*\/\s*/).map(x=>x.trim()).filter(Boolean);
 const gameParts=b=>(b.game||'').split(/\s*\/\s*/).map(x=>x.trim()).filter(Boolean);
+
+const isTrophy=b=>b && b.type==='trophy';
+function addTrophyTargets(){
+  BASE_BADGE_COUNT=BADGES.length;
+  BADGES=[
+    ...BADGES.map(b=>({...b,type:b.type||'badge'})),
+    {name:'Bronze Trophy',type:'trophy',how:'Achieve 25 badges.',room:'',game:'',level:'',trophyNeed:25},
+    {name:'Silver Trophy',type:'trophy',how:'Achieve 50 badges.',room:'',game:'',level:'',trophyNeed:50},
+    {name:'Gold Trophy',type:'trophy',how:'Achieve 75 badges.',room:'',game:'',level:'',trophyNeed:75},
+    {name:'Platinum Trophy',type:'trophy',how:'Achieve 100% of tracked badges.',room:'',game:'',level:'',trophyNeed:'all'}
+  ];
+}
+function syncTrophyEarned(){
+  const badgeCount=Object.keys(state.earned||{}).map(Number).filter(i=>i<BASE_BADGE_COUNT && state.earned[i]).length;
+  BADGES.forEach((b,i)=>{
+    if(!isTrophy(b))return;
+    const earned=b.trophyNeed==='all'?badgeCount>=BASE_BADGE_COUNT:badgeCount>=b.trophyNeed;
+    if(earned)state.earned[i]=true; else delete state.earned[i];
+  });
+}
+
+
+function gamesForSelectedRooms(){
+  const selected=new Set(activeLocation().rooms||[]);
+  const result=new Set();
+  BADGES.forEach(b=>{
+    const br=roomParts(b), bg=gameParts(b);
+    if(br.some(r=>selected.has(r))) bg.forEach(g=>result.add(g));
+  });
+  return [...result].sort((a,b)=>a.localeCompare(b));
+}
+
 
 function loadState(){
   try{
@@ -52,17 +84,17 @@ function ensureLocationShape(l){
 }
 
 function availableHere(b){
+  if(isTrophy(b)) return true;
   const l=activeLocation();
-  if(!l.rooms.length&&!l.games.length)return true;
   const rp=roomParts(b), gp=gameParts(b);
-  const roomOk=!rp.length||rp.some(r=>l.rooms.includes(r));
-  const gameOk=!gp.length||gp.some(g=>l.games.includes(g));
-  return roomOk&&gameOk;
+  const roomOk=!l.rooms.length || !rp.length || rp.some(r=>l.rooms.includes(r));
+  const gameOk=!l.games.length || !gp.length || gp.some(g=>l.games.includes(g));
+  return roomOk && gameOk;
 }
 
 function currentTrophy(){
   const n=earnedCount();
-  if(n>=BADGES.length)return 'Platinum';
+  if(n>=BASE_BADGE_COUNT)return 'Platinum';
   if(n>=75)return 'Gold';
   if(n>=50)return 'Silver';
   if(n>=25)return 'Bronze';
@@ -74,12 +106,12 @@ function nextTrophyText(){
   if(n<25)return `${25-n} to Bronze`;
   if(n<50)return `${50-n} to Silver`;
   if(n<75)return `${75-n} to Gold`;
-  if(n<BADGES.length)return `${BADGES.length-n} to Platinum`;
+  if(n<BASE_BADGE_COUNT)return `${BASE_BADGE_COUNT-n} to Platinum`;
   return '100% complete';
 }
 
 function renderHome(){
-  const n=earnedCount(), total=BADGES.length, pct=total?Math.round(n/total*100):0, l=activeLocation();
+  const n=earnedCount(), total=BASE_BADGE_COUNT, pct=total?Math.round(n/total*100):0, l=activeLocation();
   $('homeSummary').innerHTML=`<div class="label">Current trophy</div><div class="big">${esc(currentTrophy())}</div><div class="sub">${esc(nextTrophyText())}</div><div class="progress top-gap"><span style="width:${pct}%"></span></div><div class="metrics"><div class="metric"><span class="label">Earned</span><b>${n}</b></div><div class="metric"><span class="label">Complete</span><b>${pct}%</b></div><div class="metric"><span class="label">Location</span><b style="font-size:15px">${esc(l.name)}</b></div></div>`;
   $('trophies').innerHTML=[['Bronze',25],['Silver',50],['Gold',75],['Platinum',total]].map(([name,need])=>`<div class="card trophy ${n>=need?'':'locked'}"><div class="row between"><span class="cup">🏆</span><span class="pill">${n>=need?'Unlocked':`${Math.max(0,need-n)} left`}</span></div><h3>${name}</h3><div class="sub">${name==='Platinum'?'100% of tracked badges':`${need} badges`}</div><div class="progress top-gap"><span style="width:${need?Math.min(100,n/need*100):0}%"></span></div></div>`).join('');
   $('homePins').innerHTML=state.pins.length?state.pins.map((i,idx)=>`<div class="item row between"><div><b>${esc(BADGES[i].name)}</b><div class="sub">${esc(BADGES[i].room||'Any room')}</div></div><button class="mini" data-open-focus="${idx}">Open</button></div>`).join(''):'<div class="item sub">No pinned badges.</div>';
@@ -98,17 +130,24 @@ function renderBadges(){
   $('badgeCount').textContent=`${rows.length} shown`;
   $('badgeList').innerHTML=rows.length?rows.map(([b,i])=>`<article class="badge ${state.earned[i]?'done':''}">
     <button class="checkbtn" data-toggle-earned="${i}">${state.earned[i]?'✓':''}</button>
-    <div><h3>${esc(b.name)}</h3><p>${esc(b.how)}</p><div class="tags">${b.room?`<span class="tag">${esc(b.room)}</span>`:''}${b.game?`<span class="tag">${esc(b.game)}${b.level?' • L'+esc(b.level):''}</span>`:''}<span class="tag ${availableHere(b)?'ok':'away'}">${availableHere(b)?'Available here':'Other location'}</span></div></div>
+    <div><h3>${esc(b.name)}</h3><p>${esc(b.how)}</p><div class="tags"><span class="tag">${isTrophy(b)?'Trophy':'Badge'}</span>${b.room?`<span class="tag">${esc(b.room)}</span>`:''}${b.game?`<span class="tag">${esc(b.game)}${b.level?' • L'+esc(b.level):''}</span>`:''}${!isTrophy(b)?`<span class="tag ${availableHere(b)?'ok':'away'}">${availableHere(b)?'Available here':'Other location'}</span>`:''}</div></div>
     <div class="row"><button class="mini" data-pin="${i}">${state.pins.includes(i)?'📌':'📍'}</button><button class="mini" data-open-badge="${i}">›</button></div>
   </article>`).join(''):'<div class="item sub">No badges match those filters.</div>';
 }
 
 function renderLocations(){
   const l=activeLocation();
-  $('locationList').innerHTML=state.locations.map(x=>`<button class="item ${x.id===l.id?'active':''}" data-location="${x.id}"><b>${esc(x.name)}</b><div class="sub">${x.rooms.length} rooms • ${x.games.length} games</div></button>`).join('');
+  $('locationList').innerHTML=state.locations.map(x=>`<button class="item ${x.id===l.id?'active':''}" data-location="${x.id}"><b>${esc(x.name)}</b><div class="sub">${x.rooms.length} rooms • ${x.games.length} games selected</div></button>`).join('');
   $('locationName').value=l.name;
   $('locationRooms').innerHTML=ROOMS.map(r=>`<button class="toggle ${l.rooms.includes(r)?'on':''}" data-room-toggle="${esc(r)}">${esc(r)}</button>`).join('');
-  $('locationGames').innerHTML=GAMES.map(g=>`<button class="toggle ${l.games.includes(g)?'on':''}" data-game-toggle="${esc(g)}">${esc(g)}</button>`).join('');
+
+  const applicable=gamesForSelectedRooms();
+  // Drop game selections that no longer apply after room changes.
+  l.games=(l.games||[]).filter(g=>applicable.includes(g));
+
+  $('locationGames').innerHTML=applicable.length
+    ? applicable.map(g=>`<button class="toggle ${l.games.includes(g)?'on':''}" data-game-toggle="${esc(g)}">${esc(g)}</button>`).join('')
+    : '<div class="item sub">Select one or more rooms first. Games tied to those rooms will appear here.</div>';
 }
 
 function renderVenue(){
@@ -119,7 +158,7 @@ function renderVenue(){
     ? selected.map(r=>{
         const copies=Math.max(1,Number(l.roomCopies[r]||1));
         return `<div class="item row between">
-          <div><b>${esc(r)}</b><div class="sub">${copies===1?'Single room':'Duplicate room'}</div></div>
+          <div><b>${esc(r)}</b><div class="sub">${copies===1?'Single room':copies+' copies'}</div></div>
           <div class="row">
             <label class="checkline" style="margin:0">
               <input type="checkbox" data-dup-toggle="${esc(r)}" ${copies>1?'checked':''}>
@@ -131,13 +170,16 @@ function renderVenue(){
           </div>
         </div>`;
       }).join('')
-    : '<div class="item sub">Choose rooms in the Locations tab first.</div>';
+    : '<div class="item sub">Choose rooms in Locations first.</div>';
 
   const nodes=['Entrance',...l.roomInstances,'Exit'];
-  const previous=$('mapNode').value;
-  $('mapNode').innerHTML=nodes.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
-  $('mapNode').value=nodes.includes(previous)?previous:'Entrance';
-  renderMapEditor();
+  const current=$('walkCurrent');
+  const previous=current?.value||'Entrance';
+  current.innerHTML=nodes.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  current.value=nodes.includes(previous)?previous:'Entrance';
+
+  renderWalkNextOptions();
+
   $('mapSummary').innerHTML=nodes.map(n=>{
     const m=l.venueMap[n]||{};
     const bits=[m.front&&`Front → ${m.front}`,m.left&&`Left → ${m.left}`,m.right&&`Right → ${m.right}`,m.back&&`Back → ${m.back}`].filter(Boolean);
@@ -145,15 +187,34 @@ function renderVenue(){
   }).join('');
 }
 
-function renderMapEditor(){
-  const l=activeLocation(), node=$('mapNode').value||'Entrance';
-  const nodes=['Entrance',...l.roomInstances,'Exit'].filter(n=>n!==node);
-  const opts=()=>'<option value="">None</option>'+nodes.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
-  const m=l.venueMap[node]||{front:null,left:null,right:null,back:null};
-  $('mapEditor').innerHTML=`<div><div class="label">Left</div><select class="field" data-direction="left">${opts()}</select></div><div><div class="label">Front</div><select class="field" data-direction="front">${opts()}</select></div><div><div class="label">Right</div><select class="field" data-direction="right">${opts()}</select></div><div class="back"><div class="label">Back</div><select class="field" data-direction="back">${opts()}</select></div>`;
-  ['left','front','right','back'].forEach(d=>{$(`[data-direction="${d}"]`)});
-  document.querySelectorAll('[data-direction]').forEach(sel=>{sel.value=m[sel.dataset.direction]||'';sel.onchange=()=>{l.venueMap[node]=l.venueMap[node]||{};l.venueMap[node][sel.dataset.direction]=sel.value||null;save();renderVenue()}});
+function renderWalkNextOptions(){
+  const l=activeLocation();
+  const current=$('walkCurrent')?.value||'Entrance';
+  const nodes=['Entrance',...l.roomInstances,'Exit'].filter(n=>n!==current);
+  $('walkNext').innerHTML='<option value="">Choose next room…</option>'+nodes.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
 }
+
+function saveWalkStep(){
+  const l=activeLocation();
+  const current=$('walkCurrent').value;
+  const direction=$('walkDirection').value;
+  const next=$('walkNext').value;
+  if(!next){toast('Choose the next room');return}
+
+  l.venueMap[current]=l.venueMap[current]||{front:null,left:null,right:null,back:null};
+  l.venueMap[next]=l.venueMap[next]||{front:null,left:null,right:null,back:null};
+  l.venueMap[current][direction]=next;
+
+  // Create a simple return link where possible. It can be overwritten later.
+  if(!l.venueMap[next].back) l.venueMap[next].back=current;
+
+  save();
+  renderVenue();
+  $('walkCurrent').value=next;
+  renderWalkNextOptions();
+  toast(`${current} → ${next} saved`);
+}
+
 
 function buildRoomCopies(){
   const l=activeLocation(), old=l.venueMap||{};
@@ -175,25 +236,39 @@ function buildRoomCopies(){
 
 function availableFocusRooms(){
   const l=activeLocation();
-  if(l.roomInstances.length)return [...new Set(l.roomInstances.map(roomTypeFromInstance))];
   if(l.rooms.length)return [...l.rooms];
   return [...ROOMS];
 }
 
 function renderFocus(){
+  syncTrophyEarned();
   const rooms=availableFocusRooms(), chosen=$('focusRoom').value;
-  $('focusRoom').innerHTML='<option value="">Choose a room…</option>'+rooms.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
+  $('focusRoom').innerHTML='<option value="">All targets</option>'+rooms.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
   $('focusRoom').value=rooms.includes(chosen)?chosen:'';
   $('pinCount').textContent=`${state.pins.length} / ${MAX_PINS}`;
   renderFocusChoices();
-  $('pinList').innerHTML=state.pins.length?state.pins.map((i,idx)=>`<div class="item row between"><div><b>${esc(BADGES[i].name)}</b><div class="sub">${esc(BADGES[i].room||'Any room')} • ${esc(BADGES[i].how)}</div></div><div class="row"><button class="mini" data-open-focus="${idx}">Open</button><button class="mini" data-unpin="${i}">✕</button></div></div>`).join(''):'<div class="item sub">No pinned badges.</div>';
+  $('pinList').innerHTML=state.pins.length?state.pins.map((i,idx)=>`<div class="item row between"><div><b>${esc(BADGES[i].name)}</b><div class="sub">${isTrophy(BADGES[i])?'Trophy':esc(BADGES[i].room||'Global')} • ${esc(BADGES[i].how)}</div></div><div class="row"><button class="mini" data-open-focus="${idx}">Open</button><button class="mini" data-unpin="${i}">✕</button></div></div>`).join(''):'<div class="item sub">No pinned targets.</div>';
 }
 
 function renderFocusChoices(){
+  syncTrophyEarned();
   const room=$('focusRoom').value, showEarned=$('focusShowEarned').checked;
-  if(!room){$('focusChoices').innerHTML='<div class="item sub">Choose a room to see its badges.</div>';return}
-  const rows=BADGES.map((b,i)=>[b,i]).filter(([b,i])=>roomParts(b).includes(room)&&availableHere(b)&&(showEarned||!state.earned[i]));
-  $('focusChoices').innerHTML=rows.length?rows.map(([b,i])=>{const pinned=state.pins.includes(i);const full=state.pins.length>=MAX_PINS&&!pinned;return `<div class="item row between"><div><b>${state.earned[i]?'✓ ':''}${esc(b.name)}</b><div class="sub">${esc(b.how)}${b.game?' • '+esc(b.game):''}${b.level?' • L'+esc(b.level):''}</div></div><button class="mini" data-focus-pin="${i}" ${pinned||full?'disabled':''}>${pinned?'Pinned':full?'Limit 5':'Pin'}</button></div>`}).join(''):'<div class="item sub">No applicable badges for this room.</div>';
+  const rows=BADGES.map((b,i)=>[b,i]).filter(([b,i])=>{
+    if(room){
+      if(isTrophy(b)) return false;
+      if(!roomParts(b).includes(room)) return false;
+    }
+    if(!availableHere(b)) return false;
+    if(!showEarned && state.earned[i]) return false;
+    return true;
+  });
+
+  $('focusChoices').innerHTML=rows.length?rows.map(([b,i])=>{
+    const pinned=state.pins.includes(i), full=state.pins.length>=MAX_PINS&&!pinned;
+    const kind=isTrophy(b)?'Trophy':'Badge';
+    const scope=b.room?b.room:'Global';
+    return `<div class="item row between"><div><b>${state.earned[i]?'✓ ':''}${esc(b.name)}</b><div class="sub">${kind} • ${esc(scope)} • ${esc(b.how)}${b.game?' • '+esc(b.game):''}${b.level?' • L'+esc(b.level):''}</div></div><button class="mini" data-focus-pin="${i}" ${pinned||full?'disabled':''}>${pinned?'Pinned':full?'Limit 5':'Pin'}</button></div>`;
+  }).join(''):'<div class="item sub">No applicable targets for this filter.</div>';
 }
 
 function renderStats(){
@@ -207,8 +282,10 @@ function renderStats(){
 function renderAll(){renderHome();renderBadges();renderLocations();renderVenue();renderFocus();renderStats();save()}
 
 function toggleEarn(i){
+  if(isTrophy(BADGES[i])){toast('Trophies unlock automatically from badge progress');return}
   if(state.earned[i]){delete state.earned[i];state.history=state.history.filter(h=>h.badge!==i)}
   else{state.earned[i]=true;state.history.unshift({badge:i,date:new Date().toISOString().slice(0,10)})}
+  syncTrophyEarned();
   renderAll();
 }
 
@@ -223,7 +300,7 @@ function openBadge(i){
   modalBadgeIndex=i;const b=BADGES[i];
   $('modalTitle').textContent=b.name;
   $('modalBody').innerHTML=`<div class="detail"><strong>How to earn</strong>${esc(b.how)}</div>${b.room?`<div class="detail"><strong>Room / game</strong>${esc(b.room)}${b.game?' • '+esc(b.game):''}${b.level?' • Level '+esc(b.level):''}</div>`:''}${b.tip?`<div class="detail"><strong>Tip / watch out</strong>${esc(b.tip)}</div>`:''}${b.hint?`<div class="detail"><strong>Hint</strong>${esc(b.hint)}</div>`:''}${b.solution?`<div class="detail"><strong>Spoiler solution</strong><button id="revealSolution" class="btn ghost">Reveal</button><div id="solutionText" style="display:none;margin-top:8px">${esc(b.solution)}</div></div>`:''}`;
-  $('modalEarn').textContent=state.earned[i]?'Mark not earned':'Mark earned';
+  $('modalEarn').textContent=isTrophy(b)?(state.earned[i]?'Trophy unlocked':'Trophy progress automatic'):(state.earned[i]?'Mark not earned':'Mark earned');$('modalEarn').disabled=isTrophy(b);
   $('modalPin').textContent=state.pins.includes(i)?'Unpin':'Pin';
   $('badgeModal').classList.add('open');
   if($('revealSolution'))$('revealSolution').onclick=()=>{$('solutionText').style.display='block';$('revealSolution').style.display='none'};
@@ -248,9 +325,9 @@ async function init(){
   try{
     const [badgeRes,roomRes]=await Promise.all([fetch('badges.json',{cache:'no-store'}),fetch('rooms.json',{cache:'no-store'})]);
     if(!badgeRes.ok||!roomRes.ok)throw new Error('Data files failed to load');
-    BADGES=await badgeRes.json();
+    BADGES=await badgeRes.json();addTrophyTargets();
     const roomData=await roomRes.json();ROOMS=roomData.rooms||[];GAMES=roomData.games||[];
-    loadState();bindEvents();renderAll();
+    loadState();syncTrophyEarned();bindEvents();renderAll();
     setTimeout(()=>$('splash').classList.add('hide'),350);
   }catch(err){
     console.error(err);
@@ -287,7 +364,7 @@ function bindEvents(){
   $('addLocation').onclick=()=>{const id='loc_'+Date.now();state.locations.push({id,name:'New location',rooms:[],games:[],roomCopies:{},roomInstances:[],venueMap:{Entrance:{front:null,left:null,right:null,back:null},Exit:{front:null,left:null,right:null,back:null}}});state.activeLocation=id;renderAll()};
   $('deleteLocation').onclick=()=>{if(state.locations.length===1)return toast('Keep at least one location');state.locations=state.locations.filter(l=>l.id!==state.activeLocation);state.activeLocation=state.locations[0].id;renderAll()};
   $('allRooms').onclick=()=>{const l=activeLocation();l.rooms=[...ROOMS];l.rooms.forEach(r=>l.roomCopies[r]=l.roomCopies[r]||1);buildRoomCopies()};$('clearRooms').onclick=()=>{const l=activeLocation();l.rooms=[];l.roomCopies={};buildRoomCopies()};
-  $('allGames').onclick=()=>{activeLocation().games=[...GAMES];renderAll()};$('clearGames').onclick=()=>{activeLocation().games=[];renderAll()};
+  $('allGames').onclick=()=>{activeLocation().games=[...gamesForSelectedRooms()];renderAll()};$('clearGames').onclick=()=>{activeLocation().games=[];renderAll()};
   document.addEventListener('change',e=>{
   const dt=e.target.closest('[data-dup-toggle]');
   if(dt){
@@ -301,13 +378,27 @@ function bindEvents(){
     save();renderVenue();return;
   }
 });
-  $('buildRoomCopies').onclick=buildRoomCopies;$('mapNode').onchange=renderMapEditor;
+  $('buildRoomCopies').onclick=buildRoomCopies;$('walkCurrent').onchange=renderWalkNextOptions;$('saveWalkStep').onclick=saveWalkStep;$('resetWalkToEntrance').onclick=()=>{$('walkCurrent').value='Entrance';renderWalkNextOptions()};
   $('focusRoom').onchange=renderFocusChoices;$('focusShowEarned').onchange=renderFocusChoices;
   $('closeModal').onclick=()=>$('badgeModal').classList.remove('open');$('badgeModal').onclick=e=>{if(e.target.id==='badgeModal')$('badgeModal').classList.remove('open')};
   $('modalEarn').onclick=()=>{toggleEarn(modalBadgeIndex);openBadge(modalBadgeIndex)};$('modalPin').onclick=()=>{togglePin(modalBadgeIndex);openBadge(modalBadgeIndex)};
   $('closeFocusOverlay').onclick=()=>$('focusOverlay').classList.remove('open');
   $('focusNext').onclick=()=>openFocusOverlay(focusIndex+1);$('focusPrev').onclick=()=>openFocusOverlay(focusIndex-1);
-  $('focusComplete').onclick=()=>{if(!state.pins.length)return;const i=state.pins[focusIndex];if(!state.earned[i]){state.earned[i]=true;state.history.unshift({badge:i,date:new Date().toISOString().slice(0,10)})}state.pins=state.pins.filter(x=>x!==i);renderAll();if(state.pins.length)openFocusOverlay(Math.min(focusIndex,state.pins.length-1));else $('focusOverlay').classList.remove('open')};
+  $('focusComplete').onclick=()=>{
+    if(!state.pins.length)return;
+    const i=state.pins[focusIndex], target=BADGES[i];
+    if(isTrophy(target)){
+      syncTrophyEarned();
+      if(!state.earned[i]){toast('This trophy has not unlocked yet');return}
+    }else if(!state.earned[i]){
+      state.earned[i]=true;
+      state.history.unshift({badge:i,date:new Date().toISOString().slice(0,10)});
+      syncTrophyEarned();
+    }
+    state.pins=state.pins.filter(x=>x!==i);
+    renderAll();
+    if(state.pins.length)openFocusOverlay(Math.min(focusIndex,state.pins.length-1));else $('focusOverlay').classList.remove('open');
+  };
   $('backupTop').onclick=exportBackup;$('exportBackup').onclick=exportBackup;
   $('importBackup').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state=JSON.parse(r.result);state.locations.forEach(ensureLocationShape);save();renderAll();toast('Backup restored')}catch{toast('Could not read backup')}};r.readAsText(f)};
   $('resetApp').onclick=()=>{if(confirm('Reset all app data?')){state=defaultState();renderAll()}};

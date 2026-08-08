@@ -62,7 +62,7 @@
           <option value="away">Other location</option>
         </select>
       </div>
-      <div class="section-title"><h2>Badges</h2><span id="badgeCount" class="sub"></span></div>
+      <div class="section-title"><h2>Badges & Trophies</h2><span id="badgeCount" class="sub"></span></div>
       <div id="badgeList" class="badge-list"></div>
     </section>
 
@@ -85,7 +85,7 @@
 
       <div class="section-title">
         <h2>Games available</h2>
-        <span class="sub">Optional fine-tuning</span>
+        <span class="sub">Only games linked to your selected rooms are shown</span>
       </div>
       <div id="locationGames" class="toggle-grid"></div>
 
@@ -102,36 +102,60 @@
 
 
     
+
 <section id="venue" class="view">
   <div class="venue-layout">
     <div class="card">
       <div class="label">Venue editor</div>
       <h2>Duplicates</h2>
-      <p class="sub">Rooms are chosen in Locations. Here, only tell the app when a selected room has more than one copy.</p>
+      <p class="sub">Rooms are selected in Locations. Only change a room here if the venue has more than one copy.</p>
       <div id="duplicateControls" class="stack"></div>
-      <button class="btn primary top-gap" id="buildRoomCopies">Build map rooms</button>
+      <button class="btn primary top-gap" id="buildRoomCopies">Update room list</button>
     </div>
+
     <div class="card">
-      <div class="label">Map from Entrance</div>
-      <h2>Front / Left / Right / Back</h2>
-      <p class="sub">Entrance starts facing forward. Duplicate rooms appear as Laser 1, Laser 2, etc. Single rooms keep their normal name.</p>
-      <select id="mapNode" class="field"></select>
-      <div id="mapEditor" class="map-grid top-gap"></div>
-      <div class="section-title"><h2>Summary</h2></div>
+      <div class="label">Walk the venue</div>
+      <h2>Map it one step at a time</h2>
+      <p class="sub">Start at Entrance facing forward. For each step, choose the direction and the next room from the dropdown, then tap Save & Move. Repeat as you walk.</p>
+
+      <label class="label">I am currently at</label>
+      <select id="walkCurrent" class="field"></select>
+
+      <div class="row wrap top-gap">
+        <div style="flex:1;min-width:150px">
+          <label class="label">Direction</label>
+          <select id="walkDirection" class="field">
+            <option value="front">Front</option>
+            <option value="left">Left</option>
+            <option value="right">Right</option>
+            <option value="back">Back</option>
+          </select>
+        </div>
+        <div style="flex:2;min-width:190px">
+          <label class="label">Next room</label>
+          <select id="walkNext" class="field"></select>
+        </div>
+      </div>
+
+      <button id="saveWalkStep" class="btn success top-gap" style="width:100%">Save & Move to Next Room</button>
+      <button id="resetWalkToEntrance" class="btn ghost top-gap" style="width:100%">Jump back to Entrance</button>
+
+      <div class="section-title"><h2>Mapped connections</h2></div>
       <div id="mapSummary" class="stack"></div>
     </div>
   </div>
 </section>
 
 
+
     <section id="focus" class="view">
       <div class="focus-setup">
         <div class="card">
           <div class="label">Focus mode</div>
-          <h2>Choose badges for this room</h2>
-          <p class="sub">Nothing is selected automatically. Choose a room, then pin up to 5 badges across any rooms.</p>
+          <h2>Choose what to focus on</h2>
+          <p class="sub">Nothing is selected automatically. Leave the room filter on All Targets to see everything, or choose a room to see only targets that specifically require that room. Pin up to 5 total.</p>
           <label class="label">Room</label>
-          <select id="focusRoom" class="field"><option value="">Choose a room…</option></select>
+          <select id="focusRoom" class="field"><option value="">All targets</option></select>
           <label class="checkline"><input id="focusShowEarned" type="checkbox"> <span>Show earned badges too</span></label>
           <div id="focusChoices" class="stack"></div>
         </div>
@@ -153,7 +177,7 @@
     <section id="settings" class="view">
       <div class="card">
         <h2>Settings</h2>
-        <p class="sub">Version <strong>8.4.0</strong> — clean rebuild.</p>
+        <p class="sub">Version <strong>8.6.0</strong> — clean rebuild.</p>
         <div class="row wrap">
           <button class="btn primary" id="exportBackup">Export backup</button>
           <label class="btn">Restore backup<input id="importBackup" type="file" accept="application/json" hidden></label>
@@ -169,7 +193,7 @@
 
   <nav class="nav">
     <button class="active" data-view="home">⌂<br>Home</button>
-    <button data-view="badges">◈<br>Badges</button>
+    <button data-view="badges">◈<br>Targets</button>
     <button data-view="locations">⌖<br>Locations</button>
     <button data-view="venue">◇<br>Venue</button>
     <button data-view="focus">◎<br>Focus</button>

@@ -1,0 +1,30 @@
+SMARTY'S ACTIVATE TRACKER v8.5.0
+
+FIXES / CHANGES
+
+FOCUS
+- Restores room-based Focus badge selection.
+- Choose a room and see applicable badges for that room.
+- Empty game selection no longer hides game-specific badges.
+- Nothing is auto-pinned.
+- Maximum 5 pins remains.
+
+LOCATIONS
+- Choose room types first.
+- Games list now changes to show only games linked to the selected room types.
+- Selecting all games selects only those applicable games.
+- If you remove a room, irrelevant selected games are removed automatically.
+
+VENUE EDITOR
+- Simplified for setup while physically walking the venue.
+- Start at Entrance.
+- "I am currently at" dropdown.
+- Choose Front / Left / Right / Back.
+- Choose the next room from a dropdown.
+- Tap "Save & Move to Next Room".
+- App moves the current position to that room so you can immediately enter the next step.
+- Duplicate-room controls remain separate and simple.
+
+UPLOAD
+Upload every file in this ZIP to your GitHub repository root, replacing the existing files.
+Commit to main, wait 1–3 minutes for Pages, then refresh/reopen the app.
