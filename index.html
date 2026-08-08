@@ -1,7 +1,7 @@
 <!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070912"><meta name="mobile-web-app-capable" content="yes">
-<link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png"><link rel="apple-touch-icon" href="icon-192.png">
 <title>Activate Badge Tracker</title><style>
 :root{
  --bg:#070912;--panel:#101421;--panel2:#151a29;--text:#f7f8ff;--muted:#9aa5be;
@@ -63,7 +63,12 @@ h1{font-size:20px;margin:0}.sub,.label{color:var(--muted);font-size:12px}.label{
 @media(min-width:900px) and (orientation:landscape){
  .app{padding:16px 92px 16px 16px}.nav{left:auto;right:9px;top:50%;bottom:auto;transform:translateY(-50%);flex-direction:column}.nav button{min-width:64px}.badgeList{grid-template-columns:repeat(2,minmax(0,1fr))}.focusBody{grid-template-columns:1fr 1fr}.sheet{max-width:980px}
 }
-</style></head><body>
+
+.launchSplash{position:fixed;inset:0;z-index:500;display:grid;place-items:center;background:#05060d url('splash-portrait.png') center/cover no-repeat;transition:opacity .35s ease,visibility .35s ease}
+.launchSplash.hide{opacity:0;visibility:hidden}
+@media(orientation:landscape){.launchSplash{background-image:url('splash-landscape.png')}}
+.launchSplash span{position:absolute;left:-9999px}
+</style></head><body><div id="launchSplash" class="launchSplash" aria-label="Badge Tracker loading"><span>Badge Tracker loading</span></div>
 <div class="toast" aria-live="polite"></div>
 <main class="app"><header class="topbar"><div class="brand"><img src="icon-192.png" alt=""><div><h1>Badge Tracker</h1><div class="sub">Activate-inspired personal companion</div></div></div><button class="iconbtn" id="exportBtn">Backup</button></header>
 
@@ -268,4 +273,6 @@ document.getElementById('pinAvailable').onclick=()=>{const room=document.getElem
 document.getElementById('celebrateClose').onclick=()=>document.getElementById('celebrate').classList.remove('open');
 if('serviceWorker' in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('./sw.js').catch(()=>{});
 renderAll();
+</script><script>
+window.addEventListener('load',()=>setTimeout(()=>document.getElementById('launchSplash')?.classList.add('hide'),650));
 </script></body></html>
