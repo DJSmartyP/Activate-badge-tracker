@@ -139,3 +139,23 @@ linear-gradient(65deg,transparent 0 57%,rgba(0,230,255,.03) 58% 59%,transparent 
   background:rgba(0,230,255,.10);
   box-shadow:0 0 10px rgba(0,230,255,.10);
 }
+
+/* v10.3 venue readability */
+.location-choice{
+  color:#eef4ff;
+}
+.location-choice b{
+  color:#f7fbff;
+  font-weight:850;
+  text-shadow:0 0 10px rgba(255,255,255,.08);
+}
+.location-choice .sub{
+  color:#aeb8cf;
+}
+.location-choice.selected-location b{
+  color:#c9fbff;
+  text-shadow:0 0 12px rgba(0,230,255,.28);
+}
+.location-choice.selected-location .sub{
+  color:#c2cada;
+}

@@ -1,0 +1,17 @@
+SMARTY'S ACTIVATE TRACKER v10.3.0 — VENUE TEXT + SPLASH FIX
+
+FIXES
+- Venue names in the Locations list are now bright and readable.
+- Selected venue name gets a cyan highlight.
+- Secondary room/game text has better contrast.
+- Splash now has a TRUE minimum hold of 4.0 seconds.
+- Removed an older 350ms splash-dismiss timer that was overriding the longer delay.
+
+UPLOAD THESE FILES ONLY
+- index.html
+- app.js
+- style.css
+- sw.js
+
+Upload to the ROOT of your GitHub repository and replace the existing files.
+Your artwork is not included and will not be overwritten.

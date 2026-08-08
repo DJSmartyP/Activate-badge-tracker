@@ -1,9 +1,9 @@
-const SPLASH_MIN_MS=3500;
+const SPLASH_MIN_MS=4000;
 const APP_BOOT_STARTED=Date.now();
 
 'use strict';
 
-const VERSION='10.2.0';
+const VERSION='10.3.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -339,8 +339,7 @@ async function init(){
     BADGES=await badgeRes.json();addTrophyTargets();
     const roomData=await roomRes.json();ROOMS=roomData.rooms||[];GAMES=roomData.games||[];GAME_CATALOG=roomData.catalog||{};COMPETITIVE_INFO=roomData.competitiveInfo||{};
     loadState();syncTrophyEarned();bindEvents();renderAll();
-    setTimeout(()=>$('splash').classList.add('hide'),350);
-  }catch(err){
+}catch(err){
     console.error(err);
     setTimeout(()=>{$('splash').classList.add('hide')},Math.max(0,SPLASH_MIN_MS-(Date.now()-APP_BOOT_STARTED)));
     document.body.insertAdjacentHTML('afterbegin',`<div style="padding:16px;background:#5b1125;color:white">App failed to load: ${esc(err.message)}. Refresh the page after GitHub Pages finishes deploying.</div>`);
