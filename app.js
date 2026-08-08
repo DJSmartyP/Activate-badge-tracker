@@ -1,10 +1,10 @@
 
 'use strict';
 
-const VERSION='9.0.0';
+const VERSION='9.1.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
-let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, BASE_BADGE_COUNT=0;
+let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
 let state=null;
 let modalBadgeIndex=null;
 let focusIndex=0;
@@ -220,11 +220,19 @@ function availableFocusRooms(){
 function renderCompetitive(){
   const rows=competitiveEntries();
   $('competitiveCount').textContent=`${rows.length} games`;
-  $('competitiveList').innerHTML=rows.length?rows.map(x=>`<article class="badge">
+  $('competitiveList').innerHTML=rows.length?rows.map(x=>`<article class="badge comp-game" data-comp-room="${esc(x.room)}" data-comp-game="${esc(x.game)}">
     <div class="checkbtn">⚔</div>
-    <div><h3>${esc(x.game)}</h3><p>Competitive game</p><div class="tags"><span class="tag">${esc(x.room)}</span><span class="tag ok">Available here</span></div></div>
-    <div></div>
+    <div><h3>${esc(x.game)}</h3><p>Tap to see how the game is played.</p><div class="tags"><span class="tag">${esc(x.room)}</span><span class="tag ok">Competitive</span></div></div>
+    <div><button class="mini" data-comp-room="${esc(x.room)}" data-comp-game="${esc(x.game)}">›</button></div>
   </article>`).join(''):'<div class="item sub">No competitive games are listed for the rooms selected at this location.</div>';
+}
+
+function openCompetitiveGame(room,game){
+  const info=COMPETITIVE_INFO[`${room}||${game}`];
+  $('competitiveModalTitle').textContent=game;
+  $('competitiveModalBody').innerHTML=`<div class="game-card-room">${esc(room)} • Competitive</div>
+    <div class="game-how"><strong>How to play</strong>${esc(info?.description||'A description for this competitive game is not currently available in the Master Document data used by this build.')}</div>`;
+  $('competitiveModal').classList.add('open');
 }
 
 function renderStats(){
@@ -282,7 +290,7 @@ async function init(){
     const [badgeRes,roomRes]=await Promise.all([fetch('badges.json',{cache:'no-store'}),fetch('rooms.json',{cache:'no-store'})]);
     if(!badgeRes.ok||!roomRes.ok)throw new Error('Data files failed to load');
     BADGES=await badgeRes.json();addTrophyTargets();
-    const roomData=await roomRes.json();ROOMS=roomData.rooms||[];GAMES=roomData.games||[];GAME_CATALOG=roomData.catalog||{};
+    const roomData=await roomRes.json();ROOMS=roomData.rooms||[];GAMES=roomData.games||[];GAME_CATALOG=roomData.catalog||{};COMPETITIVE_INFO=roomData.competitiveInfo||{};
     loadState();syncTrophyEarned();bindEvents();renderAll();
     setTimeout(()=>$('splash').classList.add('hide'),350);
   }catch(err){
@@ -301,6 +309,8 @@ function bindEvents(){
     const fp=e.target.closest('[data-focus-pin]');if(fp)return togglePin(Number(fp.dataset.focusPin));
     const un=e.target.closest('[data-unpin]');if(un)return togglePin(Number(un.dataset.unpin));
     const of=e.target.closest('[data-open-focus]');if(of)return openFocusOverlay(Number(of.dataset.openFocus));
+    const cg=e.target.closest('[data-comp-game]');
+    if(cg){openCompetitiveGame(cg.dataset.compRoom,cg.dataset.compGame);return}
     const exg=e.target.closest('[data-exclude-game]');if(exg){
       const l=activeLocation(),g=exg.dataset.excludeGame;
       l.excludedGames=l.excludedGames||[];
@@ -326,7 +336,9 @@ function bindEvents(){
   $('deleteLocation').onclick=()=>{if(state.locations.length===1)return toast('Keep at least one location');state.locations=state.locations.filter(l=>l.id!==state.activeLocation);state.activeLocation=state.locations[0].id;renderAll()};
   $('allRooms').onclick=()=>{activeLocation().rooms=[...ROOMS];renderAll()};
   $('clearRooms').onclick=()=>{const l=activeLocation();l.rooms=[];l.excludedGames=[];renderAll()};
-  $('closeModal').onclick=()=>$('badgeModal').classList.remove('open');$('badgeModal').onclick=e=>{if(e.target.id==='badgeModal')$('badgeModal').classList.remove('open')};
+  $('closeModal').onclick=()=>$('badgeModal').classList.remove('open');
+  $('closeCompetitiveModal').onclick=()=>$('competitiveModal').classList.remove('open');
+  $('competitiveModal').onclick=e=>{if(e.target.id==='competitiveModal')$('competitiveModal').classList.remove('open')};$('badgeModal').onclick=e=>{if(e.target.id==='badgeModal')$('badgeModal').classList.remove('open')};
   $('modalEarn').onclick=()=>{toggleEarn(modalBadgeIndex);openBadge(modalBadgeIndex)};$('modalPin').onclick=()=>{togglePin(modalBadgeIndex);openBadge(modalBadgeIndex)};
   $('closeFocusOverlay').onclick=()=>$('focusOverlay').classList.remove('open');
   $('focusNext').onclick=()=>openFocusOverlay(focusIndex+1);$('focusPrev').onclick=()=>openFocusOverlay(focusIndex-1);

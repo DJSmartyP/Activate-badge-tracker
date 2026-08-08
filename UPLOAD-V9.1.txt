@@ -1,0 +1,22 @@
+SMARTY'S ACTIVATE TRACKER v9.1.0 — COMPETITIVE GAME CARDS
+
+NEW
+- Every game in the Competitive section is tappable.
+- Tapping a game opens a large card.
+- The card shows:
+  - Game name
+  - Room
+  - Competitive mode
+  - "How to play" explanation
+- Game explanations are taken from the Activate Master Document used for the tracker.
+- If that source does not contain a description for a listed competitive game, the card says so rather than inventing one.
+
+UNCHANGED
+- Targets includes room filtering and pins.
+- Large pinned-target instruction mode remains.
+- Locations infer games from selected rooms.
+- No venue mapping.
+
+UPLOAD
+Unzip and upload EVERY file to the ROOT of your GitHub repository.
+Replace same-named files, commit to main, wait 1–3 minutes, then refresh the app.

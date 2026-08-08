@@ -30,3 +30,11 @@ linear-gradient(65deg,transparent 0 57%,rgba(0,230,255,.03) 58% 59%,transparent 
 .game-auto.off{opacity:.55}
 .game-kind{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
 @media(max-width:780px){.venue-walk-grid{grid-template-columns:1fr}.nav{overflow-x:auto;justify-content:flex-start}}
+
+.comp-game{cursor:pointer;transition:transform .12s,border-color .12s,box-shadow .12s}
+.comp-game:active{transform:scale(.985)}
+.comp-game:hover{border-color:rgba(0,230,255,.4);box-shadow:0 0 24px rgba(0,230,255,.08)}
+.comp-sheet{max-width:720px}
+.game-card-room{font-size:14px;color:var(--cyan);margin-bottom:14px}
+.game-how{font-size:clamp(18px,3vw,26px);line-height:1.45;padding:18px;border-radius:18px;background:linear-gradient(180deg,rgba(22,28,45,.96),rgba(12,16,27,.96));border:1px solid rgba(0,230,255,.22)}
+.game-how strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px}

@@ -315,5 +315,157 @@
       "competitive": [],
       "cooperative": []
     }
+  },
+  "competitiveInfo": {
+    "Arena||Digby": {
+      "room": "Arena",
+      "game": "Digby",
+      "description": "Remember the placement and pattern of your coloured targets. Hit the targets to replicate the pattern shown before."
+    },
+    "Arena||Reveal": {
+      "room": "Arena",
+      "game": "Reveal",
+      "description": "Hit white targets to reveal their underlying colour. Reveal four targets of your colour to win, and hit a target of an opponent’s colour to cover it back up."
+    },
+    "Arena||Sectors": {
+      "room": "Arena",
+      "game": "Sectors",
+      "description": "Hit the targets to cycle the colour displayed. After 60 seconds, whoever has covered the most of the board with their colour will win."
+    },
+    "Arena||Sets": {
+      "room": "Arena",
+      "game": "Sets",
+      "description": "Hit your four coloured targets first to claim a set. At the end of the game, whoever has the most sets claimed will win. You can hit opponents' targets to turn them off."
+    },
+    "Arena||Swat": {
+      "room": "Arena",
+      "game": "Swat",
+      "description": "Hit the targets that appear of your colour. Make sure to hit them before they disappear, or you won’t get credit. Whoever has the most targets hit wins."
+    },
+    "Climb||Canyon Cross": {
+      "room": "Climb",
+      "game": "Canyon Cross",
+      "description": "Players take turns crossing the room while grabbing all of the holds that randomly light up in their colour. After everyone has had their turn, the fastest player to grab all their holds wins."
+    },
+    "Climb||Quick Grab": {
+      "room": "Climb",
+      "game": "Quick Grab",
+      "description": "Players start by holding two green rocks in front of them. Each round, two other rocks will pop up near the greens. The first player to grab each rock gains the point for that rock. When all rounds finish, the player with the most points wins."
+    },
+    "Control||Bop Clock": {
+      "room": "Control",
+      "game": "Bop Clock",
+      "description": "Use the D-Pad, buttons, and floor tiles to complete four different types of quick-fire minigames. Complete a minigame to pause your 60-second timer. Whoever’s timer lasts the longest wins."
+    },
+    "Control||Frequency": {
+      "room": "Control",
+      "game": "Frequency",
+      "description": "Press the coloured button that matches what colour you think appears most frequently on the screen. The closer you are, the more points you get. When someone reaches 15 points, the game ends. Watch out: if someone presses your guess before you can get to it, you have to pick something else."
+    },
+    "Control||Tails": {
+      "room": "Control",
+      "game": "Tails",
+      "description": "Use the D-Pad to maneuver your snake on the screen. Run to move faster, and collect your colour pixels to grow longer. The edges of the screen close in on the players, and whoever survives the longest wins."
+    },
+    "Grid||Colosseum": {
+      "room": "Grid",
+      "game": "Colosseum",
+      "description": "Players take turns trying to clear the tiles of their colour as fast as possible. Players on the outside can try to shoot orange tiles at the player in the middle to make more tiles appear. Whoever clears their tiles faster wins."
+    },
+    "Grid||Danger Zones": {
+      "room": "Grid",
+      "game": "Danger Zones",
+      "description": "Coloured zones for each player will appear at random spots in the room. Each player will earn points based on how quickly they reached their zone. Whoever reaches their zone first wins."
+    },
+    "Grid||Quick Step": {
+      "room": "Grid",
+      "game": "Quick Step",
+      "description": "When the game starts, lots of random tiles will appear scattered around the room in each player’s colour. Step on as many of your tiles as you can in 30 seconds to win."
+    },
+    "Hide||Numbers": {
+      "room": "Hide",
+      "game": "Numbers",
+      "description": "Panels in the room will display coloured numbers. Hit the numbers of your colour in ascending order. Whoever counts highest when the game ends wins."
+    },
+    "Hoops||Barrage": {
+      "room": "Hoops",
+      "game": "Barrage",
+      "description": "Score as many baskets as you can on your coloured hoop. Whoever has the most after 45 seconds wins."
+    },
+    "Hoops||Shot Clock": {
+      "room": "Hoops",
+      "game": "Shot Clock",
+      "description": "Score on whichever basket lights up your colour to stop the 20 second clock that is counting down. When the clock hits zero, you are out. Survive the longest to win."
+    },
+    "Hoops||Switch": {
+      "room": "Hoops",
+      "game": "Switch",
+      "description": "Score on your coloured basket to turn the light on. Score on an opponent’s coloured basket to turn their light off. When your light is on, points will count up, but they won’t when your light is off. Whoever has the most points at the end of the game will win."
+    },
+    "Laser||Trip Wire": {
+      "room": "Laser",
+      "game": "Trip Wire",
+      "description": "Step on your coloured laser while avoiding the other coloured lasers. Stepping on your laser will gain you a point and move the laser to another position. The first player to trigger 25 of their lasers wins."
+    },
+    "Mega Grid||100": {
+      "room": "Mega Grid",
+      "game": "100",
+      "description": "Everyone starts with 100 points on the board. Players will be asked a series of trivia questions with an answer between 0 and 100. Step on the tiles in your row to give your answer. After each question, everyone loses the amount of points equal to the difference between their answer and the correct one. When the game ends, whoever has the most points left wins."
+    },
+    "Mega Grid||Darvill Dash": {
+      "room": "Mega Grid",
+      "game": "Darvill Dash",
+      "description": "Everyone starts on their own green tile at the edge of the room. Hold your button to reveal your coloured tiles. When you let go, they will disappear and you have to memorize their location and step on them. At the end of the game, whoever stepped on the most of their tiles wins."
+    },
+    "Mega Grid||Lollipop": {
+      "room": "Mega Grid",
+      "game": "Lollipop",
+      "description": "Two moving rings of coloured tiles will appear in the center of the room. Regenerating orange tiles will appear around the edges. Step on the orange tiles to shoot straight forward at your colour. Shoot the most of your tiles to win."
+    },
+    "Mega Laser||Blitz": {
+      "room": "Mega Laser",
+      "game": "Blitz",
+      "description": "Like Zap, but competitive. Shoot the most of your coloured targets in the time given to win."
+    },
+    "Mega Laser||Flash Fight": {
+      "room": "Mega Laser",
+      "game": "Flash Fight",
+      "description": "Memorize the position of each of your coloured targets, then once they all disappear, shoot all of your coloured targets the fastest to win."
+    },
+    "Press||Gem Rush": {
+      "room": "Press",
+      "game": "Gem Rush",
+      "description": "Look at the four buttons in the top middle of the room. Each player tries to find those four buttons on their board the fastest. After 15 seconds, whoever found the most correct buttons wins the round. In a tie, both players get a point for the round. Whoever wins 3 rounds first wins the game."
+    },
+    "Press||Mosh Pit": {
+      "room": "Press",
+      "game": "Mosh Pit",
+      "description": "There will be one button of each colour. When you hit your coloured button, it will disappear and spawn somewhere else. Hit your coloured button 15 times to win. This game is very prone to running into your friends, so be careful!"
+    },
+    "Press||Paris": {
+      "room": "Press",
+      "game": "Paris",
+      "description": "Hit two identical buttons on your board at the same time to clear them. Clear all buttons on your board the fastest to win. There are usually more than two of each button (maybe 10 red, red, green), so hit any 2 of those 10 to clear those two. Then hit 2 of the remaining 8 to clear those two, etc. Whoever clears the most pairs wins."
+    },
+    "Strike||Airlocked": {
+      "room": "Strike",
+      "game": "Airlocked",
+      "description": "Hitting an airlock opens it, revealing either nothing or a coloured astronaut. Reveal all four of your astronauts at the same time to win. Hitting an open airlock closes it."
+    },
+    "Strike||Boom!": {
+      "room": "Strike",
+      "game": "Boom!",
+      "description": "Each player has a coloured bomb that ticks down. Hitting it makes it teleport and puts some time back on the timer. When the timer hits zero, you lose a life. Whoever makes their three lives last the longest wins."
+    },
+    "Trench||Flash Fight": {
+      "room": "Trench",
+      "game": "Flash Fight",
+      "description": "Memorize the position of each of your coloured targets, then once they all disappear, shoot all of your coloured targets the fastest to win."
+    },
+    "Trench||Zap": {
+      "room": "Trench",
+      "game": "Zap",
+      "description": "Shoot the targets that match your colour. Hit the most targets of your colour to win."
+    }
   }
 }
