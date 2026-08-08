@@ -1,6 +1,6 @@
 {
-  "name": "Smarty's Activate Tracker",
-  "short_name": "Smarty's Tracker",
+  "name": "Activate Tracker",
+  "short_name": "Activate Tracker",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

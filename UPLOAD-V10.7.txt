@@ -1,0 +1,19 @@
+ACTIVATE TRACKER v10.7.0 — APP NAME
+
+CHANGE
+- Installed/web app name is now "Activate Tracker".
+- PWA manifest name and short name are "Activate Tracker".
+- Existing splash artwork is unchanged.
+- 3-second automatic splash remains.
+
+UPLOAD THESE FILES ONLY
+- index.html
+- app.js
+- manifest.webmanifest
+- sw.js
+
+Upload to the ROOT of the GitHub repository and replace the existing files.
+
+NOTE
+If the app is already installed to the phone home screen, Android may cache the old installed name.
+If it still shows the old name after the site updates, remove the installed PWA shortcut/app and install it again.
