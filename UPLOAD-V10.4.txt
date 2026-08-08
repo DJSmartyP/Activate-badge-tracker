@@ -1,0 +1,21 @@
+SMARTY'S ACTIVATE TRACKER v10.4.0 — MANUAL SPLASH
+
+CHANGE
+- Removed all automatic splash timers.
+- Splash now stays on screen until you tap ENTER TRACKER.
+- This avoids timing/service-worker issues completely.
+
+SCALING
+- Portrait/front splash uses splash-portrait.png and is treated as 9:16 artwork.
+- Landscape/inner splash uses splash-landscape.png and is treated as 4:3 artwork.
+- Images are never stretched; any unavoidable extra screen area is filled by the dark background.
+- ENTER TRACKER respects Android safe-area spacing.
+
+UPLOAD THESE FILES ONLY
+- index.html
+- app.js
+- style.css
+- sw.js
+
+Upload to the ROOT of the GitHub repository and replace the existing files.
+Do not replace your PNG artwork.
