@@ -1,0 +1,722 @@
+[
+  {
+    "name": "10 For 10",
+    "how": "Win ten different level 10 games in a row",
+    "room": "",
+    "tip": "Extremely difficult. The source suggests building a set of reliable games and practising the weaker choices first."
+  },
+  {
+    "name": "15S in 15S",
+    "how": "Complete each wave of 15 Green level 6 in 15 seconds",
+    "room": "Hoops",
+    "game": "15 Green",
+    "level": "6",
+    "tip": "You can complete the waves faster than 15 seconds; the timing does not have to be exact. Practise the layout first."
+  },
+  {
+    "name": "2 Fast 2 See",
+    "how": "Complete Numbers level 2 without the eye going off",
+    "room": "Hide",
+    "game": "Numbers",
+    "level": "2",
+    "tip": "More players help. You have 9 seconds to hit 15 numbers and may lose lives by hitting wrong numbers."
+  },
+  {
+    "name": "2 Fast 2 See 2",
+    "how": "Complete Words level 10 without the eye going off",
+    "room": "Hide",
+    "game": "Words",
+    "level": "10",
+    "tip": "Completing a word resets the eye timer. Assign players to areas and move immediately."
+  },
+  {
+    "name": "2 For 2",
+    "how": "Win two different level 2 games in a row"
+  },
+  {
+    "name": "3 For 3",
+    "how": "Win three different level 3 games in a row"
+  },
+  {
+    "name": "4 For 4",
+    "how": "Win four different level 4 games in a row"
+  },
+  {
+    "name": "5 For 5",
+    "how": "Win five different level 5 games in a row"
+  },
+  {
+    "name": "6 For 6",
+    "how": "Win six different level 6 games in a row"
+  },
+  {
+    "name": "7 For 7",
+    "how": "Win seven different level 7 games in a row"
+  },
+  {
+    "name": "8 For 8",
+    "how": "Win eight different level 8 games in a row"
+  },
+  {
+    "name": "9 For 9",
+    "how": "Win nine different level 9 games in a row"
+  },
+  {
+    "name": "ACTIV8",
+    "how": "Score exactly 8888 points in any one level",
+    "tip": "The source suggests games you can end instantly, including Sequence, Technique and Spot. Trivial can also work."
+  },
+  {
+    "name": "Activated",
+    "how": "Beat all game levels available at your location",
+    "tip": "Badges transfer across locations, so the source recommends doing this where the available set is easiest for you."
+  },
+  {
+    "name": "Adrenaline Junkie",
+    "how": "Lose 4 lives before scoring a point, then beat Zap level 8",
+    "room": "Mega Laser / Trench",
+    "game": "Zap",
+    "level": "8",
+    "tip": "Fewer players is easier. Designate one person to lose the four lives first."
+  },
+  {
+    "name": "Best of Both Worlds",
+    "how": "Play an equal number of cooperative and competitive games for one visit"
+  },
+  {
+    "name": "Call Jenny",
+    "how": "Jenny, Jenny, who can I turn to?",
+    "room": "Strike",
+    "game": "Terminal",
+    "level": "2",
+    "hint": "Look at the badge icon closely. What is Jenny’s number?",
+    "solution": "Check if 000 is on the board. If it is, spell 8-6-7-5-3-0-9. After the telephone cue and “Hello”, beat the level."
+  },
+  {
+    "name": "Chasing Rainbows",
+    "how": "Play a game with a group of 5 players who are all different rank colours"
+  },
+  {
+    "name": "Completionist",
+    "how": "Play every game in the facility once",
+    "tip": "Competitive games count too. A disabled game can cause the badge to glitch."
+  },
+  {
+    "name": "Daily High Scorer",
+    "how": "Get 3 Daily High Scores in a row after 9pm",
+    "tip": "The source suggests using three easy games whose daily high score is still 0."
+  },
+  {
+    "name": "Deja Vu",
+    "how": "Win the same level 1 twice in a row"
+  },
+  {
+    "name": "Deja Vu 2.0",
+    "how": "Win the same level 2 twice in a row"
+  },
+  {
+    "name": "Deja Vu 3.0",
+    "how": "Win the same level 3 twice in a row"
+  },
+  {
+    "name": "Deja Vu 4.0",
+    "how": "Win the same level 4 twice in a row"
+  },
+  {
+    "name": "Deja Vu 5.0",
+    "how": "Win the same level 5 twice in a row"
+  },
+  {
+    "name": "Deja Vu 6.0",
+    "how": "Win the same level 6 twice in a row"
+  },
+  {
+    "name": "Deja Vu 7.0",
+    "how": "Win the same level 7 twice in a row"
+  },
+  {
+    "name": "Deja Vu 8.0",
+    "how": "Win the same level 8 twice in a row"
+  },
+  {
+    "name": "Deja Vu 9.0",
+    "how": "Win the same level 9 twice in a row"
+  },
+  {
+    "name": "Deja Vu Master",
+    "how": "Win the same level 10 twice in a row"
+  },
+  {
+    "name": "Direction Inspection 1.0",
+    "how": "Complete 15 Green level 4 by only sinking green baskets left to right",
+    "room": "Hoops",
+    "game": "15 Green",
+    "level": "4",
+    "tip": "After the rightmost basket, loop back to the leftmost."
+  },
+  {
+    "name": "Direction Inspection 2.0",
+    "how": "Complete Gems level 9 by pressing the target buttons from left to right",
+    "room": "Press",
+    "game": "Gems",
+    "level": "9"
+  },
+  {
+    "name": "Direction Inspection 3.0",
+    "how": "Complete Bullet Train level 9 by getting all targets in clockwise order",
+    "room": "Press",
+    "game": "Bullet Train",
+    "level": "9"
+  },
+  {
+    "name": "Directional Victory",
+    "how": "Complete Press-cision level 9 by getting all targets in clockwise order",
+    "room": "Push",
+    "game": "Press-cision",
+    "level": "9"
+  },
+  {
+    "name": "Directional Victory 2.0",
+    "how": "Complete Rings level 9 by pressing the target buttons from left to right",
+    "room": "Push",
+    "game": "Rings",
+    "level": "9"
+  },
+  {
+    "name": "Early Bird",
+    "how": "Win a game before 11 AM"
+  },
+  {
+    "name": "Easter Egg Barrage",
+    "how": "Don Quixote would find the egg and win the level",
+    "room": "Hoops",
+    "game": "Barrage",
+    "level": "3",
+    "hint": "Put all your eggs in one basket!",
+    "solution": "Beat the level while scoring all hoops on one basket, then score on the flashing basket."
+  },
+  {
+    "name": "Easter Egg Flip",
+    "how": "Find the egg, win the level",
+    "room": "Strike",
+    "game": "Flip",
+    "level": "6",
+    "hint": "What level has an egg, and what can you do with it?",
+    "solution": "Match the panel with the egg first, then beat the level."
+  },
+  {
+    "name": "Easter Egg Mega Grid",
+    "how": "Find the egg, win the level",
+    "room": "Mega Grid",
+    "game": "Mega Grid",
+    "level": "4",
+    "hint": "The egg is not obtained during the actual game itself. When else can you get it?",
+    "solution": "Before the game starts an egg briefly appears on a panel. Press it, then win the level."
+  },
+  {
+    "name": "Easter Egg Numbers",
+    "how": "Level the win, egg the find.",
+    "room": "Hide",
+    "game": "Numbers",
+    "level": "3",
+    "hint": "Read the description for the badge. What is different?",
+    "solution": "Hit the numbers from highest to lowest, then hit the panel with the egg. Beat the level normally."
+  },
+  {
+    "name": "Easter Egg Statues",
+    "how": "Find the egg, win the level",
+    "room": "Mega Grid",
+    "game": "Statues",
+    "level": "4",
+    "hint": "Watch the timers very closely.",
+    "solution": "During a round, one panel will not show a timer while the others do. Press it, then win the level."
+  },
+  {
+    "name": "Easter Egg Stopwatch",
+    "how": "Find the egg, win the level",
+    "room": "Portals",
+    "game": "Stopwatch",
+    "level": "8",
+    "hint": "What game elements are used in Stopwatch? Which ones aren’t?",
+    "solution": "At the start, press the panel that is draining down before it fully drains, then win the level."
+  },
+  {
+    "name": "Easter Egg Trivial",
+    "how": "Find the egg, win the level",
+    "room": "Hoops",
+    "game": "Trivial",
+    "level": "2",
+    "hint": "What question would have an Easter Egg?",
+    "solution": "When asked “Which of these is not associated with Easter?”, answer “Egg” and score on the flashing basket. Then answer “Tree” and finish the level.",
+    "tip": "The required question does not appear every attempt."
+  },
+  {
+    "name": "Easter Egg Words",
+    "how": "Find the egg, win the level",
+    "room": "Hide",
+    "game": "Words",
+    "level": "6",
+    "hint": "When you’re prompted for the egg, what else can you spell instead?",
+    "solution": "When the first word is EASTER, spell EGG, collect the egg on a random panel, then spell EASTER normally and win.",
+    "tip": "The EASTER prompt must be the first word, per the source as of Feb 2026."
+  },
+  {
+    "name": "Equal Partners",
+    "how": "Complete Barrage level 8 by using each active basket the same number of times",
+    "room": "Hoops",
+    "game": "Barrage",
+    "level": "8",
+    "tip": "Make sure each scored ball actually registers."
+  },
+  {
+    "name": "Expanding Horizons",
+    "how": "Play with 10 different people"
+  },
+  {
+    "name": "Fast Feet",
+    "how": "Complete Bop level 7 while each player steps on the tiles an additional 100 times",
+    "room": "Control",
+    "game": "Bop",
+    "level": "7",
+    "tip": "Running between waves should usually provide enough extra steps."
+  },
+  {
+    "name": "Firestorm",
+    "how": "Complete Mines level 8 without pressing the green button more than once",
+    "room": "Press",
+    "game": "Mines",
+    "level": "8"
+  },
+  {
+    "name": "Fire in the Hole",
+    "how": "Complete Blast level 8 without pressing the green button until all bombs are placed",
+    "room": "Push",
+    "game": "Blast",
+    "level": "8"
+  },
+  {
+    "name": "Friendly Enemies",
+    "how": "Play 25 competitive mode games"
+  },
+  {
+    "name": "Get Low",
+    "how": "Complete Whack-a-Hold level 9 by only using the bottom three rows",
+    "room": "Climb",
+    "game": "Whack-a-Hold",
+    "level": "9",
+    "tip": "Do not use blue or green rocks on the top two rows."
+  },
+  {
+    "name": "Go For Gold",
+    "how": "Qualify for a tournament",
+    "tip": "The document clarifies that this means the Tournament of Champions: top 30 yearly scores at your location at year end."
+  },
+  {
+    "name": "Halfway Mark",
+    "how": "Beat half of all game levels available at your location"
+  },
+  {
+    "name": "Hands Then Feet",
+    "how": "Complete Mega Grid level 8 hitting all buttons before stepping on the blue tiles",
+    "room": "Mega Grid",
+    "game": "Mega Grid",
+    "level": "8",
+    "tip": "Do not step on blue until every button has been hit."
+  },
+  {
+    "name": "Heating Up",
+    "how": "Win 50 competitive mode games"
+  },
+  {
+    "name": "Keener",
+    "how": "Be the first person to sign into each game for one visit"
+  },
+  {
+    "name": "Monthly High Scorer",
+    "how": "Set a monthly high score on the last day of the month"
+  },
+  {
+    "name": "My Own Competition",
+    "how": "Beat your personal high score in 25 levels"
+  },
+  {
+    "name": "Night Owl",
+    "how": "Win a game after 11 PM"
+  },
+  {
+    "name": "No Stone Unturned",
+    "how": "Complete Grid level 3 and step on every tile in the room",
+    "room": "Grid",
+    "game": "Grid",
+    "level": "3",
+    "tip": "Green tiles do not count while green, so revisit them after they move. Ensure there are no disabled tiles."
+  },
+  {
+    "name": "Old School",
+    "how": "Earn 30 bonus lives in Labyrinth level 3",
+    "room": "Control",
+    "game": "Labyrinth",
+    "level": "3",
+    "hint": "How would you earn 30 bonus lives in another game?",
+    "solution": "Before the game starts enter up, up, down, down, left, right, left, right on the D-Pad, then win.",
+    "tip": "Must be done before the game starts."
+  },
+  {
+    "name": "OmnipoTENce",
+    "how": "Play only level 10s for an entire visit"
+  },
+  {
+    "name": "One and Done",
+    "how": "Complete Technique level 5 without touching the same rocks more than once per round",
+    "room": "Climb",
+    "game": "Technique",
+    "level": "5"
+  },
+  {
+    "name": "One and Done 2.0",
+    "how": "Complete Spellinator level 4 without using the same letter more than once",
+    "room": "Hide",
+    "game": "Spellinator",
+    "level": "4"
+  },
+  {
+    "name": "One By One",
+    "how": "Complete Defuse level 5 with 3 players by only completing one target at a time",
+    "room": "Mega Laser / Trench",
+    "game": "Defuse",
+    "level": "5",
+    "tip": "If a wave times out, the badge will not award."
+  },
+  {
+    "name": "Out For Blood",
+    "how": "Only play competitive mode games for one visit"
+  },
+  {
+    "name": "Perfect Pairs",
+    "how": "Win level 1 of Link in less than 10 seconds",
+    "room": "Press",
+    "game": "Link",
+    "level": "1",
+    "tip": "Once pairs are found, use a fixed order to match them quickly."
+  },
+  {
+    "name": "Perfectly Paired",
+    "how": "Win level 2 of Match in less than 10 seconds",
+    "room": "Push",
+    "game": "Match",
+    "level": "2",
+    "tip": "Once pairs are found, use a fixed order to match them quickly."
+  },
+  {
+    "name": "Photobomb",
+    "how": "Take a photo in the photo room",
+    "room": "Photo"
+  },
+  {
+    "name": "Picture Perfect",
+    "how": "Take a photo within 60 seconds of completing a level without losing a life",
+    "room": "Photo",
+    "tip": "Any easy level can be used, as long as no life is lost."
+  },
+  {
+    "name": "Pop Quiz",
+    "how": "Solve each question of Trivial level 1 in less than 10 seconds",
+    "room": "Hoops",
+    "game": "Trivial",
+    "level": "1",
+    "tip": "Each round is 20 seconds, so more than 10 seconds remaining confirms you were fast enough."
+  },
+  {
+    "name": "Practice Makes Perfect",
+    "how": "Beat your personal high score in 100 levels"
+  },
+  {
+    "name": "Recollection",
+    "how": "Complete Memory level 6 without revealing a target more than twice",
+    "room": "Arena",
+    "game": "Memory",
+    "level": "6"
+  },
+  {
+    "name": "Recollection 2.0",
+    "how": "Complete Match level 8 without revealing a target more than twice",
+    "room": "Push",
+    "game": "Match",
+    "level": "8",
+    "tip": "The source suggests using removable personal items to mark positions."
+  },
+  {
+    "name": "Riddle 1.0",
+    "how": "With the sign all lit up, search the screen for the cup.",
+    "hint": "What sign isn’t already lit up? How can you light it up?",
+    "solution": "Sign in 5 players to a room sign-in screen, then check each game’s How To Play screen. When you see a trophy icon, click it. Its location changes daily."
+  },
+  {
+    "name": "Riddle 2.0",
+    "how": "Looking for stars while taking a break, look no further and click the mistake",
+    "hint": "“Stars” is a bit outdated. What would you use while taking a break that you could click on?",
+    "solution": "On the score checker iPad, go to Stats and click “Looses” in “Number of Looses”. It changes to “Losses” and awards the badge."
+  },
+  {
+    "name": "Riddle 3.0",
+    "how": "Mary had a little lamb, little lamb, little lamb. Mary had a little lamb, its fleece was white as snow.",
+    "hint": "Where could you play Mary Had A Little Lamb?",
+    "solution": "Click the badge trophies on the score checker. They make different pitches. Play Mary Had A Little Lamb on the trophies in the correct order."
+  },
+  {
+    "name": "Riddle 4.0",
+    "how": "Within one second of signing into a game, exit the score checker and this badge you will claim.",
+    "hint": "The description is mostly self-explanatory. How would you exit the score checker?",
+    "solution": "Scan your wristband on any sign-in screen, then click Sign Out on the score checker within 1 second."
+  },
+  {
+    "name": "Riddle 5.0",
+    "how": "Two may be missing, but there’s still twenty-four. Choose them in order, and forget about your score.",
+    "room": "Pipes",
+    "game": "Scramble",
+    "level": "1",
+    "hint": "What game has twenty-four, with two missing? That would add up to 26.",
+    "solution": "Pass the ball through all pipes in alphabetical order, skipping X and Z, then finish the level."
+  },
+  {
+    "name": "Riddle 6.0",
+    "how": "When the timer starts to run, in the first stage of level 1, go tick tock around the clock, giving all the buttons a knock",
+    "room": "Mega Grid",
+    "game": "Mega Grid",
+    "level": "1",
+    "hint": "In what game can you easily do this without instantly losing?",
+    "solution": "In the first wave, start on the left edge and hit all blue buttons in clockwise order, then beat the level."
+  },
+  {
+    "name": "Riddle 7.0",
+    "how": "Winning Activate level 7s can cause a lot of stress, now do it back to back in all games that start with S.",
+    "hint": "There is no specific order, but the challenge is that it is very difficult.",
+    "solution": "Go to each cooperative game at your facility beginning with S and beat level 7 of all of them in a row."
+  },
+  {
+    "name": "Row by Row",
+    "how": "Complete Technique level 7 by only using one row at a time",
+    "room": "Climb",
+    "game": "Technique",
+    "level": "7",
+    "tip": "All players must end each round on green, but not necessarily the same green."
+  },
+  {
+    "name": "Safety Second",
+    "how": "Complete Order Up level 8 without stepping on a green tile",
+    "room": "Mega Grid",
+    "game": "Order Up",
+    "level": "8",
+    "tip": "The source suggests moving opposite the reds and using large rhythmic strides."
+  },
+  {
+    "name": "Scatterbrained",
+    "how": "Never play back-to-back games in a room for one visit"
+  },
+  {
+    "name": "Showing Off",
+    "how": "Complete Barrage level 8 and sink 10 baskets on an unused net",
+    "room": "Hoops",
+    "game": "Barrage",
+    "level": "8",
+    "tip": "The 10 can be spread across different unused baskets."
+  },
+  {
+    "name": "Size Matters",
+    "how": "Complete Jigsaw level 5 by stepping on the solution pieces from smallest to largest",
+    "room": "Mega Grid",
+    "game": "Jigsaw",
+    "level": "5",
+    "tip": "The master document says tips are missing from this point onward."
+  },
+  {
+    "name": "Snake Island",
+    "how": "Keep five players alive in Tails for 60 seconds",
+    "room": "Control",
+    "game": "Tails"
+  },
+  {
+    "name": "Sniper 1.0",
+    "how": "Complete Terminal level 5 without missing a single throw",
+    "room": "Strike",
+    "game": "Terminal",
+    "level": "5"
+  },
+  {
+    "name": "Sniper 2.0",
+    "how": "Complete Dartmouth level 10 without missing a single throw",
+    "room": "Strike",
+    "game": "Dartmouth",
+    "level": "10"
+  },
+  {
+    "name": "Sniper Shot 1.0",
+    "how": "Complete Hunt level 7 without missing a single throw",
+    "room": "Arena",
+    "game": "Hunt",
+    "level": "7"
+  },
+  {
+    "name": "Sniper Shot 2.0",
+    "how": "Complete Digby level 10 without missing a single throw",
+    "room": "Arena",
+    "game": "Digby",
+    "level": "10"
+  },
+  {
+    "name": "Social Butterfly",
+    "how": "Play with 25 different people"
+  },
+  {
+    "name": "Starting a Rivalry",
+    "how": "Win 25 competitive mode games"
+  },
+  {
+    "name": "Steady Stream",
+    "how": "Complete Photon Rush level 6 while pushing the button every second",
+    "room": "Laser",
+    "game": "Photon Rush",
+    "level": "6",
+    "tip": "The source says this is now unobtainable except at Activate Louisville, where Photon Rush still exists."
+  },
+  {
+    "name": "The Gauntlet",
+    "how": "Beat levels 1 through 10 of a single game in a row without losing"
+  },
+  {
+    "name": "The Gauntlet Plus",
+    "how": "Beat levels 1 through 10 in a row without repeating a game and without losing a life"
+  },
+  {
+    "name": "The Grand Tour",
+    "how": "Win a level from every room in a row without losing a life"
+  },
+  {
+    "name": "The Marathon",
+    "how": "Beat Relay level 5, Mega Relay level 5 and Laser Relay level 5 in a row",
+    "room": "Hide / Mega Grid / Mega Laser",
+    "game": "Relay / Mega Relay / Laser Relay",
+    "level": "5"
+  },
+  {
+    "name": "The Ultimate Winner",
+    "how": "Win 100 competitive mode games"
+  },
+  {
+    "name": "Thumb War",
+    "how": "Score exactly 1234 points in any one level"
+  },
+  {
+    "name": "Tiptoeing",
+    "how": "Complete Zones level 5 without stepping on any wrong colours",
+    "room": "Grid",
+    "game": "Zones",
+    "level": "5"
+  },
+  {
+    "name": "Total Recall",
+    "how": "Complete Flip level 6 without revealing a target more than twice",
+    "room": "Strike",
+    "game": "Flip",
+    "level": "6"
+  },
+  {
+    "name": "Total Recall 2.0",
+    "how": "Complete Sequence level 6 without revealing a number more than twice",
+    "room": "Hide",
+    "game": "Sequence",
+    "level": "6"
+  },
+  {
+    "name": "Total Recall 3.0",
+    "how": "Complete Link level 8 without making a mistake",
+    "room": "Press",
+    "game": "Link",
+    "level": "8"
+  },
+  {
+    "name": "Untouchable",
+    "how": "Win level 1 of Mega Grid without losing a life",
+    "room": "Mega Grid",
+    "game": "Mega Grid",
+    "level": "1"
+  },
+  {
+    "name": "Untouchable 2.0",
+    "how": "Win level 2 of Maze without losing a life",
+    "room": "Mega Laser",
+    "game": "Maze",
+    "level": "2"
+  },
+  {
+    "name": "Untouchable 3.0",
+    "how": "Win level 3 of Technique without losing a life",
+    "room": "Climb",
+    "game": "Technique",
+    "level": "3"
+  },
+  {
+    "name": "Untouchable 4.0",
+    "how": "Win level 4 of Order Up without losing a life",
+    "room": "Mega Grid",
+    "game": "Order Up",
+    "level": "4"
+  },
+  {
+    "name": "Untouchable 5.0 – Piperooni",
+    "how": "Win level 5 of Piperooni without losing a life",
+    "room": "Pipes",
+    "game": "Piperooni",
+    "level": "5"
+  },
+  {
+    "name": "Untouchable 5.0 – Wormholes",
+    "how": "Win level 5 of Wormholes without losing a life",
+    "room": "Portals",
+    "game": "Wormholes",
+    "level": "5"
+  },
+  {
+    "name": "Untouchable 6.0",
+    "how": "Win level 6 of Gauntlet without losing a life",
+    "room": "Mega Laser",
+    "game": "Gauntlet",
+    "level": "6"
+  },
+  {
+    "name": "Untouchable 7.0",
+    "how": "Win level 7 of Mega Zones without losing a life",
+    "room": "Mega Grid",
+    "game": "Mega Zones",
+    "level": "7"
+  },
+  {
+    "name": "Untouchable 8.0",
+    "how": "Win level 8 of Defuse without losing a life",
+    "room": "Mega Laser / Trench",
+    "game": "Defuse",
+    "level": "8"
+  },
+  {
+    "name": "Untouchable 9.0",
+    "how": "Win level 9 of Asteroids without losing a life",
+    "room": "Strike",
+    "game": "Asteroids",
+    "level": "9"
+  },
+  {
+    "name": "Untouchable Master",
+    "how": "Win level 10 of Relay without losing a life",
+    "room": "Hide",
+    "game": "Relay",
+    "level": "10"
+  },
+  {
+    "name": "Up to Date",
+    "how": "Sign up for the Activate Newsletter from the website or sign-up screen"
+  },
+  {
+    "name": "Win/Loss",
+    "how": "Win twice as many games as you lose in one visit"
+  }
+]

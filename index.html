@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#070912">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Smarty's Activate Tracker</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="splash" class="launch-splash" aria-label="Smarty’s Activate Tracker loading"></div>
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <img src="icon-192.png" alt="">
+        <div>
+          <h1>Smarty's Activate Tracker</h1>
+          <div class="sub">Track • Pin • Conquer</div>
+        </div>
+      </div>
+      <button class="iconbtn" id="backupTop">Backup</button>
+    </header>
+
+    <section id="home" class="view active">
+      <div class="hero">
+        <div class="card hero-card" id="homeSummary"></div>
+        <div class="card">
+          <div class="row between">
+            <div>
+              <div class="label">Focus</div>
+              <h2>Pinned badges</h2>
+            </div>
+            <button class="btn primary" data-view="focus">Open</button>
+          </div>
+          <div id="homePins" class="stack"></div>
+        </div>
+      </div>
+      <div class="section-title"><h2>Trophies</h2><span class="sub">Badge-count progress only</span></div>
+      <div id="trophies" class="trophy-grid"></div>
+      <div class="section-title"><h2>Recent achievements</h2></div>
+      <div id="recent" class="stack"></div>
+    </section>
+
+    <section id="badges" class="view">
+      <div class="toolbar">
+        <input id="badgeSearch" class="field" type="search" placeholder="Search badge, room or game">
+        <select id="badgeStatus" class="field">
+          <option value="all">All badges</option>
+          <option value="todo">Not earned</option>
+          <option value="done">Earned</option>
+          <option value="pinned">Pinned</option>
+        </select>
+        <select id="badgeAvailability" class="field">
+          <option value="all">All locations</option>
+          <option value="here">Available here</option>
+          <option value="away">Other location</option>
+        </select>
+      </div>
+      <div class="section-title"><h2>Badges</h2><span id="badgeCount" class="sub"></span></div>
+      <div id="badgeList" class="badge-list"></div>
+    </section>
+
+    <section id="locations" class="view">
+      <div class="location-layout">
+        <div>
+          <div class="row between"><h2>Locations</h2><button class="btn primary" id="addLocation">+ Add</button></div>
+          <div id="locationList" class="stack"></div>
+        </div>
+        <div class="card">
+          <label class="label">Location name</label>
+          <input id="locationName" class="field">
+          <div class="section-title"><h2>Rooms available</h2></div>
+          <div id="locationRooms" class="toggle-grid"></div>
+          <div class="section-title"><h2>Games available</h2></div>
+          <div id="locationGames" class="toggle-grid"></div>
+          <div class="row wrap top-gap">
+            <button class="btn ghost" id="allRooms">Select all rooms</button>
+            <button class="btn ghost" id="clearRooms">Clear rooms</button>
+            <button class="btn ghost" id="allGames">Select all games</button>
+            <button class="btn ghost" id="clearGames">Clear games</button>
+            <button class="btn danger" id="deleteLocation">Delete location</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="venue" class="view">
+      <div class="venue-layout">
+        <div class="card">
+          <div class="label">Venue editor</div>
+          <h2>Room copies</h2>
+          <p class="sub">Set the number of each room at this venue. Entrance and Exit are always included.</p>
+          <div id="roomCopyControls" class="stack"></div>
+          <button class="btn primary top-gap" id="buildRoomCopies">Build room copies</button>
+        </div>
+        <div class="card">
+          <div class="label">Map from Entrance</div>
+          <h2>Front / Left / Right / Back</h2>
+          <p class="sub">Start at Entrance facing forward. Use Left or Right for alcoves, side corridors or corners.</p>
+          <select id="mapNode" class="field"></select>
+          <div id="mapEditor" class="map-grid top-gap"></div>
+          <div class="section-title"><h2>Summary</h2></div>
+          <div id="mapSummary" class="stack"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="focus" class="view">
+      <div class="focus-setup">
+        <div class="card">
+          <div class="label">Focus mode</div>
+          <h2>Choose badges for this room</h2>
+          <p class="sub">Nothing is selected automatically. Choose a room, then pin up to 5 badges across any rooms.</p>
+          <label class="label">Room</label>
+          <select id="focusRoom" class="field"><option value="">Choose a room…</option></select>
+          <label class="checkline"><input id="focusShowEarned" type="checkbox"> <span>Show earned badges too</span></label>
+          <div id="focusChoices" class="stack"></div>
+        </div>
+        <div>
+          <div class="section-title"><h2>Pinned <span id="pinCount" class="pill">0 / 5</span></h2></div>
+          <div id="pinList" class="stack"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="stats" class="view">
+      <div id="statsCards" class="stats-grid"></div>
+      <div class="hero top-gap">
+        <div class="card"><h2>Earned by room</h2><div id="roomStats" class="stack"></div></div>
+        <div class="card"><h2>Achievement history</h2><div id="historyList" class="stack"></div></div>
+      </div>
+    </section>
+
+    <section id="settings" class="view">
+      <div class="card">
+        <h2>Settings</h2>
+        <p class="sub">Version <strong>8.3.0</strong> — clean rebuild.</p>
+        <div class="row wrap">
+          <button class="btn primary" id="exportBackup">Export backup</button>
+          <label class="btn">Restore backup<input id="importBackup" type="file" accept="application/json" hidden></label>
+          <button class="btn danger" id="resetApp">Reset app data</button>
+        </div>
+      </div>
+      <div class="card top-gap">
+        <h2>Regional trophy information</h2>
+        <p class="sub">Prizes and rewards are intentionally not shown because they can vary by country and location.</p>
+      </div>
+    </section>
+  </main>
+
+  <nav class="nav">
+    <button class="active" data-view="home">⌂<br>Home</button>
+    <button data-view="badges">◈<br>Badges</button>
+    <button data-view="locations">⌖<br>Locations</button>
+    <button data-view="venue">◇<br>Venue</button>
+    <button data-view="focus">◎<br>Focus</button>
+    <button data-view="stats">▥<br>Stats</button>
+    <button data-view="settings">⚙<br>Settings</button>
+  </nav>
+
+  <div id="badgeModal" class="modal">
+    <div class="sheet">
+      <div class="row between"><h2 id="modalTitle"></h2><button id="closeModal" class="iconbtn">✕</button></div>
+      <div id="modalBody"></div>
+      <div class="row wrap top-gap">
+        <button id="modalEarn" class="btn success"></button>
+        <button id="modalPin" class="btn"></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="focusOverlay" class="focus-overlay">
+    <div class="focus-inner">
+      <div class="row between">
+        <div><div class="label">Pinned instructions</div><span id="focusPosition" class="sub"></span></div>
+        <button id="closeFocusOverlay" class="iconbtn">✕ Close</button>
+      </div>
+      <div id="focusOverlayBody" class="focus-overlay-body"></div>
+      <div class="focus-actions">
+        <button id="focusComplete" class="btn success">✓ Complete & Remove</button>
+        <button id="focusNext" class="btn primary">Next →</button>
+        <button id="focusPrev" class="btn">← Previous</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
