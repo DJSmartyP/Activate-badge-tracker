@@ -40,3 +40,63 @@ linear-gradient(65deg,transparent 0 57%,rgba(0,230,255,.03) 58% 59%,transparent 
 .game-how strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px}
 
 .comp-toolbar{grid-template-columns:1fr 180px}@media(max-width:780px){.comp-toolbar{grid-template-columns:1fr}}
+
+/* v10.0 Targets polish */
+.target-card{
+  position:relative;
+  transition:border-color .16s ease, box-shadow .16s ease, opacity .16s ease, transform .12s ease;
+}
+.target-card.available-here{
+  border-color:rgba(80,255,155,.36);
+  box-shadow:0 0 22px rgba(80,255,155,.08);
+}
+.target-card.available-here .availability-tag.ok{
+  color:#a8ffd0;
+  border-color:rgba(80,255,155,.42);
+  background:rgba(80,255,155,.10);
+  box-shadow:0 0 12px rgba(80,255,155,.10);
+}
+.target-card.other-location{
+  border-color:rgba(150,158,178,.20);
+  opacity:.74;
+}
+.target-card.other-location:hover,
+.target-card.other-location:focus-within{
+  opacity:.92;
+}
+.target-card.other-location .availability-tag.away{
+  color:#aab0c0;
+  border-color:rgba(170,176,192,.26);
+  background:rgba(170,176,192,.07);
+}
+.target-card.completed-target{
+  opacity:1;
+  border-color:rgba(255,211,77,.42);
+  box-shadow:0 0 24px rgba(255,211,77,.10);
+}
+.target-card.completed-target .checkbtn{
+  color:#ffe78e;
+  border-color:rgba(255,211,77,.50);
+  background:rgba(255,211,77,.10);
+  box-shadow:0 0 16px rgba(255,211,77,.12);
+}
+.target-card.pinned-target{
+  box-shadow:0 0 0 1px rgba(0,230,255,.22),0 0 22px rgba(0,230,255,.10);
+}
+.target-card.pinned-target::after{
+  content:"PINNED";
+  position:absolute;
+  top:8px;
+  right:10px;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.12em;
+  color:#87f5ff;
+  text-shadow:0 0 8px rgba(0,230,255,.55);
+  pointer-events:none;
+}
+.pin-button.active{
+  color:#87f5ff;
+  border-color:rgba(0,230,255,.42);
+  box-shadow:0 0 12px rgba(0,230,255,.12);
+}

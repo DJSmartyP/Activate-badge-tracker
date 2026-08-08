@@ -1,0 +1,26 @@
+SMARTY'S ACTIVATE TRACKER v10.0.0 — CODE-ONLY UPDATE
+
+YOUR NEW GRAPHICS ARE NOT INCLUDED.
+This package is designed for a repository where you have already uploaded the replacement art.
+
+WHAT CHANGED
+- Removed Badge / Trophy / Easter Egg type dropdown from Targets.
+- Kept Search, Room, Status, and Availability filters.
+- Available Here targets get a subtle neon-green treatment.
+- Other Location targets are greyed slightly.
+- Completed targets get a gold accent/glow.
+- Pinned targets get a cyan accent and PINNED marker.
+- Target terminology is used more consistently.
+- Competitive search / room filtering and game cards remain.
+- Trophy progress dashboard remains.
+- Easter Egg items remain normal badges and continue counting toward trophy progression.
+
+UPLOAD THESE FILES ONLY
+- index.html
+- app.js
+- style.css
+- sw.js
+- manifest.webmanifest
+
+Upload them to the ROOT of your GitHub repository and replace the existing same-named files.
+Do NOT replace your newly uploaded PNG artwork.

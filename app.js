@@ -1,7 +1,7 @@
 
 'use strict';
 
-const VERSION='9.4.0';
+const VERSION='10.0.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -176,7 +176,6 @@ function renderBadges(){
   roomSel.value=rooms.includes(chosen)?chosen:'';
 
   const room=roomSel.value;
-  const type=$('targetType').value;
   const q=$('badgeSearch').value.trim().toLowerCase();
   const status=$('badgeStatus').value;
   const avail=$('badgeAvailability').value;
@@ -185,13 +184,9 @@ function renderBadges(){
     const text=JSON.stringify(b).toLowerCase();
     const qok=!q||text.includes(q);
     const roomOk=!room || (!isTrophy(b) && roomParts(b).includes(room));
-    const typeOk=type==='all'
-      || (type==='badge' && !isTrophy(b))
-      || (type==='trophy' && isTrophy(b))
-      || (type==='easter' && isEasterEggBadge(b));
     const sok=status==='all'||(status==='todo'&&!state.earned[i])||(status==='done'&&state.earned[i])||(status==='pinned'&&state.pins.includes(i));
     const aok=avail==='all'||(avail==='here'&&availableHere(b))||(avail==='away'&&!availableHere(b));
-    return qok&&roomOk&&typeOk&&sok&&aok;
+    return qok&&roomOk&&sok&&aok;
   });
 
   $('pinCount').textContent=`${state.pins.length} / ${MAX_PINS}`;
@@ -201,15 +196,15 @@ function renderBadges(){
   </div>`).join(''):'<div class="item sub">No pinned targets.</div>';
 
   $('badgeCount').textContent=`${rows.length} shown`;
-  $('badgeList').innerHTML=rows.length?rows.map(([b,i])=>`<article class="badge ${state.earned[i]?'done':''}">
+  $('badgeList').innerHTML=rows.length?rows.map(([b,i])=>`<article class="badge target-card ${availableHere(b)?'available-here':'other-location'} ${state.earned[i]?'done completed-target':''} ${state.pins.includes(i)?'pinned-target':''}">
     <button class="checkbtn" data-toggle-earned="${i}" ${isTrophy(b)?'disabled':''}>${state.earned[i]?'✓':''}</button>
     <div><h3>${esc(b.name)}</h3><p>${esc(b.how)}</p><div class="tags">
       <span class="tag">${isTrophy(b)?'Trophy':isEasterEggBadge(b)?'Badge • Easter Egg':'Badge'}</span>
       ${b.room?`<span class="tag">${esc(b.room)}</span>`:''}
       ${b.game?`<span class="tag">${esc(b.game)}${b.level?' • L'+esc(b.level):''}</span>`:''}
-      ${!isTrophy(b)?`<span class="tag ${availableHere(b)?'ok':'away'}">${availableHere(b)?'Available here':'Other location'}</span>`:''}
+      ${!isTrophy(b)?`<span class="tag availability-tag ${availableHere(b)?'ok':'away'}">${availableHere(b)?'Available here':'Other location'}</span>`:''}
     </div></div>
-    <div class="row"><button class="mini" data-pin="${i}">${state.pins.includes(i)?'📌':'📍'}</button><button class="mini" data-open-badge="${i}">›</button></div>
+    <div class="row"><button class="mini pin-button ${state.pins.includes(i)?'active':''}" data-pin="${i}" title="${state.pins.includes(i)?'Pinned':'Pin target'}">${state.pins.includes(i)?'📌':'📍'}</button><button class="mini" data-open-badge="${i}">›</button></div>
   </article>`).join(''):'<div class="item sub">No targets match those filters.</div>';
 }
 
@@ -284,7 +279,7 @@ function renderStats(){
 function renderAll(){renderHome();renderBadges();renderLocations();renderCompetitive();renderStats();save()}
 
 function toggleEarn(i){
-  if(isTrophy(BADGES[i])){toast('Trophies unlock automatically from badge progress');return}
+  if(isTrophy(BADGES[i])){toast('Trophies unlock automatically from target progress');return}
   if(state.earned[i]){delete state.earned[i];state.history=state.history.filter(h=>h.badge!==i)}
   else{state.earned[i]=true;state.history.unshift({badge:i,date:new Date().toISOString().slice(0,10)})}
   syncTrophyEarned();
