@@ -218,8 +218,8 @@ function trophyInfo(n){
  if(n>=75)return['Gold',`${total-n} to Platinum`,''];
  if(n>=50)return['Silver',`${75-n} to Gold`,''];
  if(n>=25)return['Bronze',`${50-n} to Silver`,''];
- return['No trophy yet',`${25-n} to Bronze`,'']
-} to Platinum`,''];if(n>=50)return['Silver',`${75-n} to Gold`,''];if(n>=25)return['Bronze',`${50-n} to Silver`,''];return['No trophy yet',`${25-n} to Bronze`,'']}
+ return['No trophy yet',`${25-n} to Bronze`,''];
+}
 function celebrate(title,body,icon='🏆'){document.getElementById('celebrateTitle').textContent=title;document.getElementById('celebrateBody').textContent=body;document.getElementById('celebrateIcon').textContent=icon;document.getElementById('celebrate').classList.add('open')}
 function maybeCelebrate(oldCount,newCount,badgeName){
  const oldT=currentTrophy(oldCount),newT=currentTrophy(newCount);
