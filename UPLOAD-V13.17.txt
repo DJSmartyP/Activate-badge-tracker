@@ -1,0 +1,27 @@
+ACTIVATE TRACKER v13.17 — DRAMATIC SCI-FI TITLES
+
+TYPOGRAPHY
+- Replaced Oxanium as the main display face with Bruno Ace SC.
+- Inter remains the body/UI font.
+- Bruno Ace SC is used for:
+  • page titles
+  • section headings
+  • room headings
+  • game headings
+  • Focus titles
+  • temporary logo placeholder
+- Focus title remains a constant 38px as requested.
+- Small-screen letter spacing is tightened slightly to avoid crowding.
+
+RETAINED
+- Portrait Focus repair + responsive Focus text fitting
+- Single logo placeholder
+- Neon pink/blue animated high-score frame
+- Thicker outlines
+- Landscape scrolling fix
+
+UPLOAD TO GITHUB ROOT:
+index.html
+app.js
+style.css
+sw.js

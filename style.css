@@ -2397,3 +2397,47 @@ p{
     padding-right:7px !important;
   }
 }
+
+/* v13.17 — more dramatic sci-fi display type */
+:root{
+  --font-display:"Bruno Ace SC","Oxanium","Segoe UI",system-ui,sans-serif;
+}
+
+h1,
+h2,
+h3,
+.page-bar-copy h1,
+.section-title h2,
+.room-title-row h3,
+.side-drawer-head strong,
+.brand-banner-placeholder .brand-wordmark > strong,
+#focusOverlayBody .focus-title{
+  font-family:var(--font-display);
+  font-weight:400 !important;
+  text-transform:uppercase;
+  letter-spacing:.035em;
+}
+
+/* Game names remain readable and slightly less theatrical. */
+.room-game-head strong{
+  font-family:var(--font-display);
+  font-weight:400 !important;
+  letter-spacing:.02em;
+}
+
+/* Keep Focus titles at the constant size requested previously. */
+#focusOverlayBody .focus-title{
+  font-size:38px !important;
+  line-height:1.02 !important;
+  letter-spacing:.025em !important;
+}
+
+/* Small screens: same font and size, just tighter tracking to prevent crowding. */
+@media (max-width:390px){
+  #focusOverlayBody .focus-title{
+    letter-spacing:.01em !important;
+  }
+  .page-bar-copy h1{
+    letter-spacing:.018em !important;
+  }
+}
