@@ -1,0 +1,14 @@
+ACTIVATE TRACKER v12.4 — STICKY HEADER + NO TOP BACKUP
+
+CHANGES
+- Removed the erroneous Backup button from the top/page bar.
+- Backup/restore remain in Settings only.
+- The top logo row and dynamic page row are locked together at the top.
+- On every page, only the content beneath those rows scrolls.
+- Competitive checkbox behavior from v12.3 is retained.
+
+UPLOAD:
+index.html
+app.js
+style.css
+sw.js

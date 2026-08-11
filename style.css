@@ -734,3 +734,46 @@ body{overflow:hidden}
   outline:2px solid rgba(255,255,255,.55);
   outline-offset:2px;
 }
+
+/* v12.4 sticky two-row header on every page */
+.app{
+  height:100dvh;
+  overflow:hidden;
+}
+.app-header-shell{
+  position:sticky!important;
+  top:0!important;
+  z-index:120!important;
+  flex:0 0 auto;
+}
+.logo-placeholder-bar,
+.logo-bar{
+  position:relative;
+  z-index:121;
+}
+.page-bar{
+  position:relative;
+  z-index:122;
+}
+
+/* Only the page content scrolls beneath the locked header */
+.app-scroll{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto!important;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:contain;
+}
+
+/* If this build has direct child views rather than .app-scroll, use main as the scroll container */
+.app:not(:has(.app-scroll)){
+  overflow-y:auto;
+}
+.app:not(:has(.app-scroll)) > .app-header-shell{
+  position:sticky!important;
+  top:0!important;
+}
+
+/* Remove any leftover backup control from the page header layout */
+#backupTop,.page-backup{display:none!important}
