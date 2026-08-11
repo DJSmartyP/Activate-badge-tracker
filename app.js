@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.15.0';
+const VERSION='13.16.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -376,6 +376,63 @@ function openBadge(i){
 }
 
 
+
+let focusFitFrame=0;
+
+function fitFocusText(){
+  const overlay=$('focusOverlay');
+  const body=$('focusOverlayBody');
+  if(!overlay?.classList.contains('open') || !body)return;
+
+  const landscape=window.matchMedia('(orientation:landscape) and (min-width:700px)').matches;
+
+  // Titles intentionally do NOT scale from badge to badge.
+  // Only the instruction/detail copy is fitted to the available Focus body.
+  const limits=landscape
+    ? {reqMin:18,reqMax:30,detailMin:12.5,detailMax:16,metaMin:11,metaMax:13}
+    : {reqMin:18,reqMax:34,detailMin:13,detailMax:17,metaMin:11,metaMax:13};
+
+  const apply=t=>{
+    const lerp=(a,b)=>a+(b-a)*t;
+    body.style.setProperty('--focus-requirement-size',`${lerp(limits.reqMin,limits.reqMax).toFixed(2)}px`);
+    body.style.setProperty('--focus-detail-size',`${lerp(limits.detailMin,limits.detailMax).toFixed(2)}px`);
+    body.style.setProperty('--focus-meta-size',`${lerp(limits.metaMin,limits.metaMax).toFixed(2)}px`);
+  };
+
+  // Measure with internal scrolling disabled so scrollHeight tells us the true fit.
+  body.classList.add('focus-fitting');
+  body.style.overflowY='hidden';
+
+  apply(1);
+  const fits=()=>body.scrollHeight<=body.clientHeight+1 && body.scrollWidth<=body.clientWidth+1;
+
+  if(!fits()){
+    let lo=0,hi=1,best=0;
+    apply(0);
+    if(fits()){
+      for(let n=0;n<12;n++){
+        const mid=(lo+hi)/2;
+        apply(mid);
+        if(fits()){best=mid;lo=mid}else{hi=mid}
+      }
+      apply(best);
+    }else{
+      // Extremely long cards still remain usable rather than clipping.
+      apply(0);
+      body.style.overflowY='auto';
+    }
+  }
+
+  body.classList.remove('focus-fitting');
+}
+
+function scheduleFocusTextFit(){
+  cancelAnimationFrame(focusFitFrame);
+  focusFitFrame=requestAnimationFrame(()=>{
+    focusFitFrame=requestAnimationFrame(fitFocusText);
+  });
+}
+
 function openBadgeFocus(i){
   const b=BADGES[i];
   if(!b)return;
@@ -408,10 +465,12 @@ function openBadgeFocus(i){
   }
 
   $('focusOverlay').classList.add('open');
+  scheduleFocusTextFit();
 
   if($('focusReveal'))$('focusReveal').onclick=()=>{
     $('focusSolution').style.display='block';
     $('focusReveal').style.display='none';
+    scheduleFocusTextFit();
   };
 }
 
@@ -876,6 +935,10 @@ function installBackGuard(){
 }
 
 function bindEvents(){
+  window.addEventListener('resize',scheduleFocusTextFit,{passive:true});
+  window.addEventListener('orientationchange',scheduleFocusTextFit,{passive:true});
+  if(document.fonts?.ready)document.fonts.ready.then(scheduleFocusTextFit).catch(()=>{});
+
 
   document.querySelectorAll('[data-levels-mode]').forEach(btn=>btn.addEventListener('click',()=>{
     levelsDisplayMode=btn.dataset.levelsMode||'levels';

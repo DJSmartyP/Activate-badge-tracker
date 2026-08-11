@@ -1,0 +1,30 @@
+ACTIVATE TRACKER v13.16 — PORTRAIT FOCUS + RESPONSIVE TEXT
+
+FOCUS FIX
+- Repairs the Focus card layout in portrait.
+- Landscape Focus structure is intentionally retained.
+- Portrait uses one contained card with a dedicated reading area and compact 2x2 controls.
+
+TEXT FITTING
+- Focus badge titles are a CONSTANT 38px in both portrait and landscape.
+- Requirement/instruction text automatically grows to the largest size that fits.
+- Detail/tip/hint text also scales to the largest size that fits.
+- Recalculates when:
+  • a Focus card opens
+  • the screen rotates/resizes
+  • web fonts finish loading
+  • a spoiler is revealed
+- If an exceptionally long card still cannot fit at the safe minimum size, the body scrolls internally instead of clipping.
+
+RETAINED
+- Oxanium headlines + Inter body text
+- Single temporary logo placeholder
+- Neon pink/blue animated high-score frame
+- Thicker box outlines
+- Landscape page scrolling fix
+
+UPLOAD TO GITHUB ROOT:
+index.html
+app.js
+style.css
+sw.js

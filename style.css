@@ -2188,3 +2188,212 @@ h3,
 p{
   font-family:var(--font-body);
 }
+
+
+/* =========================================================
+   v13.16 — Focus portrait repair + responsive text fitting
+   Landscape structure remains the v13.0 layout.
+   ========================================================= */
+
+/* One constant title size on every Focus card, in both orientations. */
+#focusOverlayBody .focus-title{
+  font-family:var(--font-display,"Oxanium","Segoe UI",system-ui,sans-serif);
+  font-size:38px !important;
+  line-height:1.03 !important;
+  letter-spacing:-.018em !important;
+  overflow-wrap:anywhere;
+  word-break:normal;
+  hyphens:auto;
+}
+
+/* These sizes are set by fitFocusText() to the largest values that fit. */
+#focusOverlayBody .focus-meta{
+  font-size:var(--focus-meta-size,13px) !important;
+}
+#focusOverlayBody .focus-requirement{
+  font-size:var(--focus-requirement-size,30px) !important;
+  line-height:1.18 !important;
+  overflow-wrap:anywhere;
+}
+#focusOverlayBody .detail{
+  font-size:var(--focus-detail-size,16px) !important;
+  line-height:1.38 !important;
+  overflow-wrap:anywhere;
+}
+
+/* While measuring, suppress transitions/animations that could alter layout. */
+#focusOverlayBody.focus-fitting,
+#focusOverlayBody.focus-fitting *{
+  transition:none !important;
+}
+
+/* Portrait Focus: a single contained card with its own body area.
+   This specifically repairs portrait; landscape rules are not replaced. */
+@media (orientation:portrait), (max-width:699px){
+  #focusOverlay{
+    position:fixed !important;
+    inset:0 !important;
+    z-index:220 !important;
+    overflow:hidden !important;
+    padding:
+      max(10px,env(safe-area-inset-top))
+      max(10px,env(safe-area-inset-right))
+      max(10px,env(safe-area-inset-bottom))
+      max(10px,env(safe-area-inset-left)) !important;
+    background:rgba(3,5,12,.88);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+  }
+
+  #focusOverlay:not(.open){
+    display:none !important;
+  }
+
+  #focusOverlay.open{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+  }
+
+  #focusOverlay .focus-inner{
+    width:min(720px,100%) !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+    display:grid !important;
+    grid-template-rows:auto minmax(0,1fr) auto !important;
+    overflow:hidden !important;
+    border:2px solid rgba(129,104,255,.25);
+    border-radius:22px;
+    background:
+      radial-gradient(circle at 85% 8%,rgba(113,46,255,.13),transparent 32%),
+      linear-gradient(160deg,rgba(7,10,20,.99),rgba(10,14,27,.99));
+    box-shadow:0 20px 55px rgba(0,0,0,.45);
+  }
+
+  #focusOverlay .focus-topbar,
+  #focusOverlay .focus-inner > .row.between:first-child{
+    min-height:52px !important;
+    margin:0 !important;
+    padding:9px 12px !important;
+    flex:0 0 auto;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(7,10,20,.96);
+  }
+
+  #focusOverlay #closeFocusOverlay{
+    min-height:36px;
+    padding:7px 10px;
+    flex:0 0 auto;
+  }
+
+  #focusOverlayBody{
+    min-height:0 !important;
+    width:100% !important;
+    display:block !important;
+    overflow-y:hidden;
+    overflow-x:hidden !important;
+    padding:16px 16px 18px !important;
+    align-content:initial !important;
+  }
+
+  #focusOverlayBody > section{
+    min-width:0 !important;
+    width:100% !important;
+  }
+
+  #focusOverlayBody > section + section{
+    margin-top:14px;
+  }
+
+  #focusOverlayBody .focus-title{
+    max-width:none !important;
+    margin:0 0 10px !important;
+  }
+
+  #focusOverlayBody .focus-meta{
+    margin:0 0 7px !important;
+    line-height:1.25 !important;
+  }
+
+  #focusOverlayBody .focus-achieved-banner{
+    margin:0 0 10px !important;
+  }
+
+  #focusOverlayBody .focus-requirement{
+    max-width:none !important;
+    margin:0 !important;
+  }
+
+  #focusOverlayBody .detail{
+    margin:0 0 10px !important;
+    padding:11px 13px !important;
+    border-radius:13px !important;
+  }
+
+  /* Compact 2x2 controls to preserve maximum reading area. */
+  #focusOverlay .focus-actions{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    grid-template-rows:auto auto !important;
+    gap:8px !important;
+    margin:0 !important;
+    padding:
+      9px 10px
+      max(10px,env(safe-area-inset-bottom)) !important;
+    border-top:1px solid rgba(255,255,255,.08);
+    background:rgba(6,9,18,.97);
+  }
+
+  #focusOverlay .focus-actions .btn{
+    width:100% !important;
+    min-width:0 !important;
+    min-height:42px !important;
+    margin:0 !important;
+    padding:8px 10px !important;
+    font-size:13px !important;
+  }
+
+  #focusOverlay #focusPrev{
+    grid-column:1;
+    grid-row:1;
+  }
+  #focusOverlay #focusNext{
+    grid-column:2;
+    grid-row:1;
+  }
+  #focusOverlay #focusDismiss{
+    display:block !important;
+    grid-column:1;
+    grid-row:2;
+  }
+  #focusOverlay #focusComplete{
+    grid-column:2;
+    grid-row:2;
+  }
+}
+
+/* Very narrow cover/front screens: retain the same title size, but trim chrome. */
+@media (orientation:portrait) and (max-width:390px){
+  #focusOverlay{
+    padding-left:max(7px,env(safe-area-inset-left)) !important;
+    padding-right:max(7px,env(safe-area-inset-right)) !important;
+  }
+
+  #focusOverlayBody{
+    padding:13px 12px 14px !important;
+  }
+
+  #focusOverlayBody > section + section{
+    margin-top:11px;
+  }
+
+  #focusOverlay .focus-actions{
+    gap:6px !important;
+    padding-left:7px !important;
+    padding-right:7px !important;
+  }
+}
