@@ -777,3 +777,11 @@ body{overflow:hidden}
 
 /* Remove any leftover backup control from the page header layout */
 #backupTop,.page-backup{display:none!important}
+
+/* v12.6 in-app back behavior */
+#focusDismiss{
+  order:-1;
+}
+.focus-actions{
+  gap:10px;
+}

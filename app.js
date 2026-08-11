@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='12.4.0';
+const VERSION='12.6.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -381,6 +381,7 @@ function openBadgeFocus(i){
   }
 
   $('focusOverlay').classList.add('open');
+  pushAppHistory({overlay:'focus'});
 
   if($('focusReveal'))$('focusReveal').onclick=()=>{
     $('focusSolution').style.display='block';
@@ -650,14 +651,14 @@ function closeDrawer(){
   btn?.setAttribute('aria-expanded','false');
   setTimeout(()=>{if(!drawer.classList.contains('open'))backdrop.hidden=true},220);
 }
-function showView(view){updatePageHeader(view);
+function showView(view,opts={}){
+  currentView=view;
+  updatePageHeader?.(view);
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  const target=$(view);
-  if(target)target.classList.add('active');
-  document.querySelectorAll('.drawer-nav [data-view]').forEach(b=>{
-    b.classList.toggle('active',b.dataset.view===view);
-  });
-  closeDrawer();
+  $(view)?.classList.add('active');
+  document.querySelectorAll('.drawer-nav [data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+  closeDrawer?.();
+  if(!opts.fromHistory)pushAppHistory();
 }
 
 
@@ -678,7 +679,66 @@ function updatePageHeader(view){
   if(icon)icon.src=`icons/${meta.icon}.png`;
 }
 
+
+let currentView='home';
+let handlingPopState=false;
+
+function appHistoryState(extra={}){
+  return {activateTracker:true,view:currentView,...extra};
+}
+
+function seedAppHistory(){
+  try{
+    history.replaceState(appHistoryState({guard:true}),'');
+    history.pushState(appHistoryState(),'');
+  }catch{}
+}
+
+function pushAppHistory(extra={}){
+  if(handlingPopState)return;
+  try{history.pushState(appHistoryState(extra),'')}catch{}
+}
+
+function closeFocusWithoutCompleting(){
+  $('focusOverlay')?.classList.remove('open');
+}
+
+function handleAppBack(event){
+  handlingPopState=true;
+  const stateObj=event.state;
+
+  if($('focusOverlay')?.classList.contains('open')){
+    closeFocusWithoutCompleting();
+    currentView=stateObj?.view||currentView;
+    updatePageHeader?.(currentView);
+    handlingPopState=false;
+    return;
+  }
+
+  if(stateObj?.activateTracker){
+    const view=stateObj.view||'home';
+    currentView=view;
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    $(view)?.classList.add('active');
+    updatePageHeader?.(view);
+    highlightDrawer?.(view);
+    closeDrawer?.();
+    handlingPopState=false;
+    return;
+  }
+
+  // Prevent the first Android/browser edge-back gesture from leaving the app
+  // when there is no earlier in-app destination.
+  try{history.pushState(appHistoryState({guard:true}),'')}catch{}
+  handlingPopState=false;
+}
+
 function bindEvents(){
+  window.addEventListener('popstate',handleAppBack);
+  const onClick=(id,fn)=>{const el=$(id);if(el)el.onclick=fn};
+  const onChange=(id,fn)=>{const el=$(id);if(el)el.onchange=fn};
+  const listen=(id,event,fn)=>{const el=$(id);if(el)el.addEventListener(event,fn)};
+
   document.addEventListener('change',e=>{
     const cp=e.target.closest('[data-competitive-played]');
     if(!cp)return;
@@ -691,11 +751,11 @@ function bindEvents(){
     toast(cp.checked?'Marked as played':'Marked as not played');
   });
 
-  $('drawerMenuBtn')?.addEventListener('click',openDrawer);
-  $('closeDrawer')?.addEventListener('click',closeDrawer);
-  $('drawerBackdrop')?.addEventListener('click',closeDrawer);
+  listen('drawerMenuBtn','click',openDrawer);
+  listen('closeDrawer','click',closeDrawer);
+  listen('drawerBackdrop','click',closeDrawer);
 
-document.addEventListener('click',e=>{
+  document.addEventListener('click',e=>{
     const nav=e.target.closest('[data-view]');if(nav){showView(nav.dataset.view);return}
     const t=e.target.closest('[data-toggle-earned]');if(t)return toggleEarn(Number(t.dataset.toggleEarned));
     const fb=e.target.closest('[data-open-focus-badge]');if(fb)return openBadgeFocus(Number(fb.dataset.openFocusBadge));
@@ -719,48 +779,64 @@ document.addEventListener('click',e=>{
       if(l.rooms.includes(r)){
         l.rooms=l.rooms.filter(x=>x!==r);
         l.excludedGames=(l.excludedGames||[]).filter(g=>inferredGamesForLocation(l).some(e=>e.game===g));
-      }else{
-        l.rooms=[...l.rooms,r];
-      }
+      }else l.rooms=[...l.rooms,r];
       renderAll();return
     }
-    const gt=e.target.closest('[data-game-toggle]');if(gt){const l=activeLocation(),g=gt.dataset.gameToggle;l.games=l.games.includes(g)?l.games.filter(x=>x!==g):[...l.games,g];renderAll();return}
+    const gt=e.target.closest('[data-game-toggle]');if(gt){
+      const l=activeLocation(),g=gt.dataset.gameToggle;
+      l.games=l.games.includes(g)?l.games.filter(x=>x!==g):[...l.games,g];
+      renderAll();return
+    }
   });
-  $('importScoresCsv').onchange=async e=>{
+
+  onChange('importScoresCsv',async e=>{
     const f=e.target.files?.[0];
     if(!f)return;
-
     const info=$('levelsImportInfo');
-    info.textContent=`Reading ${f.name}…`;
-
+    if(info)info.textContent=`Reading ${f.name}…`;
     try{
       const text=await f.text();
       const result=importScores(text);
-      info.textContent=`Imported ${result.games} games • ${result.totalCompleted} co-op levels${result.competitivePlayed?` • ${result.competitivePlayed} competitive played`:''}${result.player?' • '+result.player:''}`;
+      if(info)info.textContent=`Imported ${result.games} games • ${result.totalCompleted} co-op levels${result.competitivePlayed?` • ${result.competitivePlayed} competitive played`:''}${result.player?' • '+result.player:''}`;
       toast(`Import complete • ${result.newLevels} new levels`);
     }catch(err){
       console.error('Activate-scores.ca import failed',err);
-      info.textContent=`Import failed: ${err?.message||'Unknown error'}`;
+      if(info)info.textContent=`Import failed: ${err?.message||'Unknown error'}`;
       toast(err?.message||'Could not import Activate-scores.ca CSV');
-    }finally{
-      e.target.value='';
-    }
-  };
-  $('levelsRoom').onchange=renderLevels;$('levelsView').onchange=renderLevels;$('clearLevelProgress').onclick=()=>{if(confirm('Clear all imported level progress?')){state.levelProgress={games:{},competitive:{},importedAt:null,player:null};save();renderLevels()}};$('badgeSearch').addEventListener('input',renderBadges);$('competitiveSearch').addEventListener('input',renderCompetitive);$('competitiveRoom').addEventListener('change',renderCompetitive);$('competitivePlayed').addEventListener('change',renderCompetitive);$('targetRoom').addEventListener('change',renderBadges);$('badgeStatus').addEventListener('change',renderBadges);$('badgeAvailability').addEventListener('change',renderBadges);
-  $('locationName').addEventListener('input',e=>{activeLocation().name=e.target.value;save();renderHome()});
-  $('addLocation').onclick=()=>{const id='loc_'+Date.now();state.locations.push({id,name:'New location',rooms:[],games:[],roomCopies:{},roomInstances:[],venueMap:{Entrance:{front:null,left:null,right:null,back:null},Exit:{front:null,left:null,right:null,back:null}}});state.activeLocation=id;renderAll()};
-  $('deleteLocation').onclick=()=>{if(state.locations.length===1)return toast('Keep at least one location');state.locations=state.locations.filter(l=>l.id!==state.activeLocation);state.activeLocation=state.locations[0].id;renderAll()};
-  $('allRooms').onclick=()=>{activeLocation().rooms=[...ROOMS];renderAll()};
-  $('clearRooms').onclick=()=>{const l=activeLocation();l.rooms=[];l.excludedGames=[];renderAll()};
-  $('closeModal').onclick=()=>$('badgeModal').classList.remove('open');
-  $('closeCompetitiveModal').onclick=()=>$('competitiveModal').classList.remove('open');
-  $('competitiveModal').onclick=e=>{if(e.target.id==='competitiveModal')$('competitiveModal').classList.remove('open')};$('badgeModal').onclick=e=>{if(e.target.id==='badgeModal')$('badgeModal').classList.remove('open')};
-  $('modalEarn').onclick=()=>{toggleEarn(modalBadgeIndex);openBadge(modalBadgeIndex)};$('modalPin').onclick=()=>{togglePin(modalBadgeIndex);openBadge(modalBadgeIndex)};
-  $('closeFocusOverlay').onclick=()=>$('focusOverlay').classList.remove('open');
-  $('focusNext').onclick=()=>openFocusOverlay(focusIndex+1);$('focusPrev').onclick=()=>openFocusOverlay(focusIndex-1);
-  $('focusComplete').onclick=()=>{
+    }finally{e.target.value=''}
+  });
+
+  onChange('levelsRoom',renderLevels);
+  onChange('levelsView',renderLevels);
+  onClick('clearLevelProgress',()=>{if(confirm('Clear all imported level progress?')){state.levelProgress={games:{},competitive:{},importedAt:null,player:null};save();renderLevels()}});
+
+  listen('badgeSearch','input',renderBadges);
+  listen('competitiveSearch','input',renderCompetitive);
+  listen('competitiveRoom','change',renderCompetitive);
+  listen('competitivePlayed','change',renderCompetitive);
+  listen('targetRoom','change',renderBadges);
+  listen('badgeStatus','change',renderBadges);
+  listen('badgeAvailability','change',renderBadges);
+  listen('locationName','input',e=>{activeLocation().name=e.target.value;save();renderHome()});
+
+  onClick('addLocation',()=>{const id='loc_'+Date.now();state.locations.push({id,name:'New location',rooms:[],games:[],roomCopies:{},roomInstances:[],venueMap:{Entrance:{front:null,left:null,right:null,back:null},Exit:{front:null,left:null,right:null,back:null}}});state.activeLocation=id;renderAll()});
+  onClick('deleteLocation',()=>{if(state.locations.length===1)return toast('Keep at least one location');state.locations=state.locations.filter(l=>l.id!==state.activeLocation);state.activeLocation=state.locations[0].id;renderAll()});
+  onClick('allRooms',()=>{activeLocation().rooms=[...ROOMS];renderAll()});
+  onClick('clearRooms',()=>{const l=activeLocation();l.rooms=[];l.excludedGames=[];renderAll()});
+
+  onClick('closeModal',()=>$('badgeModal')?.classList.remove('open'));
+  onClick('closeCompetitiveModal',()=>$('competitiveModal')?.classList.remove('open'));
+  onClick('competitiveModal',e=>{if(e.target.id==='competitiveModal')$('competitiveModal')?.classList.remove('open')});
+  onClick('badgeModal',e=>{if(e.target.id==='badgeModal')$('badgeModal')?.classList.remove('open')});
+  onClick('modalEarn',()=>{toggleEarn(modalBadgeIndex);openBadge(modalBadgeIndex)});
+  onClick('modalPin',()=>{togglePin(modalBadgeIndex);openBadge(modalBadgeIndex)});
+  onClick('closeFocusOverlay',()=>{if($('focusOverlay')?.classList.contains('open'))history.back()});
+  onClick('focusDismiss',()=>{if($('focusOverlay')?.classList.contains('open'))history.back()});
+  onClick('focusNext',()=>openFocusOverlay(focusIndex+1));
+  onClick('focusPrev',()=>openFocusOverlay(focusIndex-1));
+  onClick('focusComplete',()=>{
     if(!state.pins.length)return;
-    const i=state.pins[focusIndex], target=BADGES[i];
+    const i=state.pins[focusIndex],target=BADGES[i];
     if(isTrophy(target)){
       syncTrophyEarned();
       if(!state.earned[i]){toast('This trophy has not unlocked yet');return}
@@ -771,12 +847,20 @@ document.addEventListener('click',e=>{
     }
     state.pins=state.pins.filter(x=>x!==i);
     renderAll();
-    if(state.pins.length)openFocusOverlay(Math.min(focusIndex,state.pins.length-1));else $('focusOverlay').classList.remove('open');
-  };
-  $('exportBackup').onclick=exportBackup;
-  $('importBackup').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state=JSON.parse(r.result);state.locations.forEach(ensureLocationShape);ensureLevelProgress();save();renderAll();toast('Backup restored')}catch{toast('Could not read backup')}};r.readAsText(f)};
-  $('resetApp').onclick=()=>{if(confirm('Reset all app data?')){state=defaultState();renderAll()}};
+    if(state.pins.length)openFocusOverlay(Math.min(focusIndex,state.pins.length-1));
+    else $('focusOverlay')?.classList.remove('open');
+  });
+
+  onClick('exportBackup',exportBackup);
+  onChange('importBackup',e=>{
+    const f=e.target.files?.[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=()=>{try{state=JSON.parse(r.result);state.locations.forEach(ensureLocationShape);ensureLevelProgress();save();renderAll();toast('Backup restored')}catch{toast('Could not read backup')}};
+    r.readAsText(f)
+  });
+  onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();renderAll()}});
 }
 
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(console.error));
 init();
+seedAppHistory();

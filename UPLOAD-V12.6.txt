@@ -1,0 +1,15 @@
+ACTIVATE TRACKER v12.6 — IN-APP BACK / SWIPE BACK
+
+CHANGES
+- Focus cards now have a dedicated Back button that closes them without collecting the badge.
+- The existing X close control also closes without changing badge state.
+- Android/browser edge-back swipe now steps back through in-app navigation.
+- If a Focus card is open, back-swipe closes the Focus card first.
+- Page changes are added to browser history so back-swipe returns to the previous app page.
+- A history guard prevents the first edge-back gesture from immediately closing/leaving the app.
+
+UPLOAD:
+index.html
+app.js
+style.css
+sw.js
