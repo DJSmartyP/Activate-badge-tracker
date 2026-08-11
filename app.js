@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.1.0';
+const VERSION='13.2.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -13,7 +13,8 @@ const defaultState=()=>({
   pins:[],
   notes:{},
   history:[],
-  levelProgress:{games:{},importedAt:null,player:null},
+  levelProgress:{games:{},competitive:{},importedAt:null,player:null},
+  levelProgressByLocation:{},
   locations:[{id:'home',name:'My Activate',rooms:[],games:[],roomCopies:{},roomInstances:[],venueMap:{Entrance:{front:null,left:null,right:null,back:null},Exit:{front:null,left:null,right:null,back:null}}}],
   activeLocation:'home'
 });
@@ -53,11 +54,11 @@ function enabledGameNames(l=activeLocation()){
 function competitivePlayedKey(room,game){return room+'||'+game}
 function isCompetitivePlayed(room,game){
   ensureLevelProgress();
-  return !!state.levelProgress.competitive[competitivePlayedKey(room,game)];
+  return !!activeLevelProgress().competitive[competitivePlayedKey(room,game)];
 }
 function setCompetitivePlayed(room,game,played){
   ensureLevelProgress();
-  state.levelProgress.competitive[competitivePlayedKey(room,game)]=!!played;
+  activeLevelProgress().competitive[competitivePlayedKey(room,game)]=!!played;
   save();
 }
 
@@ -111,7 +112,7 @@ function loadState(){
   state.history=Array.isArray(state.history)?state.history:[];
   state.earned=state.earned||{};
   state.notes=state.notes||{};
-  state.locations.forEach(ensureLocationShape);ensureLevelProgress();
+  state.locations.forEach(ensureLocationShape);ensureLevelProgressStore();activeLevelProgress();
 }
 
 function ensureLocationShape(l){
@@ -401,10 +402,47 @@ function exportBackup(){
 
 
 
+function emptyLevelProgress(){
+  return {games:{},competitive:{},importedAt:null,player:null,source:null};
+}
+function ensureLevelProgressStore(){
+  if(!state.levelProgressByLocation || typeof state.levelProgressByLocation!=='object'){
+    state.levelProgressByLocation={};
+  }
+
+  // One-time migration: move legacy global progress into the active location.
+  if(state.levelProgress && !state._levelProgressMigrated){
+    const activeId=state.activeLocation || state.locations?.[0]?.id || 'home';
+    const legacy=state.levelProgress;
+    const hasLegacy=
+      Object.keys(legacy.games||{}).length ||
+      Object.keys(legacy.competitive||{}).length ||
+      legacy.importedAt || legacy.player;
+    if(hasLegacy && !state.levelProgressByLocation[activeId]){
+      state.levelProgressByLocation[activeId]={
+        games:{...(legacy.games||{})},
+        competitive:{...(legacy.competitive||{})},
+        importedAt:legacy.importedAt||null,
+        player:legacy.player||null,
+        source:legacy.source||null
+      };
+    }
+    state._levelProgressMigrated=true;
+  }
+}
+function activeLevelProgress(){
+  ensureLevelProgressStore();
+  const id=state.activeLocation || state.locations?.[0]?.id || 'home';
+  if(!state.levelProgressByLocation[id]){
+    state.levelProgressByLocation[id]=emptyLevelProgress();
+  }
+  const p=state.levelProgressByLocation[id];
+  if(!p.games)p.games={};
+  if(!p.competitive)p.competitive={};
+  return p;
+}
 function ensureLevelProgress(){
-  if(!state.levelProgress)state.levelProgress={games:{},competitive:{},importedAt:null,player:null};
-  if(!state.levelProgress.games)state.levelProgress.games={};
-  if(!state.levelProgress.competitive)state.levelProgress.competitive={};
+  return activeLevelProgress();
 }
 function csvRows(t){let a=[],r=[],f='',q=false;for(let i=0;i<t.length;i++){let c=t[i];if(q){if(c==='"'&&t[i+1]==='"'){f+='"';i++}else if(c==='"')q=false;else f+=c}else if(c==='"')q=true;else if(c===','){r.push(f);f=''}else if(c==='\n'){r.push(f);a.push(r);r=[];f=''}else if(c!=='\r')f+=c}if(f||r.length){r.push(f);a.push(r)}return a}
 function importScores(t){
@@ -417,7 +455,7 @@ function importScores(t){
   );
   if(headerIndex<0)throw Error('Could not find the Room / Game header row. Please use an export from Activate-scores.ca.');
 
-  ensureLevelProgress();
+  const progress=activeLevelProgress();
   const playerRow=rows.slice(0,headerIndex).find(r=>String(r[0]||'').toLowerCase().startsWith('activate:'));
   const player=playerRow?String(playerRow[0]).replace(/^Activate:\s*/i,'').trim():null;
 
@@ -439,7 +477,7 @@ function importScores(t){
         return Number.isFinite(n)&&n>0;
       });
       if(played){
-        state.levelProgress.competitive[room+'||'+game]=true;
+        progress.competitive[room+'||'+game]=true;
         competitivePlayed++;
       }
       games++;
@@ -448,7 +486,7 @@ function importScores(t){
 
     // Cooperative (including games that also have a competitive mode): parse L1-L10.
     const key=room+'||'+game;
-    const prior=state.levelProgress.games[key]||{room,game,levels:{}};
+    const prior=progress.games[key]||{room,game,levels:{}};
     const levels={...(prior.levels||{})};
     (prior.complete||[]).forEach(level=>{
       levels[level]=levels[level]||{score:0,topScore:0,complete:true};
@@ -479,15 +517,15 @@ function importScores(t){
     }
 
     if(foundLevel){
-      state.levelProgress.games[key]={room,game,levels};
+      progress.games[key]={room,game,levels};
       games++;
     }
   }
 
   if(!games)throw Error('No game rows were found in this Activate-scores.ca export.');
-  state.levelProgress.importedAt=new Date().toISOString();
-  state.levelProgress.player=player;
-  state.levelProgress.source='Activate-scores.ca';
+  progress.importedAt=new Date().toISOString();
+  progress.player=player;
+  progress.source='Activate-scores.ca';
   save();renderLevels();
   return {games,newLevels,totalCompleted,competitivePlayed,player};
 }
@@ -499,22 +537,19 @@ function gameModesForRoom(room){
   };
 }
 function progressEntries(){
-  ensureLevelProgress();
+  const progress=activeLevelProgress();
   const entries=[];
   const l=activeLocation();
 
-  const rooms=[...new Set([
-    ...(l.rooms||[]),
-    ...Object.values(state.levelProgress.games||{}).map(x=>x.room).filter(Boolean)
-  ])];
+  const rooms=[...new Set(Array.isArray(l.rooms)?l.rooms:[])];
 
   rooms.forEach(room=>{
     const modes=gameModesForRoom(room);
 
     modes.cooperative.forEach(game=>{
-      const x=state.levelProgress.games[room+'||'+game]||{};
+      const x=progress.games[room+'||'+game]||{};
       const levels={...(x.levels||{})};
-      (x.complete||[]).forEach(n=>{
+      (Array.isArray(x.complete)?x.complete:[]).forEach(n=>{
         levels[n]=levels[n]||{score:0,topScore:0,complete:true};
         levels[n].complete=true;
       });
@@ -524,7 +559,7 @@ function progressEntries(){
     modes.competitive.forEach(game=>{
       entries.push({
         room,game,mode:'competitive',
-        played:!!state.levelProgress.competitive[room+'||'+game]
+        played:!!progress.competitive[room+'||'+game]
       });
     });
   });
@@ -532,86 +567,81 @@ function progressEntries(){
   return entries.sort((a,b)=>a.room.localeCompare(b.room)||a.game.localeCompare(b.game)||a.mode.localeCompare(b.mode));
 }
 function renderLevels(){
-  ensureLevelProgress();
-  const l=activeLocation();
-  const roomSel=$('levelsRoom');
-  const currentRoom=roomSel?.value||'';
-  const rooms=[...(l.rooms||[])].sort((a,b)=>a.localeCompare(b));
+  if(!$('levelsList'))return;
 
-  if(roomSel){
-    roomSel.innerHTML='<option value="">All rooms</option>'+rooms.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
-    roomSel.value=rooms.includes(currentRoom)?currentRoom:'';
+  const progress=activeLevelProgress();
+  if($('levelsImportLocation'))$('levelsImportLocation').textContent=`Progress dataset: ${activeLocation().name}`;
+  const entries=progressEntries();
+  const rooms=[...new Set(entries.map(x=>x.room))].sort();
+
+  const sel=$('levelsRoom');
+  const oldRoom=sel?.value||'';
+  if(sel){
+    sel.innerHTML='<option value="">All rooms</option>'+rooms.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
+    if(rooms.includes(oldRoom))sel.value=oldRoom;
   }
 
-  const selectedRoom=roomSel?.value||'';
-  const view=$('levelsView')?.value||'all';
+  const room=sel?.value||'';
+  const mode=$('levelsView')?.value||'all';
+  const filtered=entries.filter(x=>!room||x.room===room);
+
   const rows=[];
+  filtered.forEach(x=>{
+    if(x.mode==='competitive'){
+      const done=!!x.played;
+      if(mode==='complete'&&!done)return;
+      if(mode==='incomplete'&&done)return;
+      rows.push({room:x.room,game:x.game,mode:'competitive',done});
+      return;
+    }
 
-  (l.rooms||[]).forEach(room=>{
-    if(selectedRoom && room!==selectedRoom)return;
-    const catalog=GAME_CATALOG[room]||{};
-    const competitive=new Set(catalog.competitive||[]);
-    const cooperative=new Set(catalog.cooperative||[]);
-    const excluded=new Set(l.excludedGames||[]);
-
-    // Cooperative games: always show levels 1–10.
-    cooperative.forEach(game=>{
-      if(excluded.has(game))return;
-      const key=room+'||'+game;
-      const progress=state.levelProgress.games?.[key]||{};
-      const completed=new Set(progress.completed||progress.levels||[]);
-      for(let level=1;level<=10;level++){
-        const done=completed.has(level) || completed.has(String(level));
-        if(view==='complete' && !done)return;
-        if(view==='incomplete' && done)return;
-        rows.push({
-          room,game,mode:'Cooperative',level,
-          complete:done,
-          score:progress.score??progress.currentScore??null,
-          topScore:progress.topScore??progress.highScore??null
-        });
-      }
-    });
-
-    // Competitive-only games: one Played / Not played row, no numbered levels.
-    competitive.forEach(game=>{
-      if(cooperative.has(game) || excluded.has(game))return;
-      const done=isCompetitivePlayed(room,game);
-      if(view==='complete' && !done)return;
-      if(view==='incomplete' && done)return;
-      rows.push({room,game,mode:'Competitive',level:null,complete:done});
-    });
+    for(let level=1;level<=10;level++){
+      const info=x.levels?.[level]||x.levels?.[String(level)]||{};
+      const done=!!info.complete;
+      if(mode==='complete'&&!done)continue;
+      if(mode==='incomplete'&&done)continue;
+      rows.push({
+        room:x.room,game:x.game,mode:'cooperative',level,done,
+        score:info.score??0,
+        topScore:info.topScore??0
+      });
+    }
   });
 
-  const total=rows.length;
-  const doneCount=rows.filter(r=>r.complete).length;
-  if($('levelsSummary')){
-    $('levelsSummary').textContent=view==='all'
-      ? `${total} entries • ${doneCount} complete`
-      : `${total} ${view}`;
-  }
+  const totalAll=filtered.reduce((sum,x)=>sum+(x.mode==='competitive'?1:10),0);
+  const completeAll=filtered.reduce((sum,x)=>{
+    if(x.mode==='competitive')return sum+(x.played?1:0);
+    return sum+[1,2,3,4,5,6,7,8,9,10].filter(n=>x.levels?.[n]?.complete).length;
+  },0);
+
+  $('levelsSummary').textContent=entries.length
+    ? `${completeAll}/${totalAll} complete • ${esc(activeLocation().name)}`
+    : `No progress imported • ${esc(activeLocation().name)}`;
+
+  $('levelsImportInfo').textContent=progress.importedAt
+    ? `Last import for ${activeLocation().name}: ${new Date(progress.importedAt).toLocaleString()}${progress.player?' • '+progress.player:''}`
+    : `No Activate-scores.ca export imported for ${activeLocation().name} yet.`;
 
   $('levelsList').innerHTML=rows.length?rows.map(r=>{
-    if(r.mode==='Competitive'){
+    if(r.mode==='competitive'){
       return `<div class="item level-row competitive-mode">
         <div>
           <b>${esc(r.game)}</b>
           <div class="sub">${esc(r.room)} • Competitive</div>
         </div>
-        <span class="pill ${r.complete?'done':''}">${r.complete?'Played':'Not played'}</span>
+        <button class="played-toggle ${r.done?'played':''}" data-toggle-comp-played="${esc(r.room)}||${esc(r.game)}">${r.done?'Played':'Not played'}</button>
       </div>`;
     }
 
-    const scoreBits=[];
-    if(r.score!==null && r.score!==undefined && r.score!=='')scoreBits.push(`Score ${esc(r.score)}`);
-    if(r.topScore!==null && r.topScore!==undefined && r.topScore!=='')scoreBits.push(`Top ${esc(r.topScore)}`);
-
-    return `<div class="item level-row cooperative-mode ${r.complete?'level-complete':'level-incomplete'}">
+    const bits=[];
+    if(Number(r.score)>0)bits.push(`Score ${r.score}`);
+    if(Number(r.topScore)>0)bits.push(`Top ${r.topScore}`);
+    return `<div class="item level-row cooperative-mode ${r.done?'level-complete':'level-incomplete'}">
       <div>
         <b>${esc(r.game)} • Level ${r.level}</b>
-        <div class="sub">${esc(r.room)} • Cooperative${scoreBits.length?' • '+scoreBits.join(' • '):''}</div>
+        <div class="sub">${esc(r.room)} • Cooperative${bits.length?' • '+bits.join(' • '):''}</div>
       </div>
-      <span class="pill ${r.complete?'done':''}">${r.complete?'Complete':'Incomplete'}</span>
+      <span class="pill ${r.done?'done':''}">${r.done?'Complete':'Incomplete'}</span>
     </div>`;
   }).join(''):'<div class="item sub">No levels match this filter.</div>';
 }
@@ -824,7 +854,7 @@ function bindEvents(){
 
   onChange('levelsRoom',renderLevels);
   onChange('levelsView',renderLevels);
-  onClick('clearLevelProgress',()=>{if(confirm('Clear all imported level progress?')){state.levelProgress={games:{},competitive:{},importedAt:null,player:null};save();renderLevels()}});
+  onClick('clearLevelProgress',()=>{if(confirm(`Clear imported level progress for ${activeLocation().name}?`)){state.levelProgressByLocation[state.activeLocation]=emptyLevelProgress();save();renderLevels()}});
 
   listen('badgeSearch','input',renderBadges);
   listen('competitiveSearch','input',renderCompetitive);
@@ -871,7 +901,7 @@ function bindEvents(){
   onChange('importBackup',e=>{
     const f=e.target.files?.[0];if(!f)return;
     const r=new FileReader();
-    r.onload=()=>{try{state=JSON.parse(r.result);state.locations.forEach(ensureLocationShape);ensureLevelProgress();save();renderAll();toast('Backup restored')}catch{toast('Could not read backup')}};
+    r.onload=()=>{try{state=JSON.parse(r.result);state.locations.forEach(ensureLocationShape);ensureLevelProgressStore();activeLevelProgress();save();renderAll();toast('Backup restored')}catch{toast('Could not read backup')}};
     r.readAsText(f)
   });
   onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();renderAll()}});

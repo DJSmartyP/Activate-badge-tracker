@@ -1,0 +1,25 @@
+ACTIVATE TRACKER v13.2 — PER-LOCATION LEVEL DATA
+
+FIXED
+- Fixes the v13.1 startup error.
+- Level progress is now stored separately for each saved Location.
+- Switching Location switches the Levels dataset immediately.
+- CSV imports are written only to the currently selected Location.
+- Existing legacy/global level progress is migrated once into the currently active Location.
+- Clear Level Progress now clears only the active Location.
+- Levels page shows which Location dataset is being viewed.
+- All / Incomplete / Complete works with individual co-op Levels 1–10.
+- Competitive-only games remain Played / Not played.
+- v13.0 landscape Focus layout retained.
+
+IMPORTANT IMPORT FLOW
+1. Select the correct Location first.
+2. Go to Settings.
+3. Import the Activate-scores.ca CSV.
+4. The data is linked to that selected Location.
+
+UPLOAD:
+index.html
+app.js
+style.css
+sw.js

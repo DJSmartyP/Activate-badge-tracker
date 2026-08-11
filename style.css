@@ -1145,3 +1145,10 @@ html,body{overscroll-behavior-x:none}
     font-size:clamp(19px,1.8vw,26px) !important;
   }
 }
+
+/* v13.2 location-linked level datasets */
+#levelsImportLocation{
+  margin-bottom:6px;
+  font-weight:700;
+  color:var(--cyan,#75eaff);
+}
