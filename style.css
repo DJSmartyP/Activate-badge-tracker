@@ -424,3 +424,82 @@ main,.app,.shell{padding-bottom:max(18px,env(safe-area-inset-bottom))}
   .drawer-nav button{min-height:58px;font-size:17px}
   .drawer-icon{font-size:26px}
 }
+
+/* v11.7 clickable badge focus */
+.clickable-badge{cursor:pointer}
+button.recent-achievement{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  text-align:left;
+  color:inherit;
+  font:inherit;
+}
+.recent-open{
+  font-size:24px;
+  opacity:.62;
+  padding-left:12px;
+}
+.clickable-badge:active{transform:scale(.995)}
+
+/* v11.8 badge readability */
+.target-card h3,.badge.target-card h3{
+  font-size:20px;
+  line-height:1.18;
+  letter-spacing:-.01em;
+}
+.target-card p,.badge.target-card p{
+  font-size:16px;
+  line-height:1.42;
+}
+.target-card .sub,.badge.target-card .sub{
+  font-size:14px;
+  line-height:1.35;
+}
+.target-card .tag,.badge.target-card .tag{
+  font-size:13px;
+  line-height:1.2;
+  padding:5px 8px;
+}
+
+/* Approved app icons */
+.drawer-icon-img{
+  width:34px;height:34px;object-fit:contain;flex:0 0 34px;border-radius:9px;
+}
+
+/* Dynamic page header */
+.page-header-bar{
+  position:sticky;
+  top:0;
+  z-index:70;
+  display:flex;
+  align-items:center;
+  min-height:66px;
+  padding:8px max(14px,env(safe-area-inset-right)) 8px max(64px,calc(env(safe-area-inset-left) + 64px));
+  border-bottom:1px solid rgba(255,255,255,.08);
+  background:rgba(7,9,16,.88);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+.page-header-left{display:flex;align-items:center;gap:11px;min-width:0}
+.page-header-icon{
+  width:40px;height:40px;object-fit:contain;border-radius:11px;flex:0 0 40px;
+}
+.page-header-kicker{
+  font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+}
+.page-header-bar h1{
+  margin:1px 0 0;font-size:20px;line-height:1.05;
+}
+
+/* Settings import block */
+.settings-import-block{margin-bottom:14px}
+
+@media(max-width:480px){
+  .target-card h3,.badge.target-card h3{font-size:19px}
+  .target-card p,.badge.target-card p{font-size:15.5px}
+  .page-header-bar{min-height:62px}
+  .page-header-icon{width:36px;height:36px;flex-basis:36px}
+  .page-header-bar h1{font-size:19px}
+}

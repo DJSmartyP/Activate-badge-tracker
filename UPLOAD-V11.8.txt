@@ -1,0 +1,20 @@
+ACTIVATE TRACKER v11.8 — HEADER / ICONS / BADGE TEXT / SETTINGS IMPORT
+
+CHANGES
+- Targets navigation label changed to Badges.
+- Badge card typography increased for easier reading.
+- New approved icons added and wired into navigation.
+- Every screen now gets a sticky header bar with the current page name and icon.
+- Activate-scores.ca CSV import moved from Levels to Settings.
+- Settings import wording explicitly states it is for Activate-scores.ca exports.
+- Levels page remains focused on Complete / Incomplete / Unplayed progress.
+- Badge Focus behavior from v11.7 is retained.
+
+UPLOAD TO GITHUB ROOT
+- index.html
+- app.js
+- style.css
+- sw.js
+- icons/  (upload the entire icons folder)
+
+No splash artwork changes are required.

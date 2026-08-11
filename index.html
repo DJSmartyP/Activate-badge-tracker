@@ -23,20 +23,30 @@
   </div>
 
   <nav class="drawer-nav">
-    <button data-view="home"><span class="drawer-icon">⌂</span><span>Home</span></button>
-    <button data-view="badges"><span class="drawer-icon">◈</span><span>Targets</span></button>
-    <button data-view="levels"><span class="drawer-icon">◫</span><span>Levels</span></button>
-    <button data-view="competitive"><span class="drawer-icon">⚔</span><span>Competitive</span></button>
-    <button data-view="locations"><span class="drawer-icon">⌖</span><span>Locations</span></button>
-    <button data-view="stats"><span class="drawer-icon">▥</span><span>Stats</span></button>
-    <button data-view="settings"><span class="drawer-icon">⚙</span><span>Settings</span></button>
+    <button data-view="home"><img class="drawer-icon-img" src="icons/home.png" alt=""><span>Home</span></button>
+    <button data-view="badges"><img class="drawer-icon-img" src="icons/badges.png" alt=""><span>Badges</span></button>
+    <button data-view="levels"><img class="drawer-icon-img" src="icons/levels.png" alt=""><span>Levels</span></button>
+    <button data-view="competitive"><img class="drawer-icon-img" src="icons/competitive.png" alt=""><span>Competitive</span></button>
+    <button data-view="locations"><img class="drawer-icon-img" src="icons/locations.png" alt=""><span>Locations</span></button>
+    <button data-view="stats"><img class="drawer-icon-img" src="icons/stats.png" alt=""><span>Stats</span></button>
+    <button data-view="settings"><img class="drawer-icon-img" src="icons/settings.png" alt=""><span>Settings</span></button>
   </nav>
 </aside>
 
   <div id="splash" class="launch-splash" aria-label="Activate Tracker loading"></div>
   <div id="toast" class="toast" aria-live="polite"></div>
 
-  <main class="app">
+  
+<div id="pageHeaderBar" class="page-header-bar">
+  <div class="page-header-left">
+    <img id="pageHeaderIcon" class="page-header-icon" src="icons/home.png" alt="">
+    <div>
+      <div class="page-header-kicker">Activate Tracker</div>
+      <h1 id="pageHeaderTitle">Home</h1>
+    </div>
+  </div>
+</div>
+<main class="app">
     <header class="topbar"><button id="drawerMenuBtn" class="drawer-menu-btn" type="button" aria-label="Open navigation" aria-expanded="false">☰</button>
       <div class="brand">
         <img src="icon-192.png?v=108" alt="">
@@ -54,7 +64,7 @@
         <div class="card">
           <div class="row between">
             <div>
-              <div class="label">Pinned targets</div>
+              <div class="label">Pinned badges</div>
               <h2>Pinned badges</h2>
             </div>
             <button class="btn primary" data-view="badges">Open</button>
@@ -91,12 +101,12 @@
   </div>
 
   <div class="section-title">
-    <h2>Pinned targets <span id="pinCount" class="pill">0 / 5</span></h2>
+    <h2>Pinned badges <span id="pinCount" class="pill">0 / 5</span></h2>
     <span class="sub">Tap Open for large in-room instructions</span>
   </div>
   <div id="pinList" class="stack"></div>
 
-  <div class="section-title"><h2>Targets</h2><span id="badgeCount" class="sub"></span></div>
+  <div class="section-title"><h2>Badges</h2><span id="badgeCount" class="sub"></span></div>
   <div id="badgeList" class="badge-list"></div>
 </section>
 
@@ -159,7 +169,7 @@
 </section>
 
 
-<section id="levels" class="view"><div class="section-title"><div><div class="label">Game progress</div><h2>Levels</h2></div><span id="levelsSummary" class="sub"></span></div><div class="card"><h3>Import progress</h3><p class="sub">Import a CSV export from <strong>Activate-scores.ca</strong>. The file is processed locally on this device and updates your completed and remaining levels.</p><div class="row wrap"><label class="btn primary">Import Activate-scores.ca CSV<input id="importScoresCsv" type="file" accept=".csv,text/csv" hidden></label><button id="clearLevelProgress" class="btn danger">Clear imported progress</button></div><div id="levelsImportInfo" class="sub top-gap"></div></div><div class="card top-gap"><div class="row wrap"><select id="levelsRoom" class="select"><option value="">All rooms</option></select><select id="levelsView" class="select"><option value="incomplete">Incomplete / not played</option><option value="complete">Complete / played</option><option value="unplayed">Unplayed games</option></select></div></div><div id="levelsList" class="stack top-gap"></div></section>
+<section id="levels" class="view"><div class="section-title"><div><div class="label">Game progress</div><h2>Levels</h2></div><span id="levelsSummary" class="sub"></span></div><div class="card top-gap"><div class="row wrap"><select id="levelsRoom" class="select"><option value="">All rooms</option></select><select id="levelsView" class="select"><option value="incomplete">Incomplete / not played</option><option value="complete">Complete / played</option><option value="unplayed">Unplayed games</option></select></div></div><div id="levelsList" class="stack top-gap"></div></section>
 <section id="stats" class="view">
       <div id="statsCards" class="stats-grid"></div>
       <div class="hero top-gap">
@@ -169,9 +179,13 @@
     </section>
 
     <section id="settings" class="view">
-      <div class="card">
+      
+<div class="settings-import-block">
+<div class="card"><h3>Import game progress</h3><p class="sub">Import a CSV export from <strong>Activate-scores.ca</strong>. The file is processed locally on this device and updates co-op levels, scores and competitive Played / Not played status.</p><div class="row wrap"><label class="btn primary">Import Activate-scores.ca CSV<input id="importScoresCsv" type="file" accept=".csv,text/csv" hidden></label><button id="clearLevelProgress" class="btn danger">Clear imported progress</button></div><div id="levelsImportInfo" class="sub top-gap"></div></div>
+</div>
+<div class="card">
         <h2>Settings</h2>
-        <p class="sub">Version <strong>11.6.0</strong> — clean rebuild.</p>
+        <p class="sub">Version <strong>11.8.0</strong> — clean rebuild.</p>
         <div class="row wrap">
           <button class="btn primary" id="exportBackup">Export backup</button>
           <label class="btn">Restore backup<input id="importBackup" type="file" accept="application/json" hidden></label>
