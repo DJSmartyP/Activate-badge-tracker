@@ -1,0 +1,29 @@
+ACTIVATE TRACKER v11.0 — LEVELS + SCORES
+
+NEW
+- Levels section.
+- Import CSV exports from Activate-scores.ca.
+- Complete levels by Room > Game.
+- Incomplete levels by Room > Game.
+- Unplayed games by Room.
+- Room filter.
+
+SCORES
+- Completed levels show your current imported score.
+- Completed levels show the Top Score from the export.
+- Missing levels show the Top Score when one is available.
+
+IMPORTS
+- Newer exports merge with existing progress.
+- Completed levels are preserved.
+- Your best imported score is preserved.
+- Top Score refreshes from the newer export.
+- Import is processed locally in the browser.
+
+UPLOAD THESE FILES TO THE REPOSITORY ROOT
+- index.html
+- app.js
+- style.css
+- sw.js
+
+No artwork needs replacing.

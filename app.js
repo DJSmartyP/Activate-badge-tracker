@@ -8,7 +8,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 
 'use strict';
 
-const VERSION='10.7.0';
+const VERSION='11.0.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -21,6 +21,7 @@ const defaultState=()=>({
   pins:[],
   notes:{},
   history:[],
+  levelProgress:{games:{},importedAt:null,player:null},
   locations:[{id:'home',name:'My Activate',rooms:[],games:[],roomCopies:{},roomInstances:[],venueMap:{Entrance:{front:null,left:null,right:null,back:null},Exit:{front:null,left:null,right:null,back:null}}}],
   activeLocation:'home'
 });
@@ -106,7 +107,7 @@ function loadState(){
   state.history=Array.isArray(state.history)?state.history:[];
   state.earned=state.earned||{};
   state.notes=state.notes||{};
-  state.locations.forEach(ensureLocationShape);
+  state.locations.forEach(ensureLocationShape);ensureLevelProgress();
 }
 
 function ensureLocationShape(l){
@@ -124,9 +125,9 @@ function availableHere(b){
   if(isTrophy(b)) return true;
   const l=activeLocation();
   const rp=roomParts(b), gp=gameParts(b);
-  const roomOk=!l.rooms.length || !rp.length || rp.some(r=>l.rooms.includes(r));
+  const roomOk=!rp.length ? true : (l.rooms.length>0 && rp.some(r=>l.rooms.includes(r)));
   const enabled=enabledGameNames(l);
-  const gameOk=!gp.length || !l.rooms.length || gp.some(g=>enabled.includes(g));
+  const gameOk=!gp.length ? true : gp.some(g=>enabled.includes(g));
   return roomOk && gameOk;
 }
 
@@ -295,7 +296,7 @@ function renderStats(){
   $('historyList').innerHTML=state.history.map(h=>`<div class="item"><b>${esc(BADGES[h.badge]?.name||'Badge')}</b><div class="sub">${esc(h.date||'')}</div></div>`).join('')||'<div class="item sub">No history yet.</div>';
 }
 
-function renderAll(){renderHome();renderBadges();renderLocations();renderCompetitive();renderStats();save()}
+function renderAll(){ensureLevelProgress();renderHome();renderBadges();renderLocations();renderCompetitive();renderLevels();renderStats();save()}
 
 function toggleEarn(i){
   if(isTrophy(BADGES[i])){toast('Trophies unlock automatically from target progress');return}
@@ -338,6 +339,132 @@ function exportBackup(){
 }
 
 
+
+function ensureLevelProgress(){if(!state.levelProgress)state.levelProgress={games:{},importedAt:null,player:null};if(!state.levelProgress.games)state.levelProgress.games={}}
+function csvRows(t){let a=[],r=[],f='',q=false;for(let i=0;i<t.length;i++){let c=t[i];if(q){if(c==='"'&&t[i+1]==='"'){f+='"';i++}else if(c==='"')q=false;else f+=c}else if(c==='"')q=true;else if(c===','){r.push(f);f=''}else if(c==='\n'){r.push(f);a.push(r);r=[];f=''}else if(c!=='\r')f+=c}if(f||r.length){r.push(f);a.push(r)}return a}
+function importScores(t){
+  const rows=csvRows(t);
+  if(!String(rows[0]?.[0]||'').toLowerCase().startsWith('activate:')) throw Error('This does not look like an Activate-scores.ca export.');
+  ensureLevelProgress();
+  let games=0,newLevels=0;
+
+  for(const r of rows.slice(2)){
+    const room=(r[0]||'').trim(), game=(r[1]||'').trim();
+    if(!room||!game||game.toLowerCase()==='total') continue;
+
+    const key=room+'||'+game;
+    const prior=state.levelProgress.games[key]||{room,game,levels:{}};
+    const levels={...(prior.levels||{})};
+
+    (prior.complete||[]).forEach(level=>{
+      levels[level]=levels[level]||{score:0,topScore:0,complete:true};
+      levels[level].complete=true;
+    });
+
+    for(let i=2;i+2<r.length;i+=3){
+      const level=parseInt(r[i],10);
+      if(!(level>=1&&level<=10)) continue;
+
+      const score=Number(String(r[i+1]||'0').replace(/,/g,''))||0;
+      const topScore=Number(String(r[i+2]||'0').replace(/,/g,''))||0;
+      const old=levels[level]||{score:0,topScore:0,complete:false};
+      const wasComplete=!!old.complete;
+      const complete=score>0||wasComplete;
+
+      levels[level]={
+        score:Math.max(old.score||0,score),
+        topScore:topScore||old.topScore||0,
+        complete
+      };
+      if(complete&&!wasComplete)newLevels++;
+    }
+
+    state.levelProgress.games[key]={room,game,levels};
+    games++;
+  }
+
+  state.levelProgress.importedAt=new Date().toISOString();
+  state.levelProgress.player=String(rows[0][0]).replace(/^Activate:\s*/i,'').trim();
+  save();renderLevels();
+  return {games,newLevels};
+}
+function allGamesForRoom(r){let c=GAME_CATALOG[r]||{};return[...new Set([...(c.cooperative||[]),...(c.competitive||[])])].sort()}
+function progressEntries(){
+  ensureLevelProgress();
+  const map=new Map();
+  Object.values(state.levelProgress.games||{}).forEach(x=>{
+    const levels={...(x.levels||{})};
+    (x.complete||[]).forEach(n=>{
+      levels[n]=levels[n]||{score:0,topScore:0,complete:true};
+      levels[n].complete=true;
+    });
+    map.set(x.room+'||'+x.game,{room:x.room,game:x.game,levels});
+  });
+
+  const l=activeLocation();
+  (l.rooms||[]).forEach(room=>allGamesForRoom(room).forEach(game=>{
+    const key=room+'||'+game;
+    if(!map.has(key))map.set(key,{room,game,levels:{}});
+  }));
+
+  return [...map.values()].sort((a,b)=>a.room.localeCompare(b.room)||a.game.localeCompare(b.game));
+}
+function renderLevels(){
+  if(!$('levelsList'))return;
+
+  const entries=progressEntries();
+  const rooms=[...new Set(entries.map(x=>x.room))].sort();
+  const sel=$('levelsRoom'),oldRoom=sel.value;
+  sel.innerHTML='<option value="">All rooms</option>'+rooms.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
+  if(rooms.includes(oldRoom))sel.value=oldRoom;
+
+  const room=sel.value,mode=$('levelsView').value;
+  const filtered=entries.filter(x=>!room||x.room===room);
+  const completeTotal=filtered.reduce((sum,x)=>sum+[1,2,3,4,5,6,7,8,9,10].filter(n=>x.levels?.[n]?.complete).length,0);
+
+  $('levelsSummary').textContent=entries.length?`${completeTotal}/${filtered.length*10} levels complete`:'No progress imported';
+  $('levelsImportInfo').textContent=state.levelProgress.importedAt
+    ? `Last import: ${new Date(state.levelProgress.importedAt).toLocaleString()}${state.levelProgress.player?' • '+state.levelProgress.player:''}`
+    : 'No Activate-scores.ca export imported yet.';
+
+  const groups={};
+  filtered.forEach(x=>{
+    const complete=[1,2,3,4,5,6,7,8,9,10].filter(n=>x.levels?.[n]?.complete);
+    const missing=[1,2,3,4,5,6,7,8,9,10].filter(n=>!x.levels?.[n]?.complete);
+
+    if(mode==='unplayed'&&complete.length)return;
+    if(mode==='complete'&&!complete.length)return;
+    if(mode==='incomplete'&&!missing.length)return;
+    (groups[x.room]??=[]).push({...x,complete,missing});
+  });
+
+  $('levelsList').innerHTML=Object.entries(groups).map(([roomName,games])=>`
+    <article class="card level-room">
+      <div class="row between"><h3>${esc(roomName)}</h3><span class="sub">${games.length} game${games.length===1?'':'s'}</span></div>
+      ${games.map(g=>{
+        if(mode==='unplayed')return `<div class="level-game"><strong>${esc(g.game)}</strong><span class="level-unplayed">Unplayed</span></div>`;
+
+        const nums=mode==='complete'?g.complete:g.missing;
+        return `<div class="level-game level-game-scores">
+          <strong>${esc(g.game)}</strong>
+          <div class="level-score-grid">
+            ${nums.map(n=>{
+              const d=g.levels?.[n]||{score:0,topScore:0,complete:false};
+              const yours=d.score?Number(d.score).toLocaleString():'—';
+              const top=d.topScore?Number(d.topScore).toLocaleString():'—';
+              return `<div class="level-score-card ${mode}">
+                <span class="level-number">L${n}</span>
+                ${mode==='complete'
+                  ? `<span class="your-score">${yours}</span><span class="top-score">Top ${top}</span>`
+                  : `<span class="your-score">Needed</span><span class="top-score">${d.topScore?'Top '+top:'No top score'}</span>`}
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+      }).join('')}
+    </article>
+  `).join('')||'<div class="card sub">Nothing to show for this filter.</div>';
+}
 
 async function init(){
   try{
@@ -383,7 +510,7 @@ document.addEventListener('click',e=>{
     }
     const gt=e.target.closest('[data-game-toggle]');if(gt){const l=activeLocation(),g=gt.dataset.gameToggle;l.games=l.games.includes(g)?l.games.filter(x=>x!==g):[...l.games,g];renderAll();return}
   });
-  $('badgeSearch').addEventListener('input',renderBadges);$('competitiveSearch').addEventListener('input',renderCompetitive);$('competitiveRoom').addEventListener('change',renderCompetitive);$('targetRoom').addEventListener('change',renderBadges);$('badgeStatus').addEventListener('change',renderBadges);$('badgeAvailability').addEventListener('change',renderBadges);
+  $('importScoresCsv').onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let result=importScores(r.result);toast(`Imported ${result.games} games • ${result.newLevels} new levels`)}catch(x){toast(x.message)}e.target.value=''};r.readAsText(f)};$('levelsRoom').onchange=renderLevels;$('levelsView').onchange=renderLevels;$('clearLevelProgress').onclick=()=>{if(confirm('Clear all imported level progress?')){state.levelProgress={games:{},importedAt:null,player:null};save();renderLevels()}};$('badgeSearch').addEventListener('input',renderBadges);$('competitiveSearch').addEventListener('input',renderCompetitive);$('competitiveRoom').addEventListener('change',renderCompetitive);$('targetRoom').addEventListener('change',renderBadges);$('badgeStatus').addEventListener('change',renderBadges);$('badgeAvailability').addEventListener('change',renderBadges);
   $('locationName').addEventListener('input',e=>{activeLocation().name=e.target.value;save();renderHome()});
   $('addLocation').onclick=()=>{const id='loc_'+Date.now();state.locations.push({id,name:'New location',rooms:[],games:[],roomCopies:{},roomInstances:[],venueMap:{Entrance:{front:null,left:null,right:null,back:null},Exit:{front:null,left:null,right:null,back:null}}});state.activeLocation=id;renderAll()};
   $('deleteLocation').onclick=()=>{if(state.locations.length===1)return toast('Keep at least one location');state.locations=state.locations.filter(l=>l.id!==state.activeLocation);state.activeLocation=state.locations[0].id;renderAll()};
@@ -411,7 +538,7 @@ document.addEventListener('click',e=>{
     if(state.pins.length)openFocusOverlay(Math.min(focusIndex,state.pins.length-1));else $('focusOverlay').classList.remove('open');
   };
   $('backupTop').onclick=exportBackup;$('exportBackup').onclick=exportBackup;
-  $('importBackup').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state=JSON.parse(r.result);state.locations.forEach(ensureLocationShape);save();renderAll();toast('Backup restored')}catch{toast('Could not read backup')}};r.readAsText(f)};
+  $('importBackup').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state=JSON.parse(r.result);state.locations.forEach(ensureLocationShape);ensureLevelProgress();save();renderAll();toast('Backup restored')}catch{toast('Could not read backup')}};r.readAsText(f)};
   $('resetApp').onclick=()=>{if(confirm('Reset all app data?')){state=defaultState();renderAll()}};
 }
 

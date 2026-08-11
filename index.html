@@ -133,6 +133,7 @@
 </section>
 
 
+<section id="levels" class="view"><div class="section-title"><div><div class="label">Game progress</div><h2>Levels</h2></div><span id="levelsSummary" class="sub"></span></div><div class="card"><h3>Import progress</h3><p class="sub">Import a CSV export from <strong>Activate-scores.ca</strong>. The file is processed locally on this device and updates your completed and remaining levels.</p><div class="row wrap"><label class="btn primary">Import Activate-scores.ca CSV<input id="importScoresCsv" type="file" accept=".csv,text/csv" hidden></label><button id="clearLevelProgress" class="btn danger">Clear imported progress</button></div><div id="levelsImportInfo" class="sub top-gap"></div></div><div class="card top-gap"><div class="row wrap"><select id="levelsRoom" class="select"><option value="">All rooms</option></select><select id="levelsView" class="select"><option value="incomplete">Incomplete levels</option><option value="complete">Complete levels</option><option value="unplayed">Unplayed games</option></select></div></div><div id="levelsList" class="stack top-gap"></div></section>
 <section id="stats" class="view">
       <div id="statsCards" class="stats-grid"></div>
       <div class="hero top-gap">
@@ -144,7 +145,7 @@
     <section id="settings" class="view">
       <div class="card">
         <h2>Settings</h2>
-        <p class="sub">Version <strong>10.8.0</strong> — clean rebuild.</p>
+        <p class="sub">Version <strong>11.0.0</strong> — clean rebuild.</p>
         <div class="row wrap">
           <button class="btn primary" id="exportBackup">Export backup</button>
           <label class="btn">Restore backup<input id="importBackup" type="file" accept="application/json" hidden></label>
@@ -163,6 +164,7 @@
     <button data-view="badges">◈<br>Targets</button>
     <button data-view="locations">⌖<br>Locations</button>
     <button data-view="competitive">⚔<br>Comp</button>
+    <button data-view="levels">◫<br>Levels</button>
     <button data-view="stats">▥<br>Stats</button>
     <button data-view="settings">⚙<br>Settings</button>
   </nav>
