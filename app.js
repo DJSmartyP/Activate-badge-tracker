@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.3.0';
+const VERSION='13.4.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -587,7 +587,6 @@ function renderLevels(){
 
   const roomSel=$('levelsRoom');
   const currentRoom=roomSel?.value||'';
-
   const baseEntries=progressEntries();
   const rooms=[...new Set(baseEntries.map(x=>x.room))].sort();
 
@@ -597,22 +596,54 @@ function renderLevels(){
   }
 
   const room=roomSel?.value||'';
+  const sortMode=$('levelsSort')?.value||'room-game';
 
-  // Toggle filter visibility.
   const levelFilter=$('levelsView');
   const gameFilter=$('gamesView');
   if(levelFilter)levelFilter.classList.toggle('hidden',levelsDisplayMode!=='levels');
   if(gameFilter)gameFilter.classList.toggle('hidden',levelsDisplayMode!=='games');
   document.querySelectorAll('[data-levels-mode]').forEach(b=>b.classList.toggle('active',b.dataset.levelsMode===levelsDisplayMode));
 
+  const sortRows=(rows)=>{
+    const copy=[...rows];
+    if(sortMode==='game-room'){
+      copy.sort((a,b)=>a.game.localeCompare(b.game)||a.room.localeCompare(b.room)||(a.level||0)-(b.level||0));
+    }else if(sortMode==='status'){
+      copy.sort((a,b)=>Number(a.done??a.played)-Number(b.done??b.played)||a.room.localeCompare(b.room)||a.game.localeCompare(b.game)||(a.level||0)-(b.level||0));
+    }else{
+      copy.sort((a,b)=>a.room.localeCompare(b.room)||a.game.localeCompare(b.game)||(a.level||0)-(b.level||0));
+    }
+    return copy;
+  };
+
+  const renderGrouped=(rows,rowHtml)=>{
+    const sorted=sortRows(rows);
+    if(!sorted.length)return '<div class="item sub">Nothing matches this filter.</div>';
+
+    // Keep the familiar room grouping when sorting by room/game.
+    if(sortMode==='room-game' && !room){
+      const groups={};
+      sorted.forEach(r=>(groups[r.room]??=[]).push(r));
+      return Object.entries(groups).map(([roomName,items])=>`
+        <section class="level-room-group">
+          <div class="level-room-heading">
+            <strong>${esc(roomName)}</strong>
+            <span>${items.length} ${levelsDisplayMode==='games'?'game'+(items.length===1?'':'s'):'entr'+(items.length===1?'y':'ies')}</span>
+          </div>
+          <div class="level-room-items">${items.map(rowHtml).join('')}</div>
+        </section>`).join('');
+    }
+    return sorted.map(rowHtml).join('');
+  };
+
   if(levelsDisplayMode==='games'){
     const mode=gameFilter?.value||'all';
     const allGames=gamePlayEntries().filter(x=>!room||x.room===room);
-    const rows=allGames.filter(x=>{
+    let rows=allGames.filter(x=>{
       if(mode==='played')return x.played;
       if(mode==='unplayed')return !x.played;
       return true;
-    });
+    }).map(x=>({...x,done:x.played}));
 
     const playedCount=allGames.filter(x=>x.played).length;
     $('levelsSummary').textContent=`${playedCount}/${allGames.length} games played • ${esc(activeLocation().name)}`;
@@ -621,17 +652,18 @@ function renderLevels(){
       ? `Last import for ${activeLocation().name}: ${new Date(progress.importedAt).toLocaleString()}${progress.player?' • '+progress.player:''}`
       : `No Activate-scores.ca export imported for ${activeLocation().name} yet.`;
 
-    $('levelsList').innerHTML=rows.length?rows.map(r=>`
+    $('levelsList').innerHTML=renderGrouped(rows,r=>`
       <div class="item game-play-row ${r.played?'game-played':'game-unplayed'}">
-        <div>
+        <div class="game-status-mark" aria-hidden="true">${r.played?'✓':'○'}</div>
+        <div class="game-play-main">
           <b>${esc(r.game)}</b>
           <div class="sub">${esc(r.room)} • ${r.mode==='competitive'?'Competitive':'Co-op'}</div>
         </div>
         ${r.mode==='competitive'
-          ? `<button class="played-toggle ${r.played?'played':''}" data-toggle-comp-played="${esc(r.room)}||${esc(r.game)}">${r.played?'Played':'Not played'}</button>`
-          : `<span class="pill ${r.played?'done':''}">${r.played?'Played':'Not played'}</span>`
+          ? `<button class="played-toggle ${r.played?'played':''}" data-toggle-comp-played="${esc(r.room)}||${esc(r.game)}" aria-pressed="${r.played?'true':'false'}">${r.played?'Played':'Not played'}</button>`
+          : `<span class="play-state-pill ${r.played?'played':'unplayed'}">${r.played?'Played':'Not played'}</span>`
         }
-      </div>`).join(''):'<div class="item sub">No games match this filter.</div>';
+      </div>`);
     return;
   }
 
@@ -675,14 +707,15 @@ function renderLevels(){
     ? `Last import for ${activeLocation().name}: ${new Date(progress.importedAt).toLocaleString()}${progress.player?' • '+progress.player:''}`
     : `No Activate-scores.ca export imported for ${activeLocation().name} yet.`;
 
-  $('levelsList').innerHTML=rows.length?rows.map(r=>{
+  $('levelsList').innerHTML=renderGrouped(rows,r=>{
     if(r.mode==='competitive'){
-      return `<div class="item level-row competitive-mode">
-        <div>
+      return `<div class="item level-row competitive-mode ${r.done?'level-complete':'level-incomplete'}">
+        <div class="game-status-mark" aria-hidden="true">${r.done?'✓':'○'}</div>
+        <div class="game-play-main">
           <b>${esc(r.game)}</b>
-          <div class="sub">${esc(r.room)} • Competitive</div>
+          <div class="sub">${esc(r.room)} • Competitive • manual status</div>
         </div>
-        <button class="played-toggle ${r.done?'played':''}" data-toggle-comp-played="${esc(r.room)}||${esc(r.game)}">${r.done?'Played':'Not played'}</button>
+        <button class="played-toggle ${r.done?'played':''}" data-toggle-comp-played="${esc(r.room)}||${esc(r.game)}" aria-pressed="${r.done?'true':'false'}">${r.done?'Played':'Not played'}</button>
       </div>`;
     }
 
@@ -690,13 +723,14 @@ function renderLevels(){
     if(Number(r.score)>0)bits.push(`Score ${r.score}`);
     if(Number(r.topScore)>0)bits.push(`Top ${r.topScore}`);
     return `<div class="item level-row cooperative-mode ${r.done?'level-complete':'level-incomplete'}">
-      <div>
+      <div class="level-state-stripe" aria-hidden="true"></div>
+      <div class="game-play-main">
         <b>${esc(r.game)} • Level ${r.level}</b>
         <div class="sub">${esc(r.room)} • Cooperative${bits.length?' • '+bits.join(' • '):''}</div>
       </div>
-      <span class="pill ${r.done?'done':''}">${r.done?'Complete':'Incomplete'}</span>
+      <span class="play-state-pill ${r.done?'played':'unplayed'}">${r.done?'Complete':'Incomplete'}</span>
     </div>`;
-  }).join(''):'<div class="item sub">No levels match this filter.</div>';
+  });
 }
 
 async function init(){
@@ -912,6 +946,7 @@ function bindEvents(){
 
   onChange('levelsRoom',renderLevels);
   onChange('levelsView',renderLevels);
+  onChange('levelsSort',renderLevels);
   onChange('gamesView',renderLevels);
   onClick('clearLevelProgress',()=>{if(confirm(`Clear imported level progress for ${activeLocation().name}?`)){state.levelProgressByLocation[state.activeLocation]=emptyLevelProgress();save();renderLevels()}});
 

@@ -1185,3 +1185,145 @@ html,body{overscroll-behavior-x:none}
 .game-play-row.game-unplayed{
   opacity:.82;
 }
+
+/* v13.4 — Levels page polish */
+#levels{
+  padding-left:clamp(16px,3.5vw,42px);
+  padding-right:clamp(16px,3.5vw,42px);
+}
+#levels > *{
+  max-width:1180px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+#levels .filters,
+#levels .toolbar,
+#levels .row.wrap{
+  gap:10px;
+}
+
+.level-room-group{
+  margin:0 0 18px;
+}
+.level-room-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:10px 14px;
+  margin:0 0 8px;
+  border:1px solid rgba(115,96,255,.18);
+  border-radius:12px;
+  background:rgba(90,70,180,.08);
+}
+.level-room-heading strong{
+  font-size:15px;
+}
+.level-room-heading span{
+  color:var(--muted,#9ea6bc);
+  font-size:12px;
+}
+.level-room-items{
+  display:grid;
+  gap:8px;
+}
+
+.game-play-row,
+.level-row{
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.07);
+}
+.game-play-main{
+  flex:1 1 auto;
+  min-width:0;
+}
+
+.game-status-mark{
+  flex:0 0 34px;
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  font-size:20px;
+  font-weight:900;
+}
+.game-played{
+  border-color:rgba(80,230,150,.35);
+  background:linear-gradient(90deg,rgba(41,180,115,.12),rgba(255,255,255,.018));
+}
+.game-played .game-status-mark{
+  color:#68f0ad;
+  background:rgba(47,195,125,.16);
+  border:1px solid rgba(104,240,173,.4);
+}
+.game-unplayed{
+  border-color:rgba(255,100,140,.24);
+  background:linear-gradient(90deg,rgba(182,47,86,.09),rgba(255,255,255,.012));
+  opacity:1 !important;
+}
+.game-unplayed .game-status-mark{
+  color:#ff789d;
+  background:rgba(210,60,100,.11);
+  border:1px solid rgba(255,120,157,.32);
+}
+
+.play-state-pill{
+  flex:0 0 auto;
+  min-width:92px;
+  text-align:center;
+  padding:8px 11px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+}
+.play-state-pill.played{
+  color:#7df5b7;
+  border:1px solid rgba(82,225,151,.42);
+  background:rgba(50,190,125,.13);
+}
+.play-state-pill.unplayed{
+  color:#ff8aa8;
+  border:1px solid rgba(255,105,145,.35);
+  background:rgba(205,60,102,.10);
+}
+.level-state-stripe{
+  position:absolute;
+  inset:0 auto 0 0;
+  width:4px;
+}
+.level-complete .level-state-stripe{background:#5deba5}
+.level-incomplete .level-state-stripe{background:#ff789d}
+
+.competitive-mode .played-toggle{
+  min-width:105px;
+  border-width:1px;
+}
+.competitive-mode .played-toggle:not(.played){
+  color:#ff8aa8;
+  border-color:rgba(255,105,145,.38);
+  background:rgba(205,60,102,.10);
+}
+.competitive-mode .played-toggle.played{
+  color:#7df5b7;
+  border-color:rgba(82,225,151,.45);
+  background:rgba(50,190,125,.15);
+}
+
+@media (max-width:700px){
+  #levels{
+    padding-left:14px;
+    padding-right:14px;
+  }
+  .game-play-row,.level-row{
+    gap:10px;
+  }
+  .play-state-pill,
+  .competitive-mode .played-toggle{
+    min-width:84px;
+    padding-left:9px;
+    padding-right:9px;
+  }
+}

@@ -1,0 +1,21 @@
+ACTIVATE TRACKER v13.4 — LEVELS PAGE POLISH
+
+CHANGES
+- Levels content no longer runs so close to the screen edges.
+- Added sorting:
+  • Room, then game
+  • Game A–Z
+  • Status
+- When using Room, then game with All rooms, entries are grouped under room headings like the earlier layout.
+- Played vs Not played is now visually obvious:
+  • green/check styling for played
+  • pink/circle styling for not played
+- Competitive games can be toggled manually from BOTH Levels view and Games view.
+- Manual competitive changes update the active location's dataset immediately.
+- Existing per-location data and landscape Focus layout retained.
+
+UPLOAD:
+index.html
+app.js
+style.css
+sw.js
