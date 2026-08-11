@@ -291,3 +291,16 @@ linear-gradient(65deg,transparent 0 57%,rgba(0,230,255,.03) 58% 59%,transparent 
   border-color:rgba(183,188,200,.25);
   background:rgba(183,188,200,.06);
 }
+
+/* v11.4: no splash + compact navigation */
+#splash,.splash,.splash-screen{display:none!important}
+.nav{grid-template-columns:repeat(5,1fr)!important;min-height:68px;padding-top:4px!important}
+.nav button{min-width:0!important;padding:4px 2px!important;font-size:9px!important;line-height:1.05!important}
+.nav .nav-icon{display:block;font-size:27px;line-height:30px;margin-bottom:2px}
+.more-menu-backdrop{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.5);backdrop-filter:blur(2px)}
+.more-menu{position:fixed;z-index:91;right:10px;bottom:82px;width:min(300px,calc(100vw - 20px));padding:12px;border:1px solid rgba(255,255,255,.14);border-radius:18px;background:rgba(12,14,22,.98);box-shadow:0 18px 50px rgba(0,0,0,.45);opacity:0;transform:translateY(12px);pointer-events:none;transition:.18s ease}
+.more-menu.open{opacity:1;transform:none;pointer-events:auto}
+.more-menu-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:8px}
+.more-menu-item{display:flex;width:100%;align-items:center;gap:13px;padding:14px 12px;margin-top:6px;border:1px solid rgba(255,255,255,.09);border-radius:13px;background:rgba(255,255,255,.04);color:inherit;text-align:left}
+.more-menu-item>span{width:30px;text-align:center;font-size:23px}
+@media(min-width:700px){.nav .nav-icon{font-size:30px;line-height:33px}.nav button{font-size:10px!important}}

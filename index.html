@@ -150,7 +150,7 @@
     <section id="settings" class="view">
       <div class="card">
         <h2>Settings</h2>
-        <p class="sub">Version <strong>11.3.0</strong> — clean rebuild.</p>
+        <p class="sub">Version <strong>11.4.0</strong> — clean rebuild.</p>
         <div class="row wrap">
           <button class="btn primary" id="exportBackup">Export backup</button>
           <label class="btn">Restore backup<input id="importBackup" type="file" accept="application/json" hidden></label>
@@ -165,14 +165,19 @@
   </main>
 
   <nav class="nav">
-    <button class="active" data-view="home">⌂<br>Home</button>
-    <button data-view="badges">◈<br>Targets</button>
-    <button data-view="locations">⌖<br>Locations</button>
-    <button data-view="competitive">⚔<br>Comp</button>
-    <button data-view="levels">◫<br>Levels</button>
-    <button data-view="stats">▥<br>Stats</button>
-    <button data-view="settings">⚙<br>Settings</button>
+    <button class="active" data-view="home"><span class="nav-icon">⌂</span><span>Home</span></button>
+    <button data-view="badges"><span class="nav-icon">◈</span><span>Targets</span></button>
+    <button data-view="levels"><span class="nav-icon">◫</span><span>Levels</span></button>
+    <button data-view="competitive"><span class="nav-icon">⚔</span><span>Comp</span></button>
+    <button id="moreMenuBtn" type="button"><span class="nav-icon">☰</span><span>More</span></button>
   </nav>
+  <div id="moreMenuBackdrop" class="more-menu-backdrop" hidden></div>
+  <aside id="moreMenu" class="more-menu" aria-hidden="true">
+    <div class="more-menu-head"><strong>More</strong><button id="closeMoreMenu" class="mini" type="button">✕</button></div>
+    <button class="more-menu-item" data-view="locations"><span>⌖</span><strong>Locations</strong></button>
+    <button class="more-menu-item" data-view="stats"><span>▥</span><strong>Stats</strong></button>
+    <button class="more-menu-item" data-view="settings"><span>⚙</span><strong>Settings</strong></button>
+  </aside>
 
   <div id="badgeModal" class="modal">
     <div class="sheet">

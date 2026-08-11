@@ -1,14 +1,6 @@
-const SPLASH_AUTO_MS=3000;
-window.addEventListener('DOMContentLoaded',()=>{
-  setTimeout(()=>{
-    const splash=document.getElementById('splash');
-    if(splash)splash.classList.add('hide');
-  },SPLASH_AUTO_MS);
-});
-
 'use strict';
 
-const VERSION='11.3.0';
+const VERSION='11.4.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -600,7 +592,11 @@ async function init(){
   }
 }
 
-function bindEvents(){
+
+function openMoreMenu(){const m=$('moreMenu'),b=$('moreMenuBackdrop');if(!m||!b)return;b.hidden=false;m.classList.add('open');m.setAttribute('aria-hidden','false')}
+function closeMoreMenu(){const m=$('moreMenu'),b=$('moreMenuBackdrop');if(!m||!b)return;m.classList.remove('open');m.setAttribute('aria-hidden','true');setTimeout(()=>{if(!m.classList.contains('open'))b.hidden=true},180)}
+
+function bindEvents(){$('moreMenuBtn')?.addEventListener('click',openMoreMenu);$('closeMoreMenu')?.addEventListener('click',closeMoreMenu);$('moreMenuBackdrop')?.addEventListener('click',closeMoreMenu);document.querySelectorAll('.more-menu-item[data-view]').forEach(b=>b.addEventListener('click',()=>{showView(b.dataset.view);closeMoreMenu()}));
 document.addEventListener('click',e=>{
     const nav=e.target.closest('[data-view]');if(nav){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));$(nav.dataset.view).classList.add('active');nav.classList.add('active');return}
     const t=e.target.closest('[data-toggle-earned]');if(t)return toggleEarn(Number(t.dataset.toggleEarned));

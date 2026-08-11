@@ -1,0 +1,9 @@
+ACTIVATE TRACKER v11.4
+- Splash screen removed: app opens directly to Home.
+- Bottom navigation: Home, Targets, Levels, Comp, More.
+- Larger navigation icons.
+- More menu: Locations, Stats, Settings.
+- Existing competitive Played sync/filtering retained.
+
+Upload index.html, app.js, style.css and sw.js to the GitHub root.
+No artwork replacement required.
