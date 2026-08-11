@@ -1,0 +1,18 @@
+ACTIVATE TRACKER v13.1 — LEVELS ALL FIX
+
+FIXED
+- Levels now genuinely supports:
+  • All levels
+  • Incomplete
+  • Complete
+- "All levels" shows both complete and incomplete cooperative levels together.
+- Cooperative games display levels 1–10.
+- Competitive-only games remain Played / Not played with no numbered levels.
+- Room filtering remains available.
+- Landscape Focus changes from v13.0 retained.
+
+UPLOAD:
+index.html
+app.js
+style.css
+sw.js

@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='12.6.0';
+const VERSION='13.1.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -381,7 +381,6 @@ function openBadgeFocus(i){
   }
 
   $('focusOverlay').classList.add('open');
-  pushAppHistory({overlay:'focus'});
 
   if($('focusReveal'))$('focusReveal').onclick=()=>{
     $('focusSolution').style.display='block';
@@ -533,87 +532,88 @@ function progressEntries(){
   return entries.sort((a,b)=>a.room.localeCompare(b.room)||a.game.localeCompare(b.game)||a.mode.localeCompare(b.mode));
 }
 function renderLevels(){
-  if(!$('levelsList'))return;
   ensureLevelProgress();
+  const l=activeLocation();
+  const roomSel=$('levelsRoom');
+  const currentRoom=roomSel?.value||'';
+  const rooms=[...(l.rooms||[])].sort((a,b)=>a.localeCompare(b));
 
-  const entries=progressEntries();
-  const rooms=[...new Set(entries.map(x=>x.room))].sort();
-  const sel=$('levelsRoom'),oldRoom=sel.value;
-  sel.innerHTML='<option value="">All rooms</option>'+rooms.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
-  if(rooms.includes(oldRoom))sel.value=oldRoom;
+  if(roomSel){
+    roomSel.innerHTML='<option value="">All rooms</option>'+rooms.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
+    roomSel.value=rooms.includes(currentRoom)?currentRoom:'';
+  }
 
-  const room=sel.value,mode=$('levelsView').value;
-  const filtered=entries.filter(x=>!room||x.room===room);
+  const selectedRoom=roomSel?.value||'';
+  const view=$('levelsView')?.value||'all';
+  const rows=[];
 
-  const coop=filtered.filter(x=>x.mode==='cooperative');
-  const comp=filtered.filter(x=>x.mode==='competitive');
-  const coopDone=coop.reduce((sum,x)=>sum+[1,2,3,4,5,6,7,8,9,10].filter(n=>x.levels?.[n]?.complete).length,0);
-  const compDone=comp.filter(x=>x.played).length;
+  (l.rooms||[]).forEach(room=>{
+    if(selectedRoom && room!==selectedRoom)return;
+    const catalog=GAME_CATALOG[room]||{};
+    const competitive=new Set(catalog.competitive||[]);
+    const cooperative=new Set(catalog.cooperative||[]);
+    const excluded=new Set(l.excludedGames||[]);
 
-  $('levelsSummary').textContent=entries.length
-    ? `${coopDone}/${coop.length*10} co-op levels • ${compDone}/${comp.length} competitive played`
-    : 'No progress imported';
+    // Cooperative games: always show levels 1–10.
+    cooperative.forEach(game=>{
+      if(excluded.has(game))return;
+      const key=room+'||'+game;
+      const progress=state.levelProgress.games?.[key]||{};
+      const completed=new Set(progress.completed||progress.levels||[]);
+      for(let level=1;level<=10;level++){
+        const done=completed.has(level) || completed.has(String(level));
+        if(view==='complete' && !done)return;
+        if(view==='incomplete' && done)return;
+        rows.push({
+          room,game,mode:'Cooperative',level,
+          complete:done,
+          score:progress.score??progress.currentScore??null,
+          topScore:progress.topScore??progress.highScore??null
+        });
+      }
+    });
 
-  $('levelsImportInfo').textContent=state.levelProgress.importedAt
-    ? `Last import: ${new Date(state.levelProgress.importedAt).toLocaleString()}${state.levelProgress.player?' • '+state.levelProgress.player:''}`
-    : 'No Activate-scores.ca export imported yet.';
-
-  const groups={};
-
-  filtered.forEach(x=>{
-    if(x.mode==='competitive'){
-      if(mode==='complete'&&!x.played)return;
-      if((mode==='incomplete'||mode==='unplayed')&&x.played)return;
-      (groups[x.room]??=[]).push(x);
-      return;
-    }
-
-    const complete=[1,2,3,4,5,6,7,8,9,10].filter(n=>x.levels?.[n]?.complete);
-    const missing=[1,2,3,4,5,6,7,8,9,10].filter(n=>!x.levels?.[n]?.complete);
-    if(mode==='unplayed'&&complete.length)return;
-    if(mode==='complete'&&!complete.length)return;
-    if(mode==='incomplete'&&!missing.length)return;
-    (groups[x.room]??=[]).push({...x,complete,missing});
+    // Competitive-only games: one Played / Not played row, no numbered levels.
+    competitive.forEach(game=>{
+      if(cooperative.has(game) || excluded.has(game))return;
+      const done=isCompetitivePlayed(room,game);
+      if(view==='complete' && !done)return;
+      if(view==='incomplete' && done)return;
+      rows.push({room,game,mode:'Competitive',level:null,complete:done});
+    });
   });
 
-  $('levelsList').innerHTML=Object.entries(groups).map(([roomName,games])=>`
-    <article class="card level-room">
-      <div class="row between"><h3>${esc(roomName)}</h3><span class="sub">${games.length} item${games.length===1?'':'s'}</span></div>
-      ${games.map(g=>{
-        if(g.mode==='competitive'){
-          return `<div class="level-game game-mode-row competitive-mode">
-            <div><strong>${esc(g.game)}</strong><span class="mode-pill competitive-pill">Competitive</span></div>
-            <button class="played-toggle ${g.played?'played':''}" data-toggle-comp-played="${esc(g.room)}||${esc(g.game)}">${g.played?'Played':'Not played'}</button>
-          </div>`;
-        }
+  const total=rows.length;
+  const doneCount=rows.filter(r=>r.complete).length;
+  if($('levelsSummary')){
+    $('levelsSummary').textContent=view==='all'
+      ? `${total} entries • ${doneCount} complete`
+      : `${total} ${view}`;
+  }
 
-        if(mode==='unplayed'){
-          return `<div class="level-game game-mode-row cooperative-mode">
-            <div><strong>${esc(g.game)}</strong><span class="mode-pill cooperative-pill">Co-op</span></div>
-            <span class="level-unplayed">Unplayed</span>
-          </div>`;
-        }
+  $('levelsList').innerHTML=rows.length?rows.map(r=>{
+    if(r.mode==='Competitive'){
+      return `<div class="item level-row competitive-mode">
+        <div>
+          <b>${esc(r.game)}</b>
+          <div class="sub">${esc(r.room)} • Competitive</div>
+        </div>
+        <span class="pill ${r.complete?'done':''}">${r.complete?'Played':'Not played'}</span>
+      </div>`;
+    }
 
-        const nums=mode==='complete'?g.complete:g.missing;
-        return `<div class="level-game level-game-scores game-mode-row cooperative-mode">
-          <div><strong>${esc(g.game)}</strong><span class="mode-pill cooperative-pill">Co-op</span></div>
-          <div class="level-score-grid">
-            ${nums.map(n=>{
-              const d=g.levels?.[n]||{score:0,topScore:0,complete:false};
-              const yours=d.score?Number(d.score).toLocaleString():'—';
-              const top=d.topScore?Number(d.topScore).toLocaleString():'—';
-              return `<div class="level-score-card ${mode}">
-                <span class="level-number">L${n}</span>
-                ${mode==='complete'
-                  ? `<span class="your-score">${yours}</span><span class="top-score">Top ${top}</span>`
-                  : `<span class="your-score">Needed</span><span class="top-score">${d.topScore?'Top '+top:'No top score'}</span>`}
-              </div>`;
-            }).join('')}
-          </div>
-        </div>`;
-      }).join('')}
-    </article>
-  `).join('')||'<div class="card sub">Nothing to show for this filter.</div>';
+    const scoreBits=[];
+    if(r.score!==null && r.score!==undefined && r.score!=='')scoreBits.push(`Score ${esc(r.score)}`);
+    if(r.topScore!==null && r.topScore!==undefined && r.topScore!=='')scoreBits.push(`Top ${esc(r.topScore)}`);
+
+    return `<div class="item level-row cooperative-mode ${r.complete?'level-complete':'level-incomplete'}">
+      <div>
+        <b>${esc(r.game)} • Level ${r.level}</b>
+        <div class="sub">${esc(r.room)} • Cooperative${scoreBits.length?' • '+scoreBits.join(' • '):''}</div>
+      </div>
+      <span class="pill ${r.complete?'done':''}">${r.complete?'Complete':'Incomplete'}</span>
+    </div>`;
+  }).join(''):'<div class="item sub">No levels match this filter.</div>';
 }
 
 async function init(){
@@ -652,13 +652,16 @@ function closeDrawer(){
   setTimeout(()=>{if(!drawer.classList.contains('open'))backdrop.hidden=true},220);
 }
 function showView(view,opts={}){
+  if(!view)return;
+  if(!opts.fromBack && currentView!==view){
+    appViewStack.push(view);
+  }
   currentView=view;
   updatePageHeader?.(view);
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   $(view)?.classList.add('active');
   document.querySelectorAll('.drawer-nav [data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
   closeDrawer?.();
-  if(!opts.fromHistory)pushAppHistory();
 }
 
 
@@ -681,60 +684,73 @@ function updatePageHeader(view){
 
 
 let currentView='home';
-let handlingPopState=false;
+let appViewStack=['home'];
+let focusReturnView='home';
 
-function appHistoryState(extra={}){
-  return {activateTracker:true,view:currentView,...extra};
+function closeFocusWithoutCompleting(){
+  const overlay=$('focusOverlay');
+  if(overlay)overlay.classList.remove('open');
 }
 
-function seedAppHistory(){
+function appBack(){
+  if($('focusOverlay')?.classList.contains('open')){
+    closeFocusWithoutCompleting();
+    return true;
+  }
+  if($('competitiveModal')?.classList.contains('open')){
+    $('competitiveModal').classList.remove('open');
+    return true;
+  }
+  if($('badgeModal')?.classList.contains('open')){
+    $('badgeModal').classList.remove('open');
+    return true;
+  }
+  if($('drawer')?.classList.contains('open') || $('drawerBackdrop')?.classList.contains('open')){
+    closeDrawer?.();
+    return true;
+  }
+  if(appViewStack.length>1){
+    appViewStack.pop();
+    const previous=appViewStack[appViewStack.length-1]||'home';
+    showView(previous,{fromBack:true});
+    return true;
+  }
+  return false;
+}
+
+function installBackGuard(){
   try{
-    history.replaceState(appHistoryState({guard:true}),'');
-    history.pushState(appHistoryState(),'');
+    history.replaceState({activateTracker:true,guard:true},'');
+    history.pushState({activateTracker:true,guard:true},'');
+    window.addEventListener('popstate',()=>{
+      const handled=appBack();
+      // Keep one browser-history entry ahead so Android edge-back is routed
+      // through the app rather than immediately leaving the PWA.
+      try{history.pushState({activateTracker:true,guard:true},'')}catch{}
+      return handled;
+    });
   }catch{}
 }
 
-function pushAppHistory(extra={}){
-  if(handlingPopState)return;
-  try{history.pushState(appHistoryState(extra),'')}catch{}
-}
-
-function closeFocusWithoutCompleting(){
-  $('focusOverlay')?.classList.remove('open');
-}
-
-function handleAppBack(event){
-  handlingPopState=true;
-  const stateObj=event.state;
-
-  if($('focusOverlay')?.classList.contains('open')){
-    closeFocusWithoutCompleting();
-    currentView=stateObj?.view||currentView;
-    updatePageHeader?.(currentView);
-    handlingPopState=false;
-    return;
-  }
-
-  if(stateObj?.activateTracker){
-    const view=stateObj.view||'home';
-    currentView=view;
-    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-    $(view)?.classList.add('active');
-    updatePageHeader?.(view);
-    highlightDrawer?.(view);
-    closeDrawer?.();
-    handlingPopState=false;
-    return;
-  }
-
-  // Prevent the first Android/browser edge-back gesture from leaving the app
-  // when there is no earlier in-app destination.
-  try{history.pushState(appHistoryState({guard:true}),'')}catch{}
-  handlingPopState=false;
-}
-
 function bindEvents(){
-  window.addEventListener('popstate',handleAppBack);
+  let touchStartX=0,touchStartY=0,touchStartTime=0;
+  document.addEventListener('touchstart',e=>{
+    if(e.touches.length!==1)return;
+    const t=e.touches[0];
+    touchStartX=t.clientX;touchStartY=t.clientY;touchStartTime=Date.now();
+  },{passive:true});
+  document.addEventListener('touchend',e=>{
+    if(!touchStartTime || !e.changedTouches.length)return;
+    const t=e.changedTouches[0];
+    const dx=t.clientX-touchStartX,dy=Math.abs(t.clientY-touchStartY);
+    const elapsed=Date.now()-touchStartTime;
+    const startedAtEdge=touchStartX<=42;
+    touchStartTime=0;
+    if(startedAtEdge && dx>=72 && dy<=80 && elapsed<=700){
+      appBack();
+    }
+  },{passive:true});
+
   const onClick=(id,fn)=>{const el=$(id);if(el)el.onclick=fn};
   const onChange=(id,fn)=>{const el=$(id);if(el)el.onchange=fn};
   const listen=(id,event,fn)=>{const el=$(id);if(el)el.addEventListener(event,fn)};
@@ -830,8 +846,8 @@ function bindEvents(){
   onClick('badgeModal',e=>{if(e.target.id==='badgeModal')$('badgeModal')?.classList.remove('open')});
   onClick('modalEarn',()=>{toggleEarn(modalBadgeIndex);openBadge(modalBadgeIndex)});
   onClick('modalPin',()=>{togglePin(modalBadgeIndex);openBadge(modalBadgeIndex)});
-  onClick('closeFocusOverlay',()=>{if($('focusOverlay')?.classList.contains('open'))history.back()});
-  onClick('focusDismiss',()=>{if($('focusOverlay')?.classList.contains('open'))history.back()});
+  onClick('closeFocusOverlay',closeFocusWithoutCompleting);
+  onClick('focusDismiss',closeFocusWithoutCompleting);
   onClick('focusNext',()=>openFocusOverlay(focusIndex+1));
   onClick('focusPrev',()=>openFocusOverlay(focusIndex-1));
   onClick('focusComplete',()=>{
@@ -863,4 +879,4 @@ function bindEvents(){
 
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(console.error));
 init();
-seedAppHistory();
+installBackGuard();

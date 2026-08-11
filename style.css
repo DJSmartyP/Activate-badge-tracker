@@ -785,3 +785,363 @@ body{overflow:hidden}
 .focus-actions{
   gap:10px;
 }
+
+/* v12.7 back navigation */
+html,body{overscroll-behavior-x:none}
+#focusDismiss{touch-action:manipulation}
+
+/* v12.8 — landscape Focus layout only.
+   Navigation/back behavior intentionally unchanged from uploaded v12.7. */
+@media (orientation:landscape) and (min-width:700px){
+  #focusOverlay{
+    align-items:flex-start;
+    justify-content:center;
+    padding:
+      max(14px,env(safe-area-inset-top))
+      max(22px,env(safe-area-inset-right))
+      max(14px,env(safe-area-inset-bottom))
+      max(22px,env(safe-area-inset-left));
+    overflow-y:auto;
+  }
+
+  #focusOverlay .focus-card,
+  #focusOverlay .focus-shell,
+  #focusOverlay > .modal-card{
+    width:min(1180px,96vw);
+    min-height:0;
+    max-height:calc(100dvh - 28px);
+    margin:auto;
+    display:flex;
+    flex-direction:column;
+    border-radius:24px;
+    overflow:hidden;
+  }
+
+  #focusOverlayBody{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    display:grid;
+    grid-template-columns:minmax(300px,.85fr) minmax(420px,1.15fr);
+    align-items:start;
+    gap:24px 34px;
+    padding:24px 28px 18px;
+  }
+
+  #focusOverlayBody > section{
+    min-width:0;
+  }
+
+  #focusOverlayBody .focus-meta{
+    font-size:14px;
+    line-height:1.25;
+    margin-bottom:10px;
+  }
+
+  #focusOverlayBody .focus-title{
+    font-size:clamp(32px,4vw,54px);
+    line-height:.98;
+    margin:0 0 14px;
+    max-width:12ch;
+  }
+
+  #focusOverlayBody .focus-achieved-banner{
+    margin:4px 0 14px;
+    font-size:13px;
+  }
+
+  #focusOverlayBody .focus-requirement{
+    font-size:clamp(22px,2.35vw,34px);
+    line-height:1.18;
+    margin:0;
+    max-width:26ch;
+  }
+
+  #focusOverlayBody .detail{
+    font-size:16px;
+    line-height:1.4;
+    margin:0 0 14px;
+    padding:16px 18px;
+    border-radius:16px;
+  }
+
+  #focusOverlayBody .detail strong{
+    display:block;
+    margin-bottom:7px;
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+
+  #focusOverlay .focus-actions{
+    flex:0 0 auto;
+    display:grid;
+    grid-template-columns:auto minmax(160px,1fr) minmax(160px,1fr);
+    gap:12px;
+    padding:12px 20px max(14px,env(safe-area-inset-bottom));
+    background:rgba(5,8,17,.96);
+    border-top:1px solid rgba(255,255,255,.08);
+  }
+
+  #focusOverlay .focus-actions .btn{
+    min-height:48px;
+    width:auto;
+    margin:0;
+    font-size:16px;
+  }
+
+  #focusOverlay #focusDismiss{
+    min-width:110px;
+  }
+
+  #focusOverlay #focusComplete{
+    min-width:170px;
+  }
+
+  #focusOverlay #focusPosition{
+    font-size:12px;
+  }
+}
+
+/* Extra-short landscape displays: compress further rather than clipping. */
+@media (orientation:landscape) and (min-width:700px) and (max-height:720px){
+  #focusOverlayBody{
+    gap:18px 26px;
+    padding:18px 22px 12px;
+  }
+  #focusOverlayBody .focus-title{
+    font-size:clamp(28px,3.5vw,44px);
+  }
+  #focusOverlayBody .focus-requirement{
+    font-size:clamp(19px,2vw,28px);
+  }
+  #focusOverlay .focus-actions{
+    padding-top:9px;
+    padding-bottom:max(9px,env(safe-area-inset-bottom));
+  }
+  #focusOverlay .focus-actions .btn{
+    min-height:44px;
+  }
+}
+
+/* v12.9 — more landscape Focus breathing room */
+@media (orientation:landscape) and (min-width:700px){
+  #focusOverlay{
+    padding:
+      max(28px,env(safe-area-inset-top))
+      max(38px,env(safe-area-inset-right))
+      max(28px,env(safe-area-inset-bottom))
+      max(38px,env(safe-area-inset-left)) !important;
+  }
+
+  #focusOverlay .focus-card,
+  #focusOverlay .focus-shell,
+  #focusOverlay > .modal-card{
+    width:min(1120px,calc(100vw - 76px)) !important;
+    max-height:calc(100dvh - 56px) !important;
+  }
+
+  #focusOverlayBody{
+    padding:28px 32px 22px !important;
+    gap:26px 38px !important;
+  }
+
+  #focusOverlay .focus-actions{
+    padding:
+      14px 28px
+      max(20px,env(safe-area-inset-bottom)) !important;
+    gap:14px !important;
+  }
+}
+
+@media (orientation:landscape) and (min-width:700px) and (max-height:720px){
+  #focusOverlay{
+    padding:
+      max(20px,env(safe-area-inset-top))
+      max(30px,env(safe-area-inset-right))
+      max(20px,env(safe-area-inset-bottom))
+      max(30px,env(safe-area-inset-left)) !important;
+  }
+
+  #focusOverlay .focus-card,
+  #focusOverlay .focus-shell,
+  #focusOverlay > .modal-card{
+    width:min(1120px,calc(100vw - 60px)) !important;
+    max-height:calc(100dvh - 40px) !important;
+  }
+
+  #focusOverlayBody{
+    padding:22px 26px 16px !important;
+  }
+}
+
+/* v13.0 — landscape Focus rework */
+@media (orientation:landscape) and (min-width:700px){
+  #focusOverlay{
+    position:fixed;
+    inset:0;
+    z-index:220;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:
+      max(34px,env(safe-area-inset-top))
+      max(46px,env(safe-area-inset-right))
+      max(34px,env(safe-area-inset-bottom))
+      max(46px,env(safe-area-inset-left)) !important;
+    background:rgba(3,5,12,.82);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    overflow:hidden;
+  }
+  #focusOverlay.open{display:flex}
+
+  #focusOverlay .focus-inner{
+    width:min(1120px,calc(100vw - 92px));
+    height:min(660px,calc(100dvh - 68px));
+    min-height:0;
+    max-height:calc(100dvh - 68px);
+    margin:0 auto;
+    display:grid;
+    grid-template-rows:auto minmax(0,1fr) auto;
+    overflow:hidden;
+    border:1px solid rgba(129,104,255,.24);
+    border-radius:26px;
+    background:
+      radial-gradient(circle at 85% 12%,rgba(113,46,255,.13),transparent 34%),
+      linear-gradient(145deg,rgba(7,10,20,.985),rgba(10,14,27,.985));
+    box-shadow:0 24px 70px rgba(0,0,0,.48);
+  }
+
+  #focusOverlay .focus-topbar,
+  #focusOverlay .focus-inner > .row.between:first-child{
+    position:relative;
+    z-index:2;
+    min-height:58px;
+    padding:12px 18px;
+    margin:0;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(7,10,20,.94);
+  }
+
+  #focusOverlay #closeFocusOverlay{
+    min-height:38px;
+    padding:0 14px;
+    border-radius:12px;
+  }
+
+  #focusOverlayBody{
+    min-height:0;
+    overflow-y:auto;
+    display:grid !important;
+    grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
+    gap:28px 34px !important;
+    align-content:start;
+    padding:26px 30px 22px !important;
+  }
+
+  #focusOverlayBody > section{
+    min-width:0;
+    align-self:start;
+  }
+
+  #focusOverlayBody .focus-meta{
+    margin:0 0 10px;
+    font-size:13px;
+    line-height:1.3;
+    color:#7eeaff;
+  }
+
+  #focusOverlayBody .focus-title{
+    max-width:none !important;
+    margin:0 0 14px !important;
+    font-size:clamp(34px,3.3vw,48px) !important;
+    line-height:1.02 !important;
+    letter-spacing:-.02em;
+  }
+
+  #focusOverlayBody .focus-achieved-banner{
+    margin:0 0 14px !important;
+  }
+
+  #focusOverlayBody .focus-requirement{
+    max-width:22ch !important;
+    margin:0 !important;
+    font-size:clamp(21px,2vw,30px) !important;
+    line-height:1.2 !important;
+  }
+
+  #focusOverlayBody .detail{
+    margin:0 0 12px !important;
+    padding:14px 16px !important;
+    border-radius:14px !important;
+    font-size:15px !important;
+    line-height:1.38 !important;
+  }
+
+  #focusOverlay .focus-actions{
+    display:grid !important;
+    grid-template-columns:1fr 1.25fr 1fr !important;
+    gap:12px !important;
+    align-items:center;
+    padding:
+      12px 18px
+      max(14px,env(safe-area-inset-bottom)) !important;
+    margin:0 !important;
+    border-top:1px solid rgba(255,255,255,.08);
+    background:rgba(6,9,18,.96);
+  }
+
+  /* The top-right Close control is the landscape escape action.
+     Hide the extra footer Back button to avoid the awkward 4-button stack. */
+  #focusOverlay #focusDismiss{
+    display:none !important;
+  }
+
+  #focusOverlay #focusPrev{
+    grid-column:1;
+    grid-row:1;
+  }
+  #focusOverlay #focusComplete{
+    grid-column:2;
+    grid-row:1;
+  }
+  #focusOverlay #focusNext{
+    grid-column:3;
+    grid-row:1;
+  }
+
+  #focusOverlay .focus-actions .btn{
+    width:100% !important;
+    min-width:0 !important;
+    min-height:46px !important;
+    margin:0 !important;
+    font-size:15px !important;
+  }
+}
+
+/* Short landscape displays: keep the same structure but compress vertically. */
+@media (orientation:landscape) and (min-width:700px) and (max-height:650px){
+  #focusOverlay{
+    padding:
+      max(22px,env(safe-area-inset-top))
+      max(34px,env(safe-area-inset-right))
+      max(22px,env(safe-area-inset-bottom))
+      max(34px,env(safe-area-inset-left)) !important;
+  }
+  #focusOverlay .focus-inner{
+    width:min(1120px,calc(100vw - 68px));
+    height:calc(100dvh - 44px);
+    max-height:calc(100dvh - 44px);
+  }
+  #focusOverlayBody{
+    padding:20px 24px 16px !important;
+    gap:20px 26px !important;
+  }
+  #focusOverlayBody .focus-title{
+    font-size:clamp(30px,3vw,42px) !important;
+  }
+  #focusOverlayBody .focus-requirement{
+    font-size:clamp(19px,1.8vw,26px) !important;
+  }
+}
