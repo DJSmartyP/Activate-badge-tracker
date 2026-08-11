@@ -1,0 +1,13 @@
+ACTIVATE TRACKER v13.11 — THICKER BOX OUTLINES
+
+CHANGE
+- Main cards, boxes, badge cards, level/game cards and dialogs now use 2px outlines.
+- Smaller tags/status pills stay slightly lighter at 1.5px.
+- Landscape scroll fix from v13.10 is retained.
+- Graphics work remains parked.
+
+UPLOAD:
+index.html
+app.js
+style.css
+sw.js

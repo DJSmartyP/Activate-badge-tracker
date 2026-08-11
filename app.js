@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.6.0';
+const VERSION='13.11.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -58,9 +58,11 @@ function isCompetitivePlayed(room,game){
   return !!activeLevelProgress().competitive[competitivePlayedKey(room,game)];
 }
 function setCompetitivePlayed(room,game,played){
-  ensureLevelProgress();
-  activeLevelProgress().competitive[competitivePlayedKey(room,game)]=!!played;
+  const progress=activeLevelProgress();
+  progress.competitive[competitivePlayedKey(room,game)]=!!played;
   save();
+  renderLevels?.();
+  renderCompetitive?.();
 }
 
 function competitiveEntries(l=activeLocation()){
@@ -109,7 +111,7 @@ function loadState(){
     state=saved||defaultState();
   }catch{state=defaultState()}
   if(!Array.isArray(state.locations)||!state.locations.length)state=defaultState();
-  state.pins=Array.isArray(state.pins)?state.pins:[];
+  state.pins=Array.isArray(state.pins)?[...new Set(state.pins.map(Number).filter(Number.isInteger))].slice(0,MAX_PINS):[];
   state.history=Array.isArray(state.history)?state.history:[];
   state.earned=state.earned||{};
   state.notes=state.notes||{};
@@ -181,6 +183,34 @@ function renderHome(){
   $('recent').innerHTML=state.history.length?state.history.slice(0,8).map(h=>`<button class="item recent-achievement clickable-badge" data-open-focus-badge="${h.badge}"><div><b>${esc(BADGES[h.badge]?.name||'Badge')}</b><div class="sub">${esc(h.date||'')}</div></div><span class="recent-open">›</span></button>`).join(''):'<div class="item sub">No achievements recorded yet.</div>';
 }
 
+
+function setBadgePinned(index,pinned){
+  const i=Number(index);
+  if(!Number.isInteger(i) || i<0 || i>=BADGES.length)return false;
+  state.pins=Array.isArray(state.pins)?state.pins.map(Number).filter(Number.isInteger):[];
+  const has=state.pins.includes(i);
+
+  if(pinned && !has){
+    if(state.pins.length>=MAX_PINS){
+      toast('Focus list is full — maximum 5 badges');
+      return false;
+    }
+    state.pins.push(i);
+  }else if(!pinned && has){
+    state.pins=state.pins.filter(x=>x!==i);
+  }else{
+    return true;
+  }
+
+  save();
+  renderAll();
+  return true;
+}
+function toggleBadgePin(index){
+  const i=Number(index);
+  return setBadgePinned(i,!(Array.isArray(state.pins)&&state.pins.includes(i)));
+}
+
 function renderBadges(){
   syncTrophyEarned();
   const rooms=availableFocusRooms();
@@ -206,7 +236,7 @@ function renderBadges(){
   $('pinCount').textContent=`${state.pins.length} / ${MAX_PINS}`;
   $('pinList').innerHTML=state.pins.length?state.pins.map((i,idx)=>`<div class="item row between">
     <div><b>${esc(BADGES[i].name)}</b><div class="sub">${isTrophy(BADGES[i])?'Trophy':esc(BADGES[i].room||'Global')} • ${esc(BADGES[i].how)}</div></div>
-    <div class="row"><button class="mini" data-open-focus="${idx}">Open</button><button class="mini" data-unpin="${i}">✕</button></div>
+    <div class="row"><button class="mini" data-open-focus="${idx}">Open</button><button class="mini" data-unpin-badge="${i}">✕</button></div>
   </div>`).join(''):'<div class="item sub">No pinned targets.</div>';
 
   $('badgeCount').textContent=`${rows.length} shown`;
@@ -218,7 +248,7 @@ function renderBadges(){
       ${b.game?`<span class="tag">${esc(b.game)}${b.level?' • L'+esc(b.level):''}</span>`:''}
       ${!isTrophy(b)?`<span class="tag availability-tag ${availableHere(b)?'ok':'away'}">${availableHere(b)?'Available here':'Other location'}</span>`:''}
     </div></div>
-    <div class="row"><button class="mini pin-button ${state.pins.includes(i)?'active':''}" data-pin="${i}" title="${state.pins.includes(i)?'Pinned':'Pin target'}">${state.pins.includes(i)?'📌':'📍'}</button><button class="mini" data-open-focus-badge="${i}" title="Open badge">›</button></div>
+    <div class="row"><button class="mini pin-button ${state.pins.includes(i)?'active':''}" data-pin-badge="${i}" title="${state.pins.includes(i)?'Pinned':'Pin target'}">${state.pins.includes(i)?'📌':'📍'}</button><button class="mini" data-open-focus-badge="${i}" title="Open badge">›</button></div>
   </article>`).join(''):'<div class="item sub">No targets match those filters.</div>';
 }
 
@@ -333,12 +363,7 @@ function toggleEarn(i){
   renderAll();updatePageHeader('home');
 }
 
-function togglePin(i){
-  if(state.pins.includes(i))state.pins=state.pins.filter(x=>x!==i);
-  else if(state.pins.length<MAX_PINS)state.pins.push(i);
-  else return toast('Focus list is full — maximum 5 badges');
-  renderAll();
-}
+function togglePin(i){return toggleBadgePin(i)}
 
 function openBadge(i){
   modalBadgeIndex=i;const b=BADGES[i];
@@ -411,14 +436,16 @@ function ensureLevelProgressStore(){
     state.levelProgressByLocation={};
   }
 
-  // One-time migration: move legacy global progress into the active location.
-  if(state.levelProgress && !state._levelProgressMigrated){
-    const activeId=state.activeLocation || state.locations?.[0]?.id || 'home';
+  if(!state._levelProgressMigrated){
     const legacy=state.levelProgress;
-    const hasLegacy=
-      Object.keys(legacy.games||{}).length ||
-      Object.keys(legacy.competitive||{}).length ||
-      legacy.importedAt || legacy.player;
+    const activeId=state.activeLocation || state.locations?.[0]?.id || 'home';
+    const hasLegacy=!!legacy && (
+      Object.keys(legacy.games||{}).length>0 ||
+      Object.keys(legacy.competitive||{}).length>0 ||
+      !!legacy.importedAt ||
+      !!legacy.player
+    );
+
     if(hasLegacy && !state.levelProgressByLocation[activeId]){
       state.levelProgressByLocation[activeId]={
         games:{...(legacy.games||{})},
@@ -842,6 +869,7 @@ function installBackGuard(){
 }
 
 function bindEvents(){
+
   document.querySelectorAll('[data-levels-mode]').forEach(btn=>btn.addEventListener('click',()=>{
     levelsDisplayMode=btn.dataset.levelsMode||'levels';
     renderLevels();
@@ -890,9 +918,9 @@ function bindEvents(){
     const t=e.target.closest('[data-toggle-earned]');if(t)return toggleEarn(Number(t.dataset.toggleEarned));
     const fb=e.target.closest('[data-open-focus-badge]');if(fb)return openBadgeFocus(Number(fb.dataset.openFocusBadge));
     const o=e.target.closest('[data-open-badge]');if(o)return openBadge(Number(o.dataset.openBadge));
-    const p=e.target.closest('[data-pin]');if(p)return togglePin(Number(p.dataset.pin));
-    const fp=e.target.closest('[data-focus-pin]');if(fp)return togglePin(Number(fp.dataset.focusPin));
-    const un=e.target.closest('[data-unpin]');if(un)return togglePin(Number(un.dataset.unpin));
+    const p=e.target.closest('[data-pin],[data-pin-badge]');if(p){e.preventDefault();e.stopPropagation();return toggleBadgePin(Number(p.dataset.pin??p.dataset.pinBadge))}
+    const fp=e.target.closest('[data-focus-pin]');if(fp){e.preventDefault();e.stopPropagation();return toggleBadgePin(Number(fp.dataset.focusPin))}
+    const un=e.target.closest('[data-unpin],[data-unpin-badge]');if(un){e.preventDefault();e.stopPropagation();return setBadgePinned(Number(un.dataset.unpin??un.dataset.unpinBadge),false)}
     const of=e.target.closest('[data-open-focus]');if(of)return openFocusOverlay(Number(of.dataset.openFocus));
     if(e.target.closest('.competitive-check'))return;
     const cg=e.target.closest('[data-comp-game]');
@@ -987,7 +1015,19 @@ function bindEvents(){
   onChange('importBackup',e=>{
     const f=e.target.files?.[0];if(!f)return;
     const r=new FileReader();
-    r.onload=()=>{try{state=JSON.parse(r.result);state.locations.forEach(ensureLocationShape);ensureLevelProgressStore();activeLevelProgress();save();renderAll();toast('Backup restored')}catch{toast('Could not read backup')}};
+    r.onload=()=>{try{state=JSON.parse(r.result);
+      if(!Array.isArray(state.locations)||!state.locations.length)state.locations=defaultState().locations;
+      state.locations.forEach(ensureLocationShape);
+      state.activeLocation=state.activeLocation||state.locations[0].id;
+      state.pins=Array.isArray(state.pins)?state.pins:[];
+      state.history=Array.isArray(state.history)?state.history:[];
+      state.earned=state.earned||{};
+      state.notes=state.notes||{};
+      ensureLevelProgressStore();
+      activeLevelProgress();
+      save();
+      renderAll();
+      toast('Backup restored')}catch{toast('Could not read backup')}};
     r.readAsText(f)
   });
   onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();renderAll()}});

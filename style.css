@@ -1804,3 +1804,181 @@ code{
     max-width:calc(100vw - 68px) !important;
   }
 }
+
+
+/* v13.7 — wide shallow branded header banner */
+.brand-banner-wrap{
+  position:sticky;
+  top:0;
+  z-index:40;
+  width:100%;
+  display:flex;
+  justify-content:center;
+  padding: max(8px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 6px max(14px, env(safe-area-inset-left));
+  background: linear-gradient(180deg, rgba(7,12,22,.96), rgba(7,12,22,.88));
+  backdrop-filter: blur(10px);
+}
+.brand-banner-img{
+  display:block;
+  width:min(100%, 1180px);
+  height:clamp(52px, 8.2vw, 78px);
+  object-fit:contain;
+  object-position:center;
+  filter: drop-shadow(0 0 10px rgba(73,183,255,.18)) drop-shadow(0 0 18px rgba(255,61,167,.12));
+}
+
+/* Ensure the page bar stays directly below the banner and remains compact */
+.page-bar,
+.page-header,
+.header-bar{
+  position:sticky;
+  top: calc(clamp(52px, 8.2vw, 78px) + max(8px, env(safe-area-inset-top)) + 10px);
+  z-index:39;
+}
+
+@media (max-width:430px){
+  .brand-banner-wrap{
+    padding-left:max(10px, env(safe-area-inset-left));
+    padding-right:max(10px, env(safe-area-inset-right));
+    padding-bottom:4px;
+  }
+  .brand-banner-img{
+    height:clamp(46px, 12vw, 62px);
+  }
+  .page-bar,
+  .page-header,
+  .header-bar{
+    top: calc(clamp(46px, 12vw, 62px) + max(8px, env(safe-area-inset-top)) + 8px);
+  }
+}
+
+@media (orientation:landscape) and (max-height:760px){
+  .brand-banner-wrap{
+    padding-top:max(6px, env(safe-area-inset-top));
+    padding-bottom:4px;
+  }
+  .brand-banner-img{
+    height:clamp(42px, 8vh, 58px);
+  }
+  .page-bar,
+  .page-header,
+  .header-bar{
+    top: calc(clamp(42px, 8vh, 58px) + max(6px, env(safe-area-inset-top)) + 8px);
+  }
+}
+
+/* v13.8 badge pin/unpin interaction fix */
+[data-pin-badge],
+[data-unpin-badge]{
+  position:relative;
+  z-index:2;
+  touch-action:manipulation;
+  pointer-events:auto;
+}
+
+/* v13.9 stability: temporary lightweight brand bar until final artwork pass */
+.brand-banner-placeholder{
+  min-height:0;
+}
+.brand-banner-placeholder .brand-wordmark{
+  width:min(100%,1180px);
+  height:clamp(46px,7vw,64px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  border-radius:14px;
+  border:1px solid rgba(105,160,255,.16);
+  background:linear-gradient(90deg,rgba(7,14,27,.96),rgba(12,19,35,.96),rgba(7,14,27,.96));
+}
+.brand-banner-placeholder strong{
+  font-size:clamp(18px,3vw,30px);
+  letter-spacing:.12em;
+  color:#8fdcff;
+}
+.brand-banner-placeholder .smarty-tag{
+  position:absolute;
+  left:clamp(14px,7vw,90px);
+  top:4px;
+  transform:rotate(-7deg);
+  font-weight:800;
+  font-size:clamp(12px,1.8vw,18px);
+  color:#ff73bd;
+}
+
+/* v13.10 — reliable page scrolling, especially landscape.
+   The app shell stays fixed; the active page is the scroll container. */
+.app{
+  height:100dvh;
+  min-height:100dvh;
+  overflow:hidden;
+}
+
+.app-header-shell{
+  flex:0 0 auto;
+}
+
+/* Inactive views stay hidden. Active view owns vertical scrolling. */
+.view{
+  min-height:0;
+  max-height:none;
+}
+
+.view.active{
+  display:block;
+  flex:1 1 auto;
+  min-height:0;
+  height:auto;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:contain;
+  scroll-padding-bottom:max(32px,env(safe-area-inset-bottom));
+  padding-bottom:max(96px,calc(32px + env(safe-area-inset-bottom))) !important;
+}
+
+/* Landscape Android/foldable browsers often expose a smaller dynamic
+   viewport after the address/navigation bars settle. Give the scroll
+   container explicit bottom clearance so the final card can clear them. */
+@media (orientation:landscape){
+  .view.active{
+    padding-bottom:max(120px,calc(44px + env(safe-area-inset-bottom))) !important;
+    scroll-padding-bottom:max(120px,calc(44px + env(safe-area-inset-bottom)));
+  }
+}
+
+/* Short landscape displays need a little extra end space because browser
+   chrome/navigation gestures consume a larger fraction of the viewport. */
+@media (orientation:landscape) and (max-height:760px){
+  .view.active{
+    padding-bottom:max(140px,calc(56px + env(safe-area-inset-bottom))) !important;
+    scroll-padding-bottom:max(140px,calc(56px + env(safe-area-inset-bottom)));
+  }
+}
+
+/* v13.11 — slightly stronger panel outlines */
+.card,
+.item,
+.badge,
+.target-card,
+.room-game-card,
+.level-chip,
+.level-room-heading,
+.game-play-row,
+.level-row,
+.modal-card,
+.dialog,
+.sheet{
+  border-width:2px !important;
+}
+
+/* Keep nested/small tags lighter so the screen doesn't become visually heavy. */
+.pill,
+.status-tag,
+.mode-tag,
+.play-state-pill,
+.status-icon,
+.played-toggle{
+  border-width:1.5px !important;
+}
