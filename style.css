@@ -1152,3 +1152,36 @@ html,body{overscroll-behavior-x:none}
   font-weight:700;
   color:var(--cyan,#75eaff);
 }
+
+/* v13.3 — Levels / Games play-status view */
+.levels-mode-tabs{
+  display:inline-flex;
+  gap:4px;
+  padding:4px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:14px;
+  background:rgba(255,255,255,.035);
+}
+.levels-mode-tabs .seg-btn{
+  border:0;
+  border-radius:10px;
+  padding:9px 15px;
+  background:transparent;
+  color:var(--muted,#a9b0c3);
+  font:inherit;
+  font-weight:700;
+}
+.levels-mode-tabs .seg-btn.active{
+  color:#fff;
+  background:linear-gradient(135deg,rgba(115,63,255,.95),rgba(72,76,255,.95));
+}
+.hidden{display:none !important}
+.game-play-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.game-play-row.game-unplayed{
+  opacity:.82;
+}

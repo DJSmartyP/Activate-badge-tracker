@@ -1,0 +1,20 @@
+ACTIVATE TRACKER v13.3 — LEVELS / GAMES VIEW
+
+NEW
+- Levels page now has a Levels | Games toggle.
+- Games mode shows each game once for the selected venue.
+- Co-op game = Played when any level 1–10 has been completed.
+- Competitive game = Played when its Played state is checked.
+- Games filters:
+  • All games
+  • Not played
+  • Played
+- Summary shows e.g. 27/34 games played • Watford.
+- Location-specific datasets from v13.2 retained.
+- Switching location switches both Levels and Games status.
+
+UPLOAD:
+index.html
+app.js
+style.css
+sw.js

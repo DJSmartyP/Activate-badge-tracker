@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.2.0';
+const VERSION='13.3.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -8,6 +8,7 @@ let state=null;
 let modalBadgeIndex=null;
 let focusIndex=0;
 
+let levelsDisplayMode='levels';
 const defaultState=()=>({
   earned:{},
   pins:[],
@@ -566,26 +567,78 @@ function progressEntries(){
 
   return entries.sort((a,b)=>a.room.localeCompare(b.room)||a.game.localeCompare(b.game)||a.mode.localeCompare(b.mode));
 }
+
+function gamePlayEntries(){
+  const entries=progressEntries();
+  return entries.map(x=>{
+    if(x.mode==='competitive'){
+      return {room:x.room,game:x.game,mode:'competitive',played:!!x.played};
+    }
+    const played=[1,2,3,4,5,6,7,8,9,10].some(n=>!!x.levels?.[n]?.complete);
+    return {room:x.room,game:x.game,mode:'cooperative',played};
+  }).sort((a,b)=>a.room.localeCompare(b.room)||a.game.localeCompare(b.game)||a.mode.localeCompare(b.mode));
+}
+
 function renderLevels(){
   if(!$('levelsList'))return;
 
   const progress=activeLevelProgress();
   if($('levelsImportLocation'))$('levelsImportLocation').textContent=`Progress dataset: ${activeLocation().name}`;
-  const entries=progressEntries();
-  const rooms=[...new Set(entries.map(x=>x.room))].sort();
 
-  const sel=$('levelsRoom');
-  const oldRoom=sel?.value||'';
-  if(sel){
-    sel.innerHTML='<option value="">All rooms</option>'+rooms.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
-    if(rooms.includes(oldRoom))sel.value=oldRoom;
+  const roomSel=$('levelsRoom');
+  const currentRoom=roomSel?.value||'';
+
+  const baseEntries=progressEntries();
+  const rooms=[...new Set(baseEntries.map(x=>x.room))].sort();
+
+  if(roomSel){
+    roomSel.innerHTML='<option value="">All rooms</option>'+rooms.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
+    if(rooms.includes(currentRoom))roomSel.value=currentRoom;
   }
 
-  const room=sel?.value||'';
-  const mode=$('levelsView')?.value||'all';
-  const filtered=entries.filter(x=>!room||x.room===room);
+  const room=roomSel?.value||'';
 
+  // Toggle filter visibility.
+  const levelFilter=$('levelsView');
+  const gameFilter=$('gamesView');
+  if(levelFilter)levelFilter.classList.toggle('hidden',levelsDisplayMode!=='levels');
+  if(gameFilter)gameFilter.classList.toggle('hidden',levelsDisplayMode!=='games');
+  document.querySelectorAll('[data-levels-mode]').forEach(b=>b.classList.toggle('active',b.dataset.levelsMode===levelsDisplayMode));
+
+  if(levelsDisplayMode==='games'){
+    const mode=gameFilter?.value||'all';
+    const allGames=gamePlayEntries().filter(x=>!room||x.room===room);
+    const rows=allGames.filter(x=>{
+      if(mode==='played')return x.played;
+      if(mode==='unplayed')return !x.played;
+      return true;
+    });
+
+    const playedCount=allGames.filter(x=>x.played).length;
+    $('levelsSummary').textContent=`${playedCount}/${allGames.length} games played • ${esc(activeLocation().name)}`;
+
+    $('levelsImportInfo').textContent=progress.importedAt
+      ? `Last import for ${activeLocation().name}: ${new Date(progress.importedAt).toLocaleString()}${progress.player?' • '+progress.player:''}`
+      : `No Activate-scores.ca export imported for ${activeLocation().name} yet.`;
+
+    $('levelsList').innerHTML=rows.length?rows.map(r=>`
+      <div class="item game-play-row ${r.played?'game-played':'game-unplayed'}">
+        <div>
+          <b>${esc(r.game)}</b>
+          <div class="sub">${esc(r.room)} • ${r.mode==='competitive'?'Competitive':'Co-op'}</div>
+        </div>
+        ${r.mode==='competitive'
+          ? `<button class="played-toggle ${r.played?'played':''}" data-toggle-comp-played="${esc(r.room)}||${esc(r.game)}">${r.played?'Played':'Not played'}</button>`
+          : `<span class="pill ${r.played?'done':''}">${r.played?'Played':'Not played'}</span>`
+        }
+      </div>`).join(''):'<div class="item sub">No games match this filter.</div>';
+    return;
+  }
+
+  const mode=levelFilter?.value||'all';
+  const filtered=baseEntries.filter(x=>!room||x.room===room);
   const rows=[];
+
   filtered.forEach(x=>{
     if(x.mode==='competitive'){
       const done=!!x.played;
@@ -614,7 +667,7 @@ function renderLevels(){
     return sum+[1,2,3,4,5,6,7,8,9,10].filter(n=>x.levels?.[n]?.complete).length;
   },0);
 
-  $('levelsSummary').textContent=entries.length
+  $('levelsSummary').textContent=baseEntries.length
     ? `${completeAll}/${totalAll} complete • ${esc(activeLocation().name)}`
     : `No progress imported • ${esc(activeLocation().name)}`;
 
@@ -763,6 +816,11 @@ function installBackGuard(){
 }
 
 function bindEvents(){
+  document.querySelectorAll('[data-levels-mode]').forEach(btn=>btn.addEventListener('click',()=>{
+    levelsDisplayMode=btn.dataset.levelsMode||'levels';
+    renderLevels();
+  }));
+
   let touchStartX=0,touchStartY=0,touchStartTime=0;
   document.addEventListener('touchstart',e=>{
     if(e.touches.length!==1)return;
@@ -854,6 +912,7 @@ function bindEvents(){
 
   onChange('levelsRoom',renderLevels);
   onChange('levelsView',renderLevels);
+  onChange('gamesView',renderLevels);
   onClick('clearLevelProgress',()=>{if(confirm(`Clear imported level progress for ${activeLocation().name}?`)){state.levelProgressByLocation[state.activeLocation]=emptyLevelProgress();save();renderLevels()}});
 
   listen('badgeSearch','input',renderBadges);

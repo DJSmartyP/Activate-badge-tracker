@@ -174,7 +174,11 @@
 </section>
 
 
-<section id="levels" class="view"><div class="section-title"><div><div class="label">Game progress</div><h2>Levels</h2></div><span id="levelsSummary" class="sub"></span></div><div class="card top-gap"><div class="row wrap"><select id="levelsRoom" class="select"><option value="">All rooms</option></select><select id="levelsView" class="select">
+<section id="levels" class="view"><div class="section-title"><div><div class="label">Game progress</div><h2>Levels</h2></div><span id="levelsSummary" class="sub"></span></div><div class="card top-gap"><div class="row wrap"><select id="levelsRoom" class="select"><option value="">All rooms</option></select><div id="levelsModeTabs" class="segmented levels-mode-tabs" role="group" aria-label="Levels display mode">
+      <button type="button" class="seg-btn active" data-levels-mode="levels">Levels</button>
+      <button type="button" class="seg-btn" data-levels-mode="games">Games</button>
+    </div>
+    <select id="levelsView" class="select">
       <option value="all">All levels</option>
       <option value="incomplete">Incomplete</option>
       <option value="complete">Complete</option>
@@ -194,7 +198,7 @@
 </div>
 <div class="card">
         <h2>Settings</h2>
-        <p class="sub">Version <strong>13.2.0</strong> — clean rebuild.</p>
+        <p class="sub">Version <strong>13.3.0</strong> — clean rebuild.</p>
         <div class="row wrap">
           <button class="btn primary" id="exportBackup">Backup app data</button>
           <label class="btn">Restore app data<input id="importBackup" type="file" accept="application/json" hidden></label>
