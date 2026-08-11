@@ -2452,3 +2452,73 @@ h3,
   pointer-events:auto;
   touch-action:manipulation;
 }
+
+/* =========================================================
+   v13.19 — Tektur titles + Bruno Ace SC body/UI
+   ========================================================= */
+:root{
+  --font-display:"Tektur","Bruno Ace SC","Segoe UI",system-ui,sans-serif;
+  --font-body:"Bruno Ace SC","Segoe UI",Roboto,system-ui,-apple-system,sans-serif;
+}
+
+/* Body/UI uses the previous heading font, as requested. */
+html,
+body,
+button,
+input,
+select,
+textarea,
+.label,
+.sub,
+.page-header-subtitle,
+.level-chip,
+.status-tag,
+.mode-tag,
+.tag,
+.field,
+.btn,
+.mini,
+p,
+li,
+dd,
+dt{
+  font-family:var(--font-body) !important;
+}
+
+/* Chunkier sci-fi treatment for titles/headings. */
+h1,
+h2,
+h3,
+.page-bar-copy h1,
+.section-title h2,
+.room-title-row h3,
+.room-game-head strong,
+.side-drawer-head strong,
+.brand-banner-placeholder .brand-wordmark > strong,
+#focusOverlayBody .focus-title{
+  font-family:var(--font-display) !important;
+  font-weight:900 !important;
+  text-transform:uppercase;
+  letter-spacing:.025em;
+}
+
+/* Keep controls/body copy readable despite the more stylized body font. */
+body,
+button,
+input,
+select,
+textarea,
+p,
+.sub,
+.level-chip,
+.field,
+.btn{
+  line-height:1.42;
+  letter-spacing:.012em;
+}
+
+/* Focus title remains the same constant size from v13.16. */
+#focusOverlayBody .focus-title{
+  font-size:38px !important;
+  line-height:1.02 !important;
+}

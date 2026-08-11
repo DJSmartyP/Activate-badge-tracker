@@ -1,0 +1,24 @@
+ACTIVATE TRACKER v13.19 — TEKTUR + BRUNO ACE SC
+
+TYPOGRAPHY
+- Tektur 900: major titles and headings.
+- Bruno Ace SC: body text, buttons, filters, labels, scores and general UI.
+- Focus title remains fixed at 38px.
+
+HOME FIX
+- Removed the duplicate small "Pinned badges" label.
+- The Home pinned-badges box now shows the heading once.
+
+RETAINED
+- v13.18 pin/unpin click-handler fix
+- portrait Focus responsive text fitting
+- neon pink/blue animated high-score frame
+- thicker outlines
+- landscape scrolling fix
+- single temporary logo placeholder
+
+UPLOAD TO GITHUB ROOT:
+index.html
+app.js
+style.css
+sw.js
