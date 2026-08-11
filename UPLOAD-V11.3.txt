@@ -1,0 +1,15 @@
+ACTIVATE TRACKER v11.3 — COMPETITIVE SYNC
+
+- Competitive Played / Not played is now shared between Levels and Competitive.
+- Changing it in either place immediately updates the other.
+- Competitive menu now includes All / Not played / Played filtering.
+- Existing game-name search and room filter remain.
+- Pink competitive styling is retained.
+
+UPLOAD TO GITHUB ROOT
+- index.html
+- app.js
+- style.css
+- sw.js
+
+No artwork files need replacing.

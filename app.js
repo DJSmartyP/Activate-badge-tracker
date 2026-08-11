@@ -8,7 +8,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 
 'use strict';
 
-const VERSION='11.1.0';
+const VERSION='11.3.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -57,6 +57,18 @@ function enabledGameNames(l=activeLocation()){
   const excluded=new Set(l.excludedGames||[]);
   return [...new Set(inferredGamesForLocation(l).filter(x=>!excluded.has(x.game)).map(x=>x.game))];
 }
+
+function competitivePlayedKey(room,game){return room+'||'+game}
+function isCompetitivePlayed(room,game){
+  ensureLevelProgress();
+  return !!state.levelProgress.competitive[competitivePlayedKey(room,game)];
+}
+function setCompetitivePlayed(room,game,played){
+  ensureLevelProgress();
+  state.levelProgress.competitive[competitivePlayedKey(room,game)]=!!played;
+  save();
+}
+
 function competitiveEntries(l=activeLocation()){
   const excluded=new Set(l.excludedGames||[]);
   const rows=[];
@@ -266,18 +278,38 @@ function renderCompetitive(){
 
   const q=($('competitiveSearch').value||'').trim().toLowerCase();
   const room=roomSel.value;
+  const playedFilter=$('competitivePlayed')?.value||'all';
+
   const rows=all.filter(x=>{
-    const nameOk=!q||x.game.toLowerCase().includes(q);
-    const roomOk=!room||x.room===room;
-    return nameOk&&roomOk;
+    const played=isCompetitivePlayed(x.room,x.game);
+    return (!q||x.game.toLowerCase().includes(q))
+      && (!room||x.room===room)
+      && (playedFilter==='all'
+        || (playedFilter==='played'&&played)
+        || (playedFilter==='notplayed'&&!played));
   });
 
   $('competitiveCount').textContent=`${rows.length} game${rows.length===1?'':'s'}`;
-  $('competitiveList').innerHTML=rows.length?rows.map(x=>`<article class="badge comp-game" data-comp-room="${esc(x.room)}" data-comp-game="${esc(x.game)}">
-    <div class="checkbtn">⚔</div>
-    <div><h3>${esc(x.game)}</h3><p>Tap to see how the game is played.</p><div class="tags"><span class="tag">${esc(x.room)}</span><span class="tag ok">Competitive</span></div></div>
-    <div><button class="mini" data-comp-room="${esc(x.room)}" data-comp-game="${esc(x.game)}">›</button></div>
-  </article>`).join(''):'<div class="item sub">No competitive games match those filters.</div>';
+
+  $('competitiveList').innerHTML=rows.length?rows.map(x=>{
+    const played=isCompetitivePlayed(x.room,x.game);
+    return `<article class="badge comp-game competitive-mode ${played?'competitive-played':''}" data-comp-room="${esc(x.room)}" data-comp-game="${esc(x.game)}">
+      <div class="checkbtn">⚔</div>
+      <div>
+        <h3>${esc(x.game)}</h3>
+        <p>Tap to see how the game is played.</p>
+        <div class="tags">
+          <span class="tag">${esc(x.room)}</span>
+          <span class="tag competitive-pill">Competitive</span>
+          <span class="tag ${played?'comp-played-tag':'comp-notplayed-tag'}">${played?'Played':'Not played'}</span>
+        </div>
+      </div>
+      <div class="comp-actions">
+        <button class="mini played-toggle ${played?'played':''}" data-toggle-comp-played="${esc(x.room)}||${esc(x.game)}">${played?'Played':'Not played'}</button>
+        <button class="mini" data-comp-room="${esc(x.room)}" data-comp-game="${esc(x.game)}">›</button>
+      </div>
+    </article>`;
+  }).join(''):'<div class="item sub">No competitive games match those filters.</div>';
 }
 
 function openCompetitiveGame(room,game){
@@ -340,59 +372,77 @@ function exportBackup(){
 
 
 
-function ensureLevelProgress(){if(!state.levelProgress)state.levelProgress={games:{},importedAt:null,player:null};if(!state.levelProgress.games)state.levelProgress.games={}}
+function ensureLevelProgress(){
+  if(!state.levelProgress)state.levelProgress={games:{},competitive:{},importedAt:null,player:null};
+  if(!state.levelProgress.games)state.levelProgress.games={};
+  if(!state.levelProgress.competitive)state.levelProgress.competitive={};
+}
 function csvRows(t){let a=[],r=[],f='',q=false;for(let i=0;i<t.length;i++){let c=t[i];if(q){if(c==='"'&&t[i+1]==='"'){f+='"';i++}else if(c==='"')q=false;else f+=c}else if(c==='"')q=true;else if(c===','){r.push(f);f=''}else if(c==='\n'){r.push(f);a.push(r);r=[];f=''}else if(c!=='\r')f+=c}if(f||r.length){r.push(f);a.push(r)}return a}
 function importScores(t){
   const rows=csvRows(t).filter(r=>r.some(c=>String(c||'').trim()!==''));
-  if(!rows.length) throw Error('The selected CSV is empty.');
+  if(!rows.length)throw Error('The selected CSV is empty.');
 
   const headerIndex=rows.findIndex(r=>
     String(r[0]||'').trim().toLowerCase()==='room' &&
     String(r[1]||'').trim().toLowerCase()==='game'
   );
-  if(headerIndex<0) throw Error('Could not find the Room / Game header row. Please use an export from Activate-scores.ca.');
+  if(headerIndex<0)throw Error('Could not find the Room / Game header row. Please use an export from Activate-scores.ca.');
 
   ensureLevelProgress();
-
   const playerRow=rows.slice(0,headerIndex).find(r=>String(r[0]||'').toLowerCase().startsWith('activate:'));
-  const player=playerRow ? String(playerRow[0]).replace(/^Activate:\s*/i,'').trim() : null;
+  const player=playerRow?String(playerRow[0]).replace(/^Activate:\s*/i,'').trim():null;
 
-  let games=0,newLevels=0,totalCompleted=0;
+  let games=0,newLevels=0,totalCompleted=0,competitivePlayed=0;
 
   for(const r of rows.slice(headerIndex+1)){
     const room=String(r[0]||'').trim();
     const game=String(r[1]||'').trim();
-    if(!room||!game||game.toLowerCase()==='total') continue;
+    if(!room||!game||game.toLowerCase()==='total')continue;
 
+    const cat=GAME_CATALOG[room]||{};
+    const isCoop=(cat.cooperative||[]).includes(game);
+    const isComp=(cat.competitive||[]).includes(game);
+
+    // Competitive-only games do not have level progression.
+    if(isComp&&!isCoop){
+      const played=r.slice(2).some(v=>{
+        const n=Number(String(v||'').replace(/,/g,'').trim());
+        return Number.isFinite(n)&&n>0;
+      });
+      if(played){
+        state.levelProgress.competitive[room+'||'+game]=true;
+        competitivePlayed++;
+      }
+      games++;
+      continue;
+    }
+
+    // Cooperative (including games that also have a competitive mode): parse L1-L10.
     const key=room+'||'+game;
     const prior=state.levelProgress.games[key]||{room,game,levels:{}};
     const levels={...(prior.levels||{})};
-
     (prior.complete||[]).forEach(level=>{
       levels[level]=levels[level]||{score:0,topScore:0,complete:true};
       levels[level].complete=true;
     });
 
     let foundLevel=false;
-
     for(let i=2;i+2<r.length;i+=3){
       const level=parseInt(String(r[i]||'').trim(),10);
-      if(!(level>=1&&level<=10)) continue;
+      if(!(level>=1&&level<=10))continue;
       foundLevel=true;
 
       const score=Number(String(r[i+1]||'0').replace(/,/g,'').trim())||0;
       const topScore=Number(String(r[i+2]||'0').replace(/,/g,'').trim())||0;
-
       const old=levels[level]||{score:0,topScore:0,complete:false};
       const wasComplete=!!old.complete;
       const complete=score>0||wasComplete;
 
       levels[level]={
         score:Math.max(Number(old.score)||0,score),
-        topScore:topScore || Number(old.topScore)||0,
+        topScore:topScore||Number(old.topScore)||0,
         complete
       };
-
       if(complete){
         totalCompleted++;
         if(!wasComplete)newLevels++;
@@ -405,39 +455,56 @@ function importScores(t){
     }
   }
 
-  if(!games) throw Error('No game rows were found in this Activate-scores.ca export.');
-
+  if(!games)throw Error('No game rows were found in this Activate-scores.ca export.');
   state.levelProgress.importedAt=new Date().toISOString();
   state.levelProgress.player=player;
   state.levelProgress.source='Activate-scores.ca';
-  save();
-  renderLevels();
-
-  return {games,newLevels,totalCompleted,player};
+  save();renderLevels();
+  return {games,newLevels,totalCompleted,competitivePlayed,player};
 }
-function allGamesForRoom(r){let c=GAME_CATALOG[r]||{};return[...new Set([...(c.cooperative||[]),...(c.competitive||[])])].sort()}
+function gameModesForRoom(room){
+  const c=GAME_CATALOG[room]||{};
+  return {
+    cooperative:[...(c.cooperative||[])],
+    competitive:[...(c.competitive||[])]
+  };
+}
 function progressEntries(){
   ensureLevelProgress();
-  const map=new Map();
-  Object.values(state.levelProgress.games||{}).forEach(x=>{
-    const levels={...(x.levels||{})};
-    (x.complete||[]).forEach(n=>{
-      levels[n]=levels[n]||{score:0,topScore:0,complete:true};
-      levels[n].complete=true;
+  const entries=[];
+  const l=activeLocation();
+
+  const rooms=[...new Set([
+    ...(l.rooms||[]),
+    ...Object.values(state.levelProgress.games||{}).map(x=>x.room).filter(Boolean)
+  ])];
+
+  rooms.forEach(room=>{
+    const modes=gameModesForRoom(room);
+
+    modes.cooperative.forEach(game=>{
+      const x=state.levelProgress.games[room+'||'+game]||{};
+      const levels={...(x.levels||{})};
+      (x.complete||[]).forEach(n=>{
+        levels[n]=levels[n]||{score:0,topScore:0,complete:true};
+        levels[n].complete=true;
+      });
+      entries.push({room,game,mode:'cooperative',levels});
     });
-    map.set(x.room+'||'+x.game,{room:x.room,game:x.game,levels});
+
+    modes.competitive.forEach(game=>{
+      entries.push({
+        room,game,mode:'competitive',
+        played:!!state.levelProgress.competitive[room+'||'+game]
+      });
+    });
   });
 
-  const l=activeLocation();
-  (l.rooms||[]).forEach(room=>allGamesForRoom(room).forEach(game=>{
-    const key=room+'||'+game;
-    if(!map.has(key))map.set(key,{room,game,levels:{}});
-  }));
-
-  return [...map.values()].sort((a,b)=>a.room.localeCompare(b.room)||a.game.localeCompare(b.game));
+  return entries.sort((a,b)=>a.room.localeCompare(b.room)||a.game.localeCompare(b.game)||a.mode.localeCompare(b.mode));
 }
 function renderLevels(){
   if(!$('levelsList'))return;
+  ensureLevelProgress();
 
   const entries=progressEntries();
   const rooms=[...new Set(entries.map(x=>x.room))].sort();
@@ -447,18 +514,32 @@ function renderLevels(){
 
   const room=sel.value,mode=$('levelsView').value;
   const filtered=entries.filter(x=>!room||x.room===room);
-  const completeTotal=filtered.reduce((sum,x)=>sum+[1,2,3,4,5,6,7,8,9,10].filter(n=>x.levels?.[n]?.complete).length,0);
 
-  $('levelsSummary').textContent=entries.length?`${completeTotal}/${filtered.length*10} levels complete`:'No progress imported';
+  const coop=filtered.filter(x=>x.mode==='cooperative');
+  const comp=filtered.filter(x=>x.mode==='competitive');
+  const coopDone=coop.reduce((sum,x)=>sum+[1,2,3,4,5,6,7,8,9,10].filter(n=>x.levels?.[n]?.complete).length,0);
+  const compDone=comp.filter(x=>x.played).length;
+
+  $('levelsSummary').textContent=entries.length
+    ? `${coopDone}/${coop.length*10} co-op levels • ${compDone}/${comp.length} competitive played`
+    : 'No progress imported';
+
   $('levelsImportInfo').textContent=state.levelProgress.importedAt
     ? `Last import: ${new Date(state.levelProgress.importedAt).toLocaleString()}${state.levelProgress.player?' • '+state.levelProgress.player:''}`
     : 'No Activate-scores.ca export imported yet.';
 
   const groups={};
+
   filtered.forEach(x=>{
+    if(x.mode==='competitive'){
+      if(mode==='complete'&&!x.played)return;
+      if((mode==='incomplete'||mode==='unplayed')&&x.played)return;
+      (groups[x.room]??=[]).push(x);
+      return;
+    }
+
     const complete=[1,2,3,4,5,6,7,8,9,10].filter(n=>x.levels?.[n]?.complete);
     const missing=[1,2,3,4,5,6,7,8,9,10].filter(n=>!x.levels?.[n]?.complete);
-
     if(mode==='unplayed'&&complete.length)return;
     if(mode==='complete'&&!complete.length)return;
     if(mode==='incomplete'&&!missing.length)return;
@@ -467,13 +548,25 @@ function renderLevels(){
 
   $('levelsList').innerHTML=Object.entries(groups).map(([roomName,games])=>`
     <article class="card level-room">
-      <div class="row between"><h3>${esc(roomName)}</h3><span class="sub">${games.length} game${games.length===1?'':'s'}</span></div>
+      <div class="row between"><h3>${esc(roomName)}</h3><span class="sub">${games.length} item${games.length===1?'':'s'}</span></div>
       ${games.map(g=>{
-        if(mode==='unplayed')return `<div class="level-game"><strong>${esc(g.game)}</strong><span class="level-unplayed">Unplayed</span></div>`;
+        if(g.mode==='competitive'){
+          return `<div class="level-game game-mode-row competitive-mode">
+            <div><strong>${esc(g.game)}</strong><span class="mode-pill competitive-pill">Competitive</span></div>
+            <button class="played-toggle ${g.played?'played':''}" data-toggle-comp-played="${esc(g.room)}||${esc(g.game)}">${g.played?'Played':'Not played'}</button>
+          </div>`;
+        }
+
+        if(mode==='unplayed'){
+          return `<div class="level-game game-mode-row cooperative-mode">
+            <div><strong>${esc(g.game)}</strong><span class="mode-pill cooperative-pill">Co-op</span></div>
+            <span class="level-unplayed">Unplayed</span>
+          </div>`;
+        }
 
         const nums=mode==='complete'?g.complete:g.missing;
-        return `<div class="level-game level-game-scores">
-          <strong>${esc(g.game)}</strong>
+        return `<div class="level-game level-game-scores game-mode-row cooperative-mode">
+          <div><strong>${esc(g.game)}</strong><span class="mode-pill cooperative-pill">Co-op</span></div>
           <div class="level-score-grid">
             ${nums.map(n=>{
               const d=g.levels?.[n]||{score:0,topScore:0,complete:false};
@@ -516,6 +609,16 @@ document.addEventListener('click',e=>{
     const fp=e.target.closest('[data-focus-pin]');if(fp)return togglePin(Number(fp.dataset.focusPin));
     const un=e.target.closest('[data-unpin]');if(un)return togglePin(Number(un.dataset.unpin));
     const of=e.target.closest('[data-open-focus]');if(of)return openFocusOverlay(Number(of.dataset.openFocus));
+    const cp=e.target.closest('[data-toggle-comp-played]');
+    if(cp){
+      const key=cp.dataset.toggleCompPlayed;
+      const cut=key.indexOf('||');
+      const room=key.slice(0,cut),game=key.slice(cut+2);
+      setCompetitivePlayed(room,game,!isCompetitivePlayed(room,game));
+      renderLevels();
+      renderCompetitive();
+      return
+    }
     const cg=e.target.closest('[data-comp-game]');
     if(cg){openCompetitiveGame(cg.dataset.compRoom,cg.dataset.compGame);return}
     const exg=e.target.closest('[data-exclude-game]');if(exg){
@@ -547,7 +650,7 @@ document.addEventListener('click',e=>{
     try{
       const text=await f.text();
       const result=importScores(text);
-      info.textContent=`Imported ${result.games} games • ${result.totalCompleted} completed levels${result.player?' • '+result.player:''}`;
+      info.textContent=`Imported ${result.games} games • ${result.totalCompleted} co-op levels${result.competitivePlayed?` • ${result.competitivePlayed} competitive played`:''}${result.player?' • '+result.player:''}`;
       toast(`Import complete • ${result.newLevels} new levels`);
     }catch(err){
       console.error('Activate-scores.ca import failed',err);
@@ -557,7 +660,7 @@ document.addEventListener('click',e=>{
       e.target.value='';
     }
   };
-  $('levelsRoom').onchange=renderLevels;$('levelsView').onchange=renderLevels;$('clearLevelProgress').onclick=()=>{if(confirm('Clear all imported level progress?')){state.levelProgress={games:{},importedAt:null,player:null};save();renderLevels()}};$('badgeSearch').addEventListener('input',renderBadges);$('competitiveSearch').addEventListener('input',renderCompetitive);$('competitiveRoom').addEventListener('change',renderCompetitive);$('targetRoom').addEventListener('change',renderBadges);$('badgeStatus').addEventListener('change',renderBadges);$('badgeAvailability').addEventListener('change',renderBadges);
+  $('levelsRoom').onchange=renderLevels;$('levelsView').onchange=renderLevels;$('clearLevelProgress').onclick=()=>{if(confirm('Clear all imported level progress?')){state.levelProgress={games:{},competitive:{},importedAt:null,player:null};save();renderLevels()}};$('badgeSearch').addEventListener('input',renderBadges);$('competitiveSearch').addEventListener('input',renderCompetitive);$('competitiveRoom').addEventListener('change',renderCompetitive);$('competitivePlayed').addEventListener('change',renderCompetitive);$('targetRoom').addEventListener('change',renderBadges);$('badgeStatus').addEventListener('change',renderBadges);$('badgeAvailability').addEventListener('change',renderBadges);
   $('locationName').addEventListener('input',e=>{activeLocation().name=e.target.value;save();renderHome()});
   $('addLocation').onclick=()=>{const id='loc_'+Date.now();state.locations.push({id,name:'New location',rooms:[],games:[],roomCopies:{},roomInstances:[],venueMap:{Entrance:{front:null,left:null,right:null,back:null},Exit:{front:null,left:null,right:null,back:null}}});state.activeLocation=id;renderAll()};
   $('deleteLocation').onclick=()=>{if(state.locations.length===1)return toast('Keep at least one location');state.locations=state.locations.filter(l=>l.id!==state.activeLocation);state.activeLocation=state.locations[0].id;renderAll()};

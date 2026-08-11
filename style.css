@@ -228,3 +228,66 @@ linear-gradient(65deg,transparent 0 57%,rgba(0,230,255,.03) 58% 59%,transparent 
   padding-top:6px;
   line-height:1.4;
 }
+
+/* v11.2 co-op / competitive progress colours */
+.game-mode-row{
+  border-left:3px solid transparent;
+  padding-left:12px;
+}
+.cooperative-mode{
+  border-left-color:#27b7ff;
+  background:linear-gradient(90deg,rgba(39,183,255,.07),transparent 55%);
+}
+.competitive-mode{
+  border-left-color:#ff4aa8;
+  background:linear-gradient(90deg,rgba(255,74,168,.08),transparent 55%);
+}
+.mode-pill{
+  display:inline-block;
+  margin-left:8px;
+  padding:3px 7px;
+  border-radius:999px;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.cooperative-pill{
+  color:#9edfff;
+  border:1px solid rgba(39,183,255,.38);
+  background:rgba(39,183,255,.10);
+}
+.competitive-pill{
+  color:#ffb1d7;
+  border:1px solid rgba(255,74,168,.40);
+  background:rgba(255,74,168,.11);
+}
+.played-toggle{
+  border:1px solid rgba(255,74,168,.34);
+  background:rgba(255,74,168,.08);
+  color:#ffb1d7;
+  border-radius:999px;
+  padding:8px 12px;
+  font-weight:850;
+}
+.played-toggle.played{
+  background:rgba(255,74,168,.20);
+  box-shadow:0 0 14px rgba(255,74,168,.12);
+}
+
+/* v11.3 shared competitive played state */
+.comp-actions{display:flex;gap:8px;align-items:center}
+.competitive-played{
+  border-color:rgba(255,74,168,.42);
+  box-shadow:0 0 20px rgba(255,74,168,.10);
+}
+.comp-played-tag{
+  color:#ffd0e7;
+  border-color:rgba(255,74,168,.45);
+  background:rgba(255,74,168,.16);
+}
+.comp-notplayed-tag{
+  color:#b7bcc8;
+  border-color:rgba(183,188,200,.25);
+  background:rgba(183,188,200,.06);
+}
