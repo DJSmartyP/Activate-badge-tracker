@@ -1,12 +1,14 @@
 'use strict';
 
-const VERSION='13.19.0';
+const VERSION='13.21.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
 let state=null;
 let modalBadgeIndex=null;
 let focusIndex=0;
+let focusBadgeIndex=null;
+let focusContext={source:'single',indices:[]};
 
 let levelsDisplayMode='levels';
 const defaultState=()=>({
@@ -180,7 +182,7 @@ function renderHome(){
     </div>`;
   $('trophies').innerHTML=[['Bronze',25],['Silver',50],['Gold',75],['Platinum',total]].map(([name,need])=>`<div class="card trophy ${n>=need?'':'locked'}"><div class="row between"><span class="cup">🏆</span><span class="pill">${n>=need?'Unlocked':`${Math.max(0,need-n)} left`}</span></div><h3>${name}</h3><div class="sub">${name==='Platinum'?'100% of tracked badges':`${need} badges`}</div><div class="progress top-gap"><span style="width:${need?Math.min(100,n/need*100):0}%"></span></div></div>`).join('');
   $('homePins').innerHTML=state.pins.length?state.pins.map((i,idx)=>`<div class="item row between"><div><b>${esc(BADGES[i].name)}</b><div class="sub">${esc(BADGES[i].room||'Any room')}</div></div><button class="mini" data-open-focus="${idx}">Open</button></div>`).join(''):'<div class="item sub">No pinned badges.</div>';
-  $('recent').innerHTML=state.history.length?state.history.slice(0,8).map(h=>`<button class="item recent-achievement clickable-badge" data-open-focus-badge="${h.badge}"><div><b>${esc(BADGES[h.badge]?.name||'Badge')}</b><div class="sub">${esc(h.date||'')}</div></div><span class="recent-open">›</span></button>`).join(''):'<div class="item sub">No achievements recorded yet.</div>';
+  $('recent').innerHTML=state.history.length?state.history.slice(0,8).map(h=>`<button class="item recent-achievement clickable-badge" data-open-focus-badge="${h.badge}" data-focus-source="recent"><div><b>${esc(BADGES[h.badge]?.name||'Badge')}</b><div class="sub">${esc(h.date||'')}</div></div><span class="recent-open">›</span></button>`).join(''):'<div class="item sub">No achievements recorded yet.</div>';
 }
 
 
@@ -204,11 +206,43 @@ function setBadgePinned(index,pinned){
 
   save();
   renderAll();
+  toast(pinned?'Pinned to Focus':'Removed from Focus');
   return true;
 }
 function toggleBadgePin(index){
   const i=Number(index);
   return setBadgePinned(i,!(Array.isArray(state.pins)&&state.pins.includes(i)));
+}
+
+
+function filteredBadgeIndices(){
+  const room=$('targetRoom')?.value||'';
+  const q=($('badgeSearch')?.value||'').trim().toLowerCase();
+  const status=$('badgeStatus')?.value||'all';
+  const avail=$('badgeAvailability')?.value||'all';
+
+  return BADGES.map((b,i)=>[b,i]).filter(([b,i])=>{
+    const text=JSON.stringify(b).toLowerCase();
+    const qok=!q||text.includes(q);
+    const roomOk=!room || (!isTrophy(b) && roomParts(b).includes(room));
+    const sok=status==='all'
+      ||(status==='todo'&&!state.earned[i])
+      ||(status==='done'&&state.earned[i])
+      ||(status==='pinned'&&state.pins.includes(i));
+    const aok=avail==='all'
+      ||(avail==='here'&&availableHere(b))
+      ||(avail==='away'&&!availableHere(b));
+    return qok&&roomOk&&sok&&aok;
+  }).map(([,i])=>i);
+}
+
+function recentBadgeIndices(){
+  const seen=new Set();
+  return (state.history||[]).map(h=>Number(h.badge)).filter(i=>{
+    if(!Number.isInteger(i) || i<0 || i>=BADGES.length || seen.has(i))return false;
+    seen.add(i);
+    return true;
+  }).slice(0,8);
 }
 
 function renderBadges(){
@@ -219,19 +253,7 @@ function renderBadges(){
   roomSel.innerHTML='<option value="">All targets</option>'+rooms.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
   roomSel.value=rooms.includes(chosen)?chosen:'';
 
-  const room=roomSel.value;
-  const q=$('badgeSearch').value.trim().toLowerCase();
-  const status=$('badgeStatus').value;
-  const avail=$('badgeAvailability').value;
-
-  const rows=BADGES.map((b,i)=>[b,i]).filter(([b,i])=>{
-    const text=JSON.stringify(b).toLowerCase();
-    const qok=!q||text.includes(q);
-    const roomOk=!room || (!isTrophy(b) && roomParts(b).includes(room));
-    const sok=status==='all'||(status==='todo'&&!state.earned[i])||(status==='done'&&state.earned[i])||(status==='pinned'&&state.pins.includes(i));
-    const aok=avail==='all'||(avail==='here'&&availableHere(b))||(avail==='away'&&!availableHere(b));
-    return qok&&roomOk&&sok&&aok;
-  });
+  const rows=filteredBadgeIndices().map(i=>[BADGES[i],i]);
 
   $('pinCount').textContent=`${state.pins.length} / ${MAX_PINS}`;
   $('pinList').innerHTML=state.pins.length?state.pins.map((i,idx)=>`<div class="item row between">
@@ -240,7 +262,7 @@ function renderBadges(){
   </div>`).join(''):'<div class="item sub">No pinned targets.</div>';
 
   $('badgeCount').textContent=`${rows.length} shown`;
-  $('badgeList').innerHTML=rows.length?rows.map(([b,i])=>`<article class="badge target-card clickable-badge ${availableHere(b)?'available-here':'other-location'} ${state.earned[i]?'done completed-target':''} ${state.pins.includes(i)?'pinned-target':''}" data-open-focus-badge="${i}">
+  $('badgeList').innerHTML=rows.length?rows.map(([b,i])=>`<article class="badge target-card clickable-badge ${availableHere(b)?'available-here':'other-location'} ${state.earned[i]?'done completed-target':''} ${state.pins.includes(i)?'pinned-target':''}" data-open-focus-badge="${i}" data-focus-source="badges">
     <button class="checkbtn" data-toggle-earned="${i}" ${isTrophy(b)?'disabled':''}>${state.earned[i]?'✓':''}</button>
     <div><h3>${esc(b.name)}</h3><p>${esc(b.how)}</p><div class="tags">
       <span class="tag">${isTrophy(b)?'Trophy':isEasterEggBadge(b)?'Badge • Easter Egg':'Badge'}</span>
@@ -248,7 +270,7 @@ function renderBadges(){
       ${b.game?`<span class="tag">${esc(b.game)}${b.level?' • L'+esc(b.level):''}</span>`:''}
       ${!isTrophy(b)?`<span class="tag availability-tag ${availableHere(b)?'ok':'away'}">${availableHere(b)?'Available here':'Other location'}</span>`:''}
     </div></div>
-    <div class="row"><button type="button" class="mini pin-button ${state.pins.includes(i)?'active':''}" data-pin-badge="${i}" title="${state.pins.includes(i)?'Pinned':'Pin target'}">${state.pins.includes(i)?'📌':'📍'}</button><button class="mini" data-open-focus-badge="${i}" title="Open badge">›</button></div>
+    <div class="row"><button type="button" class="mini pin-button ${state.pins.includes(i)?'active':''}" data-pin-badge="${i}" aria-pressed="${state.pins.includes(i)?'true':'false'}" aria-label="${state.pins.includes(i)?'Unpin':'Pin'} ${esc(b.name)}" title="${state.pins.includes(i)?'Unpin badge':'Pin badge'}">${state.pins.includes(i)?'📌':'📍'}</button><button class="mini" data-open-focus-badge="${i}" title="Open badge">›</button></div>
   </article>`).join(''):'<div class="item sub">No targets match those filters.</div>';
 }
 
@@ -433,22 +455,94 @@ function scheduleFocusTextFit(){
   });
 }
 
-function openBadgeFocus(i){
-  const b=BADGES[i];
+function focusSequenceFor(source,badgeIndex){
+  if(source==='pins')return [...(state.pins||[])];
+  if(source==='badges')return filteredBadgeIndices();
+  if(source==='recent')return recentBadgeIndices();
+  return [Number(badgeIndex)];
+}
+
+function focusContextName(source){
+  if(source==='pins')return 'Pinned badges';
+  if(source==='badges')return 'Badges';
+  if(source==='recent')return 'Recent achievements';
+  return 'Badge';
+}
+
+function setFocusContext(source,badgeIndex,explicitIndices=null){
+  const indices=Array.isArray(explicitIndices)
+    ? explicitIndices.map(Number).filter(Number.isInteger)
+    : focusSequenceFor(source,badgeIndex);
+
+  focusContext={
+    source:source||'single',
+    indices:indices.length?indices:[Number(badgeIndex)]
+  };
+
+  const pos=focusContext.indices.indexOf(Number(badgeIndex));
+  focusIndex=pos>=0?pos:0;
+  focusBadgeIndex=Number(badgeIndex);
+}
+
+function refreshFocusContextForCurrentBadge(){
+  if(focusContext.source==='pins'){
+    focusContext.indices=[...(state.pins||[])];
+  }else if(focusContext.source==='badges'){
+    focusContext.indices=filteredBadgeIndices();
+  }else if(focusContext.source==='recent'){
+    focusContext.indices=recentBadgeIndices();
+  }
+
+  if(!focusContext.indices.length)return false;
+
+  const pos=focusContext.indices.indexOf(Number(focusBadgeIndex));
+  if(pos>=0)focusIndex=pos;
+  else focusIndex=Math.min(focusIndex,focusContext.indices.length-1);
+  return true;
+}
+
+function updateFocusNavUi(){
+  const count=focusContext.indices.length;
+  const contextLabel=$('focusContextLabel');
+  if(contextLabel)contextLabel.textContent=focusContextName(focusContext.source);
+
+  const pos=$('focusPosition');
+  if(pos)pos.textContent=count?`${focusIndex+1} / ${count}`:'';
+
+  const prev=$('focusPrev'),next=$('focusNext');
+  const hasMultiple=count>1;
+  if(prev){
+    prev.disabled=!hasMultiple;
+    prev.setAttribute('aria-label',hasMultiple?'Previous badge in this list':'No previous badge');
+  }
+  if(next){
+    next.disabled=!hasMultiple;
+    next.setAttribute('aria-label',hasMultiple?'Next badge in this list':'No next badge');
+  }
+}
+
+function openBadgeFocus(i,opts={}){
+  const badgeIndex=Number(i);
+  const b=BADGES[badgeIndex];
   if(!b)return;
 
-  const pinnedPos=state.pins.indexOf(i);
-  focusIndex=pinnedPos>=0?pinnedPos:0;
-  const achieved=!!state.earned[i];
+  if(opts.newContext!==false){
+    const source=opts.source||'single';
+    setFocusContext(source,badgeIndex,opts.indices||null);
+  }else{
+    focusBadgeIndex=badgeIndex;
+    const pos=focusContext.indices.indexOf(badgeIndex);
+    if(pos>=0)focusIndex=pos;
+  }
 
-  $('focusPosition').textContent=pinnedPos>=0
-    ? `${pinnedPos+1} / ${state.pins.length}`
-    : (state.pins.length?'Badge view • not pinned':'Badge view');
+  const achieved=!!state.earned[badgeIndex];
+
+  updateFocusNavUi();
 
   $('focusOverlayBody').innerHTML=`<section>
     <div class="focus-meta">${esc(b.room||'Any room')}${b.game?' • '+esc(b.game):''}${b.level?' • Level '+esc(b.level):''}</div>
     <h2 class="focus-title">${esc(b.name)}</h2>
-    ${achieved?'<div class="focus-achieved-banner">✓ Already achieved</div>':''}
+    ${achieved?'<div class="focus-achieved-banner"><span class="focus-achieved-symbol">★</span><span>ACHIEVED</span></div>':''}
     <p class="focus-requirement">${esc(b.how)}</p>
   </section>
   <section>
@@ -457,11 +551,25 @@ function openBadgeFocus(i){
     ${b.solution?`<div class="detail"><strong>Spoiler</strong><button id="focusReveal" class="btn ghost">Reveal</button><div id="focusSolution" style="display:none;margin-top:8px">${esc(b.solution)}</div></div>`:''}
   </section>`;
 
+  const inner=$('focusOverlay')?.querySelector('.focus-inner');
+  inner?.classList.toggle('focus-achieved',achieved);
+
   const completeBtn=$('focusComplete');
   if(completeBtn){
-    completeBtn.disabled=achieved;
+    completeBtn.disabled=achieved || isTrophy(b);
     completeBtn.classList.toggle('achieved-locked',achieved);
-    completeBtn.textContent=achieved?'✓ Achieved':'✓ Badge Collected';
+    completeBtn.classList.toggle('trophy-locked',isTrophy(b)&&!achieved);
+
+    if(achieved){
+      completeBtn.textContent='ACHIEVED';
+      completeBtn.setAttribute('aria-label','Badge already achieved');
+    }else if(isTrophy(b)){
+      completeBtn.textContent='Unlocks automatically';
+      completeBtn.setAttribute('aria-label','Trophy unlocks automatically');
+    }else{
+      completeBtn.textContent='MARK BADGE EARNED';
+      completeBtn.setAttribute('aria-label','Mark this badge as earned');
+    }
   }
 
   $('focusOverlay').classList.add('open');
@@ -474,10 +582,28 @@ function openBadgeFocus(i){
   };
 }
 
-function openFocusOverlay(index){
+function openFocusFromPins(index){
   if(!state.pins.length)return;
-  focusIndex=(index+state.pins.length)%state.pins.length;
-  openBadgeFocus(state.pins[focusIndex]);
+  const pos=(Number(index)+state.pins.length)%state.pins.length;
+  openBadgeFocus(state.pins[pos],{source:'pins'});
+}
+
+function moveFocus(step){
+  if(!refreshFocusContextForCurrentBadge())return;
+
+  const count=focusContext.indices.length;
+  if(!count)return;
+
+  const currentPos=focusContext.indices.indexOf(Number(focusBadgeIndex));
+  const base=currentPos>=0?currentPos:Math.min(focusIndex,count-1);
+  focusIndex=(base+step+count)%count;
+  focusBadgeIndex=focusContext.indices[focusIndex];
+  openBadgeFocus(focusBadgeIndex,{newContext:false});
+}
+
+// Backwards-compatible wrapper used by existing pinned Open buttons.
+function openFocusOverlay(index){
+  openFocusFromPins(index);
 }
 
 function exportBackup(){
@@ -935,6 +1061,30 @@ function installBackGuard(){
 }
 
 function bindEvents(){
+  // Pin controls get first refusal in CAPTURE phase.
+  // This makes them independent of the clickable badge-card event path.
+  document.addEventListener('click',e=>{
+    const pin=e.target.closest('[data-pin-badge],[data-pin],[data-focus-pin]');
+    const unpin=e.target.closest('[data-unpin-badge],[data-unpin]');
+    if(!pin && !unpin)return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+
+    if(unpin){
+      const i=Number(unpin.dataset.unpinBadge??unpin.dataset.unpin);
+      setBadgePinned(i,false);
+      return;
+    }
+
+    if(pin){
+      const raw=pin.dataset.pinBadge??pin.dataset.pin??pin.dataset.focusPin;
+      toggleBadgePin(Number(raw));
+    }
+  },true);
+
+
   window.addEventListener('resize',scheduleFocusTextFit,{passive:true});
   window.addEventListener('orientationchange',scheduleFocusTextFit,{passive:true});
   if(document.fonts?.ready)document.fonts.ready.then(scheduleFocusTextFit).catch(()=>{});
@@ -992,28 +1142,6 @@ function bindEvents(){
     const t=e.target.closest('[data-toggle-earned]');
     if(t){e.preventDefault();e.stopPropagation();return toggleEarn(Number(t.dataset.toggleEarned))}
 
-    const p=e.target.closest('[data-pin],[data-pin-badge]');
-    if(p){
-      e.preventDefault();
-      e.stopPropagation();
-      const i=Number(p.dataset.pin??p.dataset.pinBadge);
-      return toggleBadgePin(i);
-    }
-
-    const fp=e.target.closest('[data-focus-pin]');
-    if(fp){
-      e.preventDefault();
-      e.stopPropagation();
-      return toggleBadgePin(Number(fp.dataset.focusPin));
-    }
-
-    const un=e.target.closest('[data-unpin],[data-unpin-badge]');
-    if(un){
-      e.preventDefault();
-      e.stopPropagation();
-      const i=Number(un.dataset.unpin??un.dataset.unpinBadge);
-      return setBadgePinned(i,false);
-    }
 
     const of=e.target.closest('[data-open-focus]');
     if(of){e.preventDefault();e.stopPropagation();return openFocusOverlay(Number(of.dataset.openFocus))}
@@ -1022,7 +1150,10 @@ function bindEvents(){
     if(o){e.preventDefault();e.stopPropagation();return openBadge(Number(o.dataset.openBadge))}
 
     const fb=e.target.closest('[data-open-focus-badge]');
-    if(fb)return openBadgeFocus(Number(fb.dataset.openFocusBadge));
+    if(fb){
+      const source=fb.dataset.focusSource||fb.closest('[data-focus-source]')?.dataset.focusSource||'badges';
+      return openBadgeFocus(Number(fb.dataset.openFocusBadge),{source});
+    }
     if(e.target.closest('.competitive-check'))return;
     const cg=e.target.closest('[data-comp-game]');
     if(cg){openCompetitiveGame(cg.dataset.compRoom,cg.dataset.compGame);return}
@@ -1093,23 +1224,71 @@ function bindEvents(){
   onClick('modalPin',()=>{togglePin(modalBadgeIndex);openBadge(modalBadgeIndex)});
   onClick('closeFocusOverlay',closeFocusWithoutCompleting);
   onClick('focusDismiss',closeFocusWithoutCompleting);
-  onClick('focusNext',()=>openFocusOverlay(focusIndex+1));
-  onClick('focusPrev',()=>openFocusOverlay(focusIndex-1));
+  onClick('focusNext',()=>moveFocus(1));
+  onClick('focusPrev',()=>moveFocus(-1));
   onClick('focusComplete',()=>{
-    if(!state.pins.length)return;
-    const i=state.pins[focusIndex],target=BADGES[i];
+    const i=Number(focusBadgeIndex);
+    const target=BADGES[i];
+    if(!target)return;
+
     if(isTrophy(target)){
       syncTrophyEarned();
-      if(!state.earned[i]){toast('This trophy has not unlocked yet');return}
-    }else if(!state.earned[i]){
-      state.earned[i]=true;
-      state.history.unshift({badge:i,date:new Date().toISOString().slice(0,10)});
-      syncTrophyEarned();
+      toast(state.earned[i]?'Trophy already achieved':'Trophies unlock automatically');
+      openBadgeFocus(i,{newContext:false});
+      return;
     }
-    state.pins=state.pins.filter(x=>x!==i);
+
+    if(state.earned[i]){
+      toast('Badge already achieved');
+      return;
+    }
+
+    state.earned[i]=true;
+    state.history.unshift({badge:i,date:new Date().toISOString().slice(0,10)});
+    syncTrophyEarned();
+
+    // An earned badge leaves Focus/pins, but earning from the Badges list does
+    // not otherwise alter the user's active list except where the current
+    // filter itself excludes achieved badges.
+    if(state.pins.includes(i)){
+      state.pins=state.pins.filter(x=>x!==i);
+    }
+
+    save();
     renderAll();
-    if(state.pins.length)openFocusOverlay(Math.min(focusIndex,state.pins.length-1));
-    else $('focusOverlay')?.classList.remove('open');
+    toast('Badge marked as earned');
+
+    if(focusContext.source==='pins'){
+      focusContext.indices=[...(state.pins||[])];
+      if(!focusContext.indices.length){
+        $('focusOverlay')?.classList.remove('open');
+        return;
+      }
+      focusIndex=Math.min(focusIndex,focusContext.indices.length-1);
+      focusBadgeIndex=focusContext.indices[focusIndex];
+      openBadgeFocus(focusBadgeIndex,{newContext:false});
+      return;
+    }
+
+    if(focusContext.source==='badges'){
+      const updated=filteredBadgeIndices();
+      // If the active filter removes this newly achieved badge (for example
+      // "Not earned"), continue at the nearest remaining result.
+      if(!updated.includes(i)){
+        focusContext.indices=updated;
+        if(!updated.length){
+          $('focusOverlay')?.classList.remove('open');
+          return;
+        }
+        focusIndex=Math.min(focusIndex,updated.length-1);
+        focusBadgeIndex=updated[focusIndex];
+        openBadgeFocus(focusBadgeIndex,{newContext:false});
+        return;
+      }
+      focusContext.indices=updated;
+    }
+
+    openBadgeFocus(i,{newContext:false});
   });
 
   onClick('exportBackup',exportBackup);

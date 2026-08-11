@@ -2522,3 +2522,134 @@ p,
   font-size:38px !important;
   line-height:1.02 !important;
 }
+
+/* v13.20 — robust mobile pin controls */
+#badgeList .pin-button,
+#pinList [data-unpin-badge]{
+  min-width:44px !important;
+  min-height:44px !important;
+  display:inline-grid !important;
+  place-items:center;
+  padding:8px !important;
+  position:relative !important;
+  z-index:10 !important;
+  pointer-events:auto !important;
+  touch-action:manipulation !important;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+#badgeList .pin-button.active{
+  border-color:rgba(0,229,255,.72) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,56,189,.22),
+    0 0 14px rgba(0,229,255,.22),
+    0 0 18px rgba(255,56,189,.12);
+}
+
+/* =========================================================
+   v13.21 — source-aware Focus navigation + clear achieved state
+   ========================================================= */
+
+/* Completed cards get a distinct animated emerald/cyan aura. */
+#focusOverlay .focus-inner.focus-achieved{
+  position:relative;
+  border-color:rgba(73,255,172,.82) !important;
+  box-shadow:
+    0 0 0 1px rgba(70,255,186,.14),
+    0 0 18px rgba(49,255,171,.24),
+    0 0 42px rgba(0,229,255,.15),
+    0 24px 70px rgba(0,0,0,.48) !important;
+  animation:focusAchievedPulse 2.8s ease-in-out infinite;
+}
+
+#focusOverlay .focus-inner.focus-achieved::after{
+  content:"";
+  position:absolute;
+  z-index:6;
+  left:-35%;
+  top:0;
+  width:32%;
+  height:3px;
+  border-radius:999px;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(76,255,172,.9),
+    #8fffd4,
+    #00e5ff,
+    transparent
+  );
+  box-shadow:
+    0 0 9px rgba(76,255,172,.9),
+    0 0 15px rgba(0,229,255,.65);
+  pointer-events:none;
+  animation:focusAchievedSweep 2.5s linear infinite;
+}
+
+.focus-achieved-banner{
+  border-width:2px !important;
+  border-color:rgba(73,255,172,.62) !important;
+  background:
+    linear-gradient(90deg,rgba(47,255,164,.14),rgba(0,229,255,.09)) !important;
+  color:#c9ffe7 !important;
+  box-shadow:
+    0 0 12px rgba(73,255,172,.14),
+    inset 0 0 12px rgba(0,229,255,.05);
+}
+
+.focus-achieved-symbol{
+  color:#7dffc4;
+  text-shadow:0 0 8px rgba(73,255,172,.75);
+}
+
+#focusComplete{
+  white-space:normal;
+  text-align:center;
+}
+
+#focusComplete.achieved-locked{
+  opacity:1 !important;
+  background:
+    linear-gradient(135deg,rgba(33,151,105,.30),rgba(11,105,112,.28)) !important;
+  border-color:rgba(73,255,172,.55) !important;
+  color:#d5ffeb !important;
+  box-shadow:inset 0 0 16px rgba(73,255,172,.08);
+}
+
+#focusComplete.trophy-locked{
+  opacity:.72;
+}
+
+@keyframes focusAchievedPulse{
+  0%,100%{
+    box-shadow:
+      0 0 0 1px rgba(70,255,186,.12),
+      0 0 15px rgba(49,255,171,.18),
+      0 0 34px rgba(0,229,255,.11),
+      0 24px 70px rgba(0,0,0,.48);
+  }
+  50%{
+    box-shadow:
+      0 0 0 1px rgba(70,255,186,.22),
+      0 0 24px rgba(49,255,171,.32),
+      0 0 52px rgba(0,229,255,.20),
+      0 24px 70px rgba(0,0,0,.48);
+  }
+}
+
+@keyframes focusAchievedSweep{
+  from{left:-35%}
+  to{left:108%}
+}
+
+@media (prefers-reduced-motion:reduce){
+  #focusOverlay .focus-inner.focus-achieved{
+    animation:none;
+  }
+  #focusOverlay .focus-inner.focus-achieved::after{
+    animation:none;
+    left:34%;
+    width:32%;
+  }
+}

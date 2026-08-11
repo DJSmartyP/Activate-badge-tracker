@@ -1,0 +1,47 @@
+ACTIVATE TRACKER v13.21 — CONTEXT-AWARE FOCUS + ACHIEVED EFFECT
+
+FOCUS NEXT / PREVIOUS
+- Open from Pinned badges:
+  Previous / Next moves through the pinned list.
+- Open from Badges:
+  Previous / Next moves through the exact currently visible badge list.
+  Search, Room, Status and Availability filters are respected.
+- Open from Recent achievements:
+  Previous / Next moves through the recent-achievements list.
+- Focus header now says which list you are browsing and shows position, e.g. 3 / 12.
+- Single-item contexts disable Previous / Next.
+
+EARNED / ACHIEVED WORDING
+- Unachieved badge action: MARK BADGE EARNED
+- Achieved badge action: ACHIEVED
+- Trophy action: Unlocks automatically
+- Removed the confusing checkmark from both button states.
+
+SPECIAL COMPLETED EFFECT
+- Achieved Focus cards get a distinct emerald/cyan glowing frame.
+- The glow gently pulses.
+- A neon light sweep travels across the top edge.
+- ACHIEVED appears as a separate highlighted status pill.
+- Reduced-motion accessibility disables the animation.
+
+FILTER BEHAVIOR AFTER EARNING
+- If a badge is earned while viewing a filter such as "Not earned",
+  it is removed from that filtered sequence and Focus advances to the
+  nearest remaining visible badge.
+- If earning empties the current filtered list, Focus closes cleanly.
+- If earning a pinned badge, it is removed from pins and Focus continues
+  with the remaining pinned list.
+
+RETAINED
+- v13.20 pin-control hard fix
+- Tektur titles + Bruno Ace SC body/UI
+- Portrait Focus text fitting
+- Neon pink/blue animated venue-high-score frame
+- Thicker outlines
+- Landscape scrolling fix
+
+UPLOAD TO GITHUB ROOT:
+index.html
+app.js
+style.css
+sw.js
