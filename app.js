@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='11.9.0';
+const VERSION='12.3.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -285,8 +285,12 @@ function renderCompetitive(){
 
   $('competitiveList').innerHTML=rows.length?rows.map(x=>{
     const played=isCompetitivePlayed(x.room,x.game);
+    const key=`${x.room}||${x.game}`;
     return `<article class="badge comp-game competitive-mode ${played?'competitive-played':''}" data-comp-room="${esc(x.room)}" data-comp-game="${esc(x.game)}">
-      <div class="checkbtn">⚔</div>
+      <label class="competitive-check" title="${played?'Played':'Not played'}">
+        <input type="checkbox" data-competitive-played="${esc(key)}" ${played?'checked':''}>
+        <span class="competitive-check-box">${played?'✓':''}</span>
+      </label>
       <div>
         <h3>${esc(x.game)}</h3>
         <p>Tap to see how the game is played.</p>
@@ -296,10 +300,7 @@ function renderCompetitive(){
           <span class="tag ${played?'comp-played-tag':'comp-notplayed-tag'}">${played?'Played':'Not played'}</span>
         </div>
       </div>
-      <div class="comp-actions">
-        <button class="mini played-toggle ${played?'played':''}" data-toggle-comp-played="${esc(x.room)}||${esc(x.game)}">${played?'Played':'Not played'}</button>
-        <button class="mini" data-comp-room="${esc(x.room)}" data-comp-game="${esc(x.game)}">›</button>
-      </div>
+      <button class="mini" data-comp-room="${esc(x.room)}" data-comp-game="${esc(x.game)}">›</button>
     </article>`;
   }).join(''):'<div class="item sub">No competitive games match those filters.</div>';
 }
@@ -354,6 +355,7 @@ function openBadgeFocus(i){
 
   const pinnedPos=state.pins.indexOf(i);
   focusIndex=pinnedPos>=0?pinnedPos:0;
+  const achieved=!!state.earned[i];
 
   $('focusPosition').textContent=pinnedPos>=0
     ? `${pinnedPos+1} / ${state.pins.length}`
@@ -362,6 +364,7 @@ function openBadgeFocus(i){
   $('focusOverlayBody').innerHTML=`<section>
     <div class="focus-meta">${esc(b.room||'Any room')}${b.game?' • '+esc(b.game):''}${b.level?' • Level '+esc(b.level):''}</div>
     <h2 class="focus-title">${esc(b.name)}</h2>
+    ${achieved?'<div class="focus-achieved-banner">✓ Already achieved</div>':''}
     <p class="focus-requirement">${esc(b.how)}</p>
   </section>
   <section>
@@ -370,7 +373,15 @@ function openBadgeFocus(i){
     ${b.solution?`<div class="detail"><strong>Spoiler</strong><button id="focusReveal" class="btn ghost">Reveal</button><div id="focusSolution" style="display:none;margin-top:8px">${esc(b.solution)}</div></div>`:''}
   </section>`;
 
+  const completeBtn=$('focusComplete');
+  if(completeBtn){
+    completeBtn.disabled=achieved;
+    completeBtn.classList.toggle('achieved-locked',achieved);
+    completeBtn.textContent=achieved?'✓ Achieved':'✓ Badge Collected';
+  }
+
   $('focusOverlay').classList.add('open');
+
   if($('focusReveal'))$('focusReveal').onclick=()=>{
     $('focusSolution').style.display='block';
     $('focusReveal').style.display='none';
@@ -651,22 +662,35 @@ function showView(view){updatePageHeader(view);
 
 
 const PAGE_META={
-  home:{title:'Home',icon:'home'},
-  badges:{title:'Badges',icon:'badges'},
-  levels:{title:'Levels',icon:'levels'},
-  competitive:{title:'Competitive',icon:'competitive'},
-  locations:{title:'Locations',icon:'locations'},
-  stats:{title:'Stats',icon:'stats'},
-  settings:{title:'Settings',icon:'settings'}
+  home:{title:'Home',subtitle:'Dashboard overview',icon:'home'},
+  badges:{title:'Badges',subtitle:'View and manage your badges',icon:'badges'},
+  levels:{title:'Levels',subtitle:'Track your level progress',icon:'levels'},
+  competitive:{title:'Competitive',subtitle:'Manage your competitive play',icon:'competitive'},
+  locations:{title:'Locations',subtitle:'Explore and track locations',icon:'locations'},
+  stats:{title:'Stats',subtitle:'View your statistics and insights',icon:'stats'},
+  settings:{title:'Settings',subtitle:'Configure your preferences',icon:'settings'}
 };
 function updatePageHeader(view){
-  const meta=PAGE_META[view]||{title:'Activate Tracker',icon:'home'};
-  const title=$('pageHeaderTitle'),icon=$('pageHeaderIcon');
+  const meta=PAGE_META[view]||PAGE_META.home;
+  const title=$('pageHeaderTitle'),subtitle=$('pageHeaderSubtitle'),icon=$('pageHeaderIcon');
   if(title)title.textContent=meta.title;
+  if(subtitle)subtitle.textContent=meta.subtitle;
   if(icon)icon.src=`icons/${meta.icon}.png`;
 }
 
 function bindEvents(){
+  document.addEventListener('change',e=>{
+    const cp=e.target.closest('[data-competitive-played]');
+    if(!cp)return;
+    const key=cp.dataset.competitivePlayed;
+    const cut=key.indexOf('||');
+    const room=key.slice(0,cut),game=key.slice(cut+2);
+    setCompetitivePlayed(room,game,cp.checked);
+    renderLevels();
+    renderCompetitive();
+    toast(cp.checked?'Marked as played':'Marked as not played');
+  });
+
   $('drawerMenuBtn')?.addEventListener('click',openDrawer);
   $('closeDrawer')?.addEventListener('click',closeDrawer);
   $('drawerBackdrop')?.addEventListener('click',closeDrawer);
@@ -680,16 +704,7 @@ document.addEventListener('click',e=>{
     const fp=e.target.closest('[data-focus-pin]');if(fp)return togglePin(Number(fp.dataset.focusPin));
     const un=e.target.closest('[data-unpin]');if(un)return togglePin(Number(un.dataset.unpin));
     const of=e.target.closest('[data-open-focus]');if(of)return openFocusOverlay(Number(of.dataset.openFocus));
-    const cp=e.target.closest('[data-toggle-comp-played]');
-    if(cp){
-      const key=cp.dataset.toggleCompPlayed;
-      const cut=key.indexOf('||');
-      const room=key.slice(0,cut),game=key.slice(cut+2);
-      setCompetitivePlayed(room,game,!isCompetitivePlayed(room,game));
-      renderLevels();
-      renderCompetitive();
-      return
-    }
+    if(e.target.closest('.competitive-check'))return;
     const cg=e.target.closest('[data-comp-game]');
     if(cg){openCompetitiveGame(cg.dataset.compRoom,cg.dataset.compGame);return}
     const exg=e.target.closest('[data-exclude-game]');if(exg){
@@ -758,7 +773,7 @@ document.addEventListener('click',e=>{
     renderAll();
     if(state.pins.length)openFocusOverlay(Math.min(focusIndex,state.pins.length-1));else $('focusOverlay').classList.remove('open');
   };
-  $('backupTop').onclick=exportBackup;$('exportBackup').onclick=exportBackup;
+  $('exportBackup').onclick=exportBackup;
   $('importBackup').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state=JSON.parse(r.result);state.locations.forEach(ensureLocationShape);ensureLevelProgress();save();renderAll();toast('Backup restored')}catch{toast('Could not read backup')}};r.readAsText(f)};
   $('resetApp').onclick=()=>{if(confirm('Reset all app data?')){state=defaultState();renderAll()}};
 }

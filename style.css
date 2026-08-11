@@ -504,7 +504,7 @@ button.recent-achievement{
   .page-header-bar h1{font-size:19px}
 }
 
-/* v11.9 two-tier fixed header */
+/* v12.0 clean logo placeholder + dynamic page bar */
 html,body{height:100%}
 body{overflow:hidden}
 
@@ -520,132 +520,114 @@ body{overflow:hidden}
   flex:0 0 auto;
   position:relative;
   z-index:80;
-  background:rgba(6,8,16,.98);
+  background:#070912;
   border-bottom:1px solid rgba(255,255,255,.08);
 }
 
-.logo-bar{
+.logo-placeholder-bar{
+  min-height:116px;
   display:flex;
   align-items:center;
   justify-content:center;
-  min-height:112px;
-  padding:10px 18px 8px;
+  padding:14px 18px;
   background:
-    radial-gradient(circle at 50% 0,rgba(255,0,180,.10),transparent 42%),
-    radial-gradient(circle at 80% 100%,rgba(0,200,255,.08),transparent 35%),
+    radial-gradient(circle at 25% 15%,rgba(255,0,190,.10),transparent 35%),
+    radial-gradient(circle at 85% 70%,rgba(0,200,255,.08),transparent 38%),
     #070912;
 }
 
-.logo-lockup{
+.logo-placeholder-inner{
+  width:min(100%,760px);
+  min-height:84px;
+  border:1px dashed rgba(255,255,255,.16);
+  border-radius:18px;
   display:flex;
   align-items:center;
   justify-content:center;
   gap:14px;
-  width:min(100%,760px);
+  padding:12px 18px;
+  color:#aeb7ca;
 }
 
-.logo-mark{
-  width:70px;
-  height:70px;
-  object-fit:contain;
-  flex:0 0 70px;
-}
-
-.logo-wording{
-  position:relative;
-  min-width:0;
-  padding-top:9px;
-}
-
-.smarty-tag{
-  position:absolute;
-  left:-2px;
-  top:-6px;
-  transform:rotate(-5deg);
-  transform-origin:left center;
-  font-size:17px;
-  line-height:1;
-  font-weight:1000;
-  font-style:italic;
-  letter-spacing:.02em;
-  color:#ff4dc4;
-  text-shadow:
-    0 0 8px rgba(255,77,196,.75),
-    1px 1px 0 rgba(255,255,255,.28);
-}
-
-.logo-title{
-  font-size:24px;
-  line-height:1;
-  font-weight:950;
-  letter-spacing:.12em;
-  white-space:nowrap;
-}
-
-.logo-tagline{
-  margin-top:7px;
+.logo-placeholder-mark{
+  width:56px;
+  height:56px;
+  display:grid;
+  place-items:center;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.04);
   font-size:11px;
-  line-height:1;
-  font-weight:850;
-  letter-spacing:.16em;
-  color:#d8ff62;
-  white-space:nowrap;
+  font-weight:900;
+  letter-spacing:.08em;
 }
+
+.logo-placeholder-copy{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.logo-placeholder-copy strong{font-size:15px;color:#eef2ff}
+.logo-placeholder-copy span{font-size:12px;color:#8f98ac}
 
 .page-bar{
-  min-height:72px;
+  min-height:82px;
   display:grid;
-  grid-template-columns:54px minmax(0,1fr) auto;
+  grid-template-columns:54px minmax(0,1fr);
   align-items:center;
-  gap:12px;
-  padding:8px max(14px,env(safe-area-inset-right)) 8px max(14px,env(safe-area-inset-left));
-  background:linear-gradient(90deg,rgba(42,13,88,.96),rgba(10,18,54,.96));
-  border-top:1px solid rgba(255,255,255,.07);
+  gap:14px;
+  padding:10px max(16px,env(safe-area-inset-right)) 10px max(16px,env(safe-area-inset-left));
+  background:linear-gradient(90deg,rgba(37,14,82,.98),rgba(10,18,52,.98));
+  border-top:1px solid rgba(255,255,255,.06);
 }
 
 .page-bar .drawer-menu-btn{
   position:static!important;
-  width:46px;
-  height:46px;
+  width:50px;
+  height:50px;
   margin:0;
-  z-index:auto;
 }
 
 .page-bar-title{
   display:flex;
   align-items:center;
-  gap:11px;
+  gap:13px;
   min-width:0;
 }
 
 .page-header-icon{
-  width:42px;
-  height:42px;
+  width:52px;
+  height:52px;
+  flex:0 0 52px;
   object-fit:contain;
-  border-radius:11px;
-  flex:0 0 42px;
+  border-radius:14px;
+  background:rgba(4,7,16,.45);
 }
 
-.page-header-kicker{
-  font-size:9px;
-  font-weight:800;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  color:#aeb7ca;
-}
-
+.page-bar-copy{min-width:0}
 .page-bar h1{
-  margin:1px 0 0;
-  font-size:22px;
+  margin:0;
+  font-size:24px;
   line-height:1.05;
-}
-
-.page-backup{
-  min-height:44px;
-  padding:0 16px;
   white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.page-header-subtitle{
+  margin-top:4px;
+  color:#d8ff62;
+  font-size:13px;
+  line-height:1.2;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
+/* Scroll only content below header */
+.app > .view,
+.app > .app-scroll{
+  min-height:0;
+}
 .app-scroll{
   flex:1 1 auto;
   min-height:0;
@@ -655,36 +637,100 @@ body{overflow:hidden}
   padding:18px 16px max(24px,env(safe-area-inset-bottom));
 }
 
-/* Kill obsolete page-header layout from v11.8 */
-.page-header-bar{display:none!important}
-
-/* Inner / landscape Fold view */
-@media(min-width:700px){
-  .logo-bar{min-height:96px;padding:8px 22px 7px}
-  .logo-mark{width:62px;height:62px;flex-basis:62px}
-  .logo-title{font-size:25px}
-  .smarty-tag{font-size:18px}
-  .logo-tagline{font-size:11px}
-  .page-bar{min-height:68px;grid-template-columns:58px minmax(0,1fr) auto;padding-inline:22px}
-  .page-header-icon{width:40px;height:40px;flex-basis:40px}
-  .page-bar h1{font-size:23px}
-  .app-scroll{padding:20px 24px 28px}
+/* If views are still direct children, make main itself scroll below header */
+.app-header-shell ~ .view{
+  overflow:visible;
+}
+.app:not(:has(.app-scroll)){
+  overflow-y:auto;
 }
 
-/* Narrow Fold front display */
+/* Remove obsolete header elements */
+.page-header-bar,.topbar{display:none!important}
+
 @media(max-width:480px){
-  .logo-bar{min-height:92px;padding:8px 12px 6px}
-  .logo-lockup{gap:9px}
-  .logo-mark{width:54px;height:54px;flex-basis:54px}
-  .logo-wording{padding-top:7px}
-  .smarty-tag{font-size:14px;top:-5px}
-  .logo-title{font-size:17px;letter-spacing:.09em}
-  .logo-tagline{font-size:8.5px;letter-spacing:.12em;margin-top:5px}
-  .page-bar{min-height:64px;grid-template-columns:46px minmax(0,1fr) auto;gap:8px;padding:7px 10px}
-  .page-bar .drawer-menu-btn{width:42px;height:42px;font-size:22px}
-  .page-header-icon{width:36px;height:36px;flex-basis:36px}
-  .page-header-kicker{font-size:8px}
-  .page-bar h1{font-size:19px}
-  .page-backup{min-height:40px;padding:0 12px;font-size:14px}
-  .app-scroll{padding:14px 12px max(20px,env(safe-area-inset-bottom))}
+  .logo-placeholder-bar{min-height:92px;padding:10px 12px}
+  .logo-placeholder-inner{min-height:68px;border-radius:15px;padding:9px 12px;gap:10px}
+  .logo-placeholder-mark{width:46px;height:46px}
+  .logo-placeholder-copy strong{font-size:13px}
+  .logo-placeholder-copy span{font-size:10px}
+  .page-bar{min-height:72px;grid-template-columns:46px minmax(0,1fr);gap:10px;padding:8px 10px}
+  .page-bar .drawer-menu-btn{width:44px;height:44px;font-size:22px}
+  .page-header-icon{width:44px;height:44px;flex-basis:44px}
+  .page-bar h1{font-size:21px}
+  .page-header-subtitle{font-size:11px}
+}
+
+@media(min-width:700px){
+  .logo-placeholder-bar{min-height:98px}
+  .page-bar{min-height:74px;padding-inline:22px}
+  .page-header-icon{width:48px;height:48px;flex-basis:48px}
+  .page-bar h1{font-size:23px}
+  .page-header-subtitle{font-size:12px}
+}
+
+/* v12.1 achieved state in focus cards */
+.focus-achieved-banner{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin:10px 0 4px;
+  padding:7px 11px;
+  border-radius:999px;
+  border:1px solid rgba(78,255,168,.34);
+  background:rgba(78,255,168,.10);
+  color:#bfffdc;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.02em;
+}
+#focusComplete.achieved-locked{
+  opacity:.68;
+  cursor:not-allowed;
+  background:rgba(78,255,168,.12);
+  border-color:rgba(78,255,168,.28);
+  color:#bfffdc;
+}
+
+/* v12.3 Competitive played checkbox */
+.comp-game{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:12px;
+}
+.competitive-check{
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  width:34px;
+  height:34px;
+}
+.competitive-check input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.competitive-check-box{
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  border-radius:8px;
+  border:2px solid rgba(255,74,168,.65);
+  background:rgba(255,74,168,.06);
+  color:white;
+  font-size:19px;
+  font-weight:1000;
+  line-height:1;
+  transition:.15s ease;
+}
+.competitive-check input:checked + .competitive-check-box{
+  border-color:#ff4aa8;
+  background:linear-gradient(135deg,rgba(255,74,168,.95),rgba(151,73,255,.95));
+  box-shadow:0 0 14px rgba(255,74,168,.28);
+}
+.competitive-check:focus-within .competitive-check-box{
+  outline:2px solid rgba(255,255,255,.55);
+  outline-offset:2px;
 }

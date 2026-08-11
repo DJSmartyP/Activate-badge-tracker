@@ -1,0 +1,14 @@
+ACTIVATE TRACKER v12.3 — COMPETITIVE CHECKBOX
+
+- Competitive games now use a proper checkbox for Played / Not played.
+- Checked = Played.
+- Unchecked = Not played.
+- The same played state remains shared with Levels.
+- Clicking the checkbox does not open the competitive game details.
+- Existing room/game/played filters remain.
+
+UPLOAD:
+index.html
+app.js
+style.css
+sw.js
