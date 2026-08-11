@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='11.5.0';
+const VERSION='11.6.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -597,7 +597,10 @@ function openDrawer(){
   const drawer=$('sideDrawer'),backdrop=$('drawerBackdrop'),btn=$('drawerMenuBtn');
   if(!drawer||!backdrop)return;
   backdrop.hidden=false;
-  requestAnimationFrame(()=>{drawer.classList.add('open');backdrop.classList.add('open')});
+  requestAnimationFrame(()=>{
+    drawer.classList.add('open');
+    backdrop.classList.add('open');
+  });
   drawer.setAttribute('aria-hidden','false');
   btn?.setAttribute('aria-expanded','true');
 }
@@ -610,8 +613,14 @@ function closeDrawer(){
   btn?.setAttribute('aria-expanded','false');
   setTimeout(()=>{if(!drawer.classList.contains('open'))backdrop.hidden=true},220);
 }
-function highlightDrawer(view){
-  document.querySelectorAll('.drawer-nav [data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+function showView(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const target=$(view);
+  if(target)target.classList.add('active');
+  document.querySelectorAll('.drawer-nav [data-view]').forEach(b=>{
+    b.classList.toggle('active',b.dataset.view===view);
+  });
+  closeDrawer();
 }
 
 function bindEvents(){
@@ -620,7 +629,7 @@ function bindEvents(){
   $('drawerBackdrop')?.addEventListener('click',closeDrawer);
 
 document.addEventListener('click',e=>{
-    const nav=e.target.closest('[data-view]');if(nav){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));const target=$(nav.dataset.view);if(target)target.classList.add('active');const bottom=document.querySelector(`.nav [data-view="${nav.dataset.view}"]`);if(bottom)bottom.classList.add('active');highlightDrawer(nav.dataset.view);closeDrawer();return}
+    const nav=e.target.closest('[data-view]');if(nav){showView(nav.dataset.view);return}
     const t=e.target.closest('[data-toggle-earned]');if(t)return toggleEarn(Number(t.dataset.toggleEarned));
     const o=e.target.closest('[data-open-badge]');if(o)return openBadge(Number(o.dataset.openBadge));
     const p=e.target.closest('[data-pin]');if(p)return togglePin(Number(p.dataset.pin));

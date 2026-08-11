@@ -1,0 +1,19 @@
+ACTIVATE TRACKER v11.6 — DRAWER-ONLY NAVIGATION
+
+CHANGES
+- Bottom navigation removed completely.
+- Navigation is now entirely through a top-left hamburger button.
+- Menu slides in from the left and slides out cleanly.
+- Drawer contains Home, Targets, Levels, Competitive, Locations, Stats and Settings.
+- Selecting a screen closes the drawer automatically.
+- Tapping the backdrop or X closes the drawer.
+- Splash remains removed.
+- Existing Competitive Played/Not Played sync and Levels functionality are retained.
+
+UPLOAD TO GITHUB ROOT
+- index.html
+- app.js
+- style.css
+- sw.js
+
+No artwork files need replacing.

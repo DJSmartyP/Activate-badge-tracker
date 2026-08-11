@@ -11,21 +11,25 @@
   <link rel="apple-touch-icon" href="icon-192.png?v=108">
   <link rel="stylesheet" href="style.css">
 </head>
-<body><button id="drawerMenuBtn" class="drawer-menu-btn" type="button" aria-label="Open navigation" aria-expanded="false">☰</button>
+<body>
 <div id="drawerBackdrop" class="drawer-backdrop" hidden></div>
-<aside id="sideDrawer" class="side-drawer" aria-hidden="true">
+<aside id="sideDrawer" class="side-drawer" aria-hidden="true" aria-label="Main navigation">
   <div class="side-drawer-head">
-    <div><div class="label">Activate Tracker</div><strong>Menu</strong></div>
-    <button id="closeDrawer" class="mini" type="button" aria-label="Close navigation">✕</button>
+    <div>
+      <div class="label">Activate Tracker</div>
+      <strong>Menu</strong>
+    </div>
+    <button id="closeDrawer" class="drawer-close" type="button" aria-label="Close navigation">✕</button>
   </div>
+
   <nav class="drawer-nav">
-    <button data-view="home"><span>⌂</span><strong>Home</strong></button>
-    <button data-view="badges"><span>◈</span><strong>Targets</strong></button>
-    <button data-view="levels"><span>◫</span><strong>Levels</strong></button>
-    <button data-view="competitive"><span>⚔</span><strong>Competitive</strong></button>
-    <button data-view="locations"><span>⌖</span><strong>Locations</strong></button>
-    <button data-view="stats"><span>▥</span><strong>Stats</strong></button>
-    <button data-view="settings"><span>⚙</span><strong>Settings</strong></button>
+    <button data-view="home"><span class="drawer-icon">⌂</span><span>Home</span></button>
+    <button data-view="badges"><span class="drawer-icon">◈</span><span>Targets</span></button>
+    <button data-view="levels"><span class="drawer-icon">◫</span><span>Levels</span></button>
+    <button data-view="competitive"><span class="drawer-icon">⚔</span><span>Competitive</span></button>
+    <button data-view="locations"><span class="drawer-icon">⌖</span><span>Locations</span></button>
+    <button data-view="stats"><span class="drawer-icon">▥</span><span>Stats</span></button>
+    <button data-view="settings"><span class="drawer-icon">⚙</span><span>Settings</span></button>
   </nav>
 </aside>
 
@@ -33,7 +37,7 @@
   <div id="toast" class="toast" aria-live="polite"></div>
 
   <main class="app">
-    <header class="topbar">
+    <header class="topbar"><button id="drawerMenuBtn" class="drawer-menu-btn" type="button" aria-label="Open navigation" aria-expanded="false">☰</button>
       <div class="brand">
         <img src="icon-192.png?v=108" alt="">
         <div>
@@ -167,7 +171,7 @@
     <section id="settings" class="view">
       <div class="card">
         <h2>Settings</h2>
-        <p class="sub">Version <strong>11.5.0</strong> — clean rebuild.</p>
+        <p class="sub">Version <strong>11.6.0</strong> — clean rebuild.</p>
         <div class="row wrap">
           <button class="btn primary" id="exportBackup">Export backup</button>
           <label class="btn">Restore backup<input id="importBackup" type="file" accept="application/json" hidden></label>
@@ -180,15 +184,7 @@
       </div>
     </section>
   </main>
-
-  <nav class="nav">
-    <button class="active" data-view="home"><span class="nav-icon">⌂</span><span>Home</span></button>
-    <button data-view="badges"><span class="nav-icon">◈</span><span>Targets</span></button>
-    <button data-view="levels"><span class="nav-icon">◫</span><span>Levels</span></button>
-    <button data-view="competitive"><span class="nav-icon">⚔</span><span>Comp</span></button>
-  </nav>
-
-  <div id="badgeModal" class="modal">
+<div id="badgeModal" class="modal">
     <div class="sheet">
       <div class="row between"><h2 id="modalTitle"></h2><button id="closeModal" class="iconbtn">✕</button></div>
       <div id="modalBody"></div>
