@@ -1,0 +1,28 @@
+ACTIVATE TRACKER v13.18 — PIN / UNPIN CLICK FIX
+
+ROOT CAUSE
+- Each badge card is clickable and carries data-open-focus-badge.
+- The delegated click handler checked "open Focus" BEFORE checking the nested
+  pin/unpin button.
+- A tap on the pin button therefore matched the parent card first and opened
+  Focus instead of changing the pin state.
+
+FIX
+- Pin, unpin, earned-state and explicit Open controls are now handled BEFORE
+  the clickable badge-card action.
+- Those nested controls stop propagation so the parent card cannot swallow them.
+- Pin/unpin still saves immediately through the single saved pin-state function.
+- Added type="button" / stronger touch handling to the generated pin controls.
+
+RETAINED
+- Bruno Ace SC + Inter typography
+- Portrait Focus responsive text fitting
+- Neon pink/blue animated high-score frame
+- Thicker outlines
+- Landscape scrolling fix
+
+UPLOAD TO GITHUB ROOT:
+index.html
+app.js
+style.css
+sw.js

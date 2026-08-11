@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.17.0';
+const VERSION='13.18.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -236,7 +236,7 @@ function renderBadges(){
   $('pinCount').textContent=`${state.pins.length} / ${MAX_PINS}`;
   $('pinList').innerHTML=state.pins.length?state.pins.map((i,idx)=>`<div class="item row between">
     <div><b>${esc(BADGES[i].name)}</b><div class="sub">${isTrophy(BADGES[i])?'Trophy':esc(BADGES[i].room||'Global')} • ${esc(BADGES[i].how)}</div></div>
-    <div class="row"><button class="mini" data-open-focus="${idx}">Open</button><button class="mini" data-unpin-badge="${i}">✕</button></div>
+    <div class="row"><button class="mini" data-open-focus="${idx}">Open</button><button type="button" class="mini" data-unpin-badge="${i}" aria-label="Unpin ${esc(BADGES[i].name)}">✕</button></div>
   </div>`).join(''):'<div class="item sub">No pinned targets.</div>';
 
   $('badgeCount').textContent=`${rows.length} shown`;
@@ -248,7 +248,7 @@ function renderBadges(){
       ${b.game?`<span class="tag">${esc(b.game)}${b.level?' • L'+esc(b.level):''}</span>`:''}
       ${!isTrophy(b)?`<span class="tag availability-tag ${availableHere(b)?'ok':'away'}">${availableHere(b)?'Available here':'Other location'}</span>`:''}
     </div></div>
-    <div class="row"><button class="mini pin-button ${state.pins.includes(i)?'active':''}" data-pin-badge="${i}" title="${state.pins.includes(i)?'Pinned':'Pin target'}">${state.pins.includes(i)?'📌':'📍'}</button><button class="mini" data-open-focus-badge="${i}" title="Open badge">›</button></div>
+    <div class="row"><button type="button" class="mini pin-button ${state.pins.includes(i)?'active':''}" data-pin-badge="${i}" title="${state.pins.includes(i)?'Pinned':'Pin target'}">${state.pins.includes(i)?'📌':'📍'}</button><button class="mini" data-open-focus-badge="${i}" title="Open badge">›</button></div>
   </article>`).join(''):'<div class="item sub">No targets match those filters.</div>';
 }
 
@@ -985,13 +985,44 @@ function bindEvents(){
 
   document.addEventListener('click',e=>{
     const nav=e.target.closest('[data-view]');if(nav){showView(nav.dataset.view);return}
-    const t=e.target.closest('[data-toggle-earned]');if(t)return toggleEarn(Number(t.dataset.toggleEarned));
-    const fb=e.target.closest('[data-open-focus-badge]');if(fb)return openBadgeFocus(Number(fb.dataset.openFocusBadge));
-    const o=e.target.closest('[data-open-badge]');if(o)return openBadge(Number(o.dataset.openBadge));
-    const p=e.target.closest('[data-pin],[data-pin-badge]');if(p){e.preventDefault();e.stopPropagation();return toggleBadgePin(Number(p.dataset.pin??p.dataset.pinBadge))}
-    const fp=e.target.closest('[data-focus-pin]');if(fp){e.preventDefault();e.stopPropagation();return toggleBadgePin(Number(fp.dataset.focusPin))}
-    const un=e.target.closest('[data-unpin],[data-unpin-badge]');if(un){e.preventDefault();e.stopPropagation();return setBadgePinned(Number(un.dataset.unpin??un.dataset.unpinBadge),false)}
-    const of=e.target.closest('[data-open-focus]');if(of)return openFocusOverlay(Number(of.dataset.openFocus));
+
+    // Nested badge controls MUST be handled before the clickable badge card.
+    // The card itself carries data-open-focus-badge, so checking the card first
+    // causes pin/unpin taps to be swallowed and opens Focus instead.
+    const t=e.target.closest('[data-toggle-earned]');
+    if(t){e.preventDefault();e.stopPropagation();return toggleEarn(Number(t.dataset.toggleEarned))}
+
+    const p=e.target.closest('[data-pin],[data-pin-badge]');
+    if(p){
+      e.preventDefault();
+      e.stopPropagation();
+      const i=Number(p.dataset.pin??p.dataset.pinBadge);
+      return toggleBadgePin(i);
+    }
+
+    const fp=e.target.closest('[data-focus-pin]');
+    if(fp){
+      e.preventDefault();
+      e.stopPropagation();
+      return toggleBadgePin(Number(fp.dataset.focusPin));
+    }
+
+    const un=e.target.closest('[data-unpin],[data-unpin-badge]');
+    if(un){
+      e.preventDefault();
+      e.stopPropagation();
+      const i=Number(un.dataset.unpin??un.dataset.unpinBadge);
+      return setBadgePinned(i,false);
+    }
+
+    const of=e.target.closest('[data-open-focus]');
+    if(of){e.preventDefault();e.stopPropagation();return openFocusOverlay(Number(of.dataset.openFocus))}
+
+    const o=e.target.closest('[data-open-badge]');
+    if(o){e.preventDefault();e.stopPropagation();return openBadge(Number(o.dataset.openBadge))}
+
+    const fb=e.target.closest('[data-open-focus-badge]');
+    if(fb)return openBadgeFocus(Number(fb.dataset.openFocusBadge));
     if(e.target.closest('.competitive-check'))return;
     const cg=e.target.closest('[data-comp-game]');
     if(cg){openCompetitiveGame(cg.dataset.compRoom,cg.dataset.compGame);return}

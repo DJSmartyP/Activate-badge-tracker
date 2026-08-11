@@ -2441,3 +2441,14 @@ h3,
     letter-spacing:.018em !important;
   }
 }
+
+/* v13.18 — nested badge controls always win over the clickable card */
+.clickable-badge [data-pin-badge],
+.clickable-badge [data-unpin-badge],
+.clickable-badge [data-toggle-earned],
+.clickable-badge button{
+  position:relative;
+  z-index:4;
+  pointer-events:auto;
+  touch-action:manipulation;
+}
