@@ -35,28 +35,37 @@
 
   <div id="splash" class="launch-splash" aria-label="Activate Tracker loading"></div>
   <div id="toast" class="toast" aria-live="polite"></div>
-
-  
-<div id="pageHeaderBar" class="page-header-bar">
-  <div class="page-header-left">
-    <img id="pageHeaderIcon" class="page-header-icon" src="icons/home.png" alt="">
-    <div>
-      <div class="page-header-kicker">Activate Tracker</div>
-      <h1 id="pageHeaderTitle">Home</h1>
-    </div>
-  </div>
 </div>
 <main class="app">
-    <header class="topbar"><button id="drawerMenuBtn" class="drawer-menu-btn" type="button" aria-label="Open navigation" aria-expanded="false">☰</button>
-      <div class="brand">
-        <img src="icon-192.png?v=108" alt="">
-        <div>
-          <h1>Activate Tracker</h1>
-          <div class="sub">Track • Pin • Conquer</div>
-        </div>
+  <div class="app-scroll">
+
+<header class="app-header-shell">
+  <div class="logo-bar">
+    <div class="logo-lockup">
+      <img class="logo-mark" src="icon-192.png?v=108" alt="">
+      <div class="logo-wording">
+        <div class="smarty-tag">Smarty's</div>
+        <div class="logo-title">ACTIVATE TRACKER</div>
+        <div class="logo-tagline">TRACK • PIN • CONQUER</div>
       </div>
-      <button class="iconbtn" id="backupTop">Backup</button>
-    </header>
+    </div>
+  </div>
+
+  <div class="page-bar">
+    <button id="drawerMenuBtn" class="drawer-menu-btn" type="button" aria-label="Open navigation" aria-expanded="false">☰</button>
+
+    <div class="page-bar-title">
+      <img id="pageHeaderIcon" class="page-header-icon" src="icons/home.png" alt="">
+      <div>
+        <div class="page-header-kicker">Activate Tracker</div>
+        <h1 id="pageHeaderTitle">Home</h1>
+      </div>
+    </div>
+
+    <button class="iconbtn page-backup" id="backupTop">Backup</button>
+  </div>
+</header>
+
 
     <section id="home" class="view active">
       <div class="hero">
@@ -185,7 +194,7 @@
 </div>
 <div class="card">
         <h2>Settings</h2>
-        <p class="sub">Version <strong>11.8.0</strong> — clean rebuild.</p>
+        <p class="sub">Version <strong>11.9.0</strong> — clean rebuild.</p>
         <div class="row wrap">
           <button class="btn primary" id="exportBackup">Export backup</button>
           <label class="btn">Restore backup<input id="importBackup" type="file" accept="application/json" hidden></label>
@@ -197,7 +206,9 @@
         <p class="sub">Prizes and rewards are intentionally not shown because they can vary by country and location.</p>
       </div>
     </section>
-  </main>
+
+  </div>
+</main>
 <div id="badgeModal" class="modal">
     <div class="sheet">
       <div class="row between"><h2 id="modalTitle"></h2><button id="closeModal" class="iconbtn">✕</button></div>

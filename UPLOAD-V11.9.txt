@@ -1,0 +1,19 @@
+ACTIVATE TRACKER v11.9 — HEADER REWORK
+
+CHANGES
+- New dedicated logo bar at the very top.
+- "Smarty's" added as a graffiti-style tack-on above ACTIVATE TRACKER.
+- Logo bar scales separately for Fold front/narrow and inner/landscape displays.
+- Page bar sits directly beneath the logo bar.
+- Page bar contains hamburger, current page icon/title and Backup.
+- Only the content below the bars scrolls.
+- Old duplicated page header removed.
+- Existing Badges, Levels, Competitive, Locations, Stats and Settings behavior retained.
+
+UPLOAD TO GITHUB ROOT
+- index.html
+- app.js
+- style.css
+- sw.js
+
+Keep the current icons/ folder in place.
