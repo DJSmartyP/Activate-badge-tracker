@@ -1,0 +1,16 @@
+ACTIVATE TRACKER v11.5 — LEFT SLIDE-IN MENU
+
+- Top-left hamburger button.
+- Menu slides in from the left and closes by X, backdrop tap, or selecting a screen.
+- Drawer contains Home, Targets, Levels, Competitive, Locations, Stats and Settings.
+- Bottom bar is now just Home / Targets / Levels / Comp with larger icons.
+- Splash screen remains removed.
+- Competitive Played/Not played sync remains.
+
+Upload to GitHub root:
+index.html
+app.js
+style.css
+sw.js
+
+No artwork files need replacing.

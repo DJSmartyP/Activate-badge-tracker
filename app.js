@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='11.4.0';
+const VERSION='11.5.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -593,12 +593,34 @@ async function init(){
 }
 
 
-function openMoreMenu(){const m=$('moreMenu'),b=$('moreMenuBackdrop');if(!m||!b)return;b.hidden=false;m.classList.add('open');m.setAttribute('aria-hidden','false')}
-function closeMoreMenu(){const m=$('moreMenu'),b=$('moreMenuBackdrop');if(!m||!b)return;m.classList.remove('open');m.setAttribute('aria-hidden','true');setTimeout(()=>{if(!m.classList.contains('open'))b.hidden=true},180)}
+function openDrawer(){
+  const drawer=$('sideDrawer'),backdrop=$('drawerBackdrop'),btn=$('drawerMenuBtn');
+  if(!drawer||!backdrop)return;
+  backdrop.hidden=false;
+  requestAnimationFrame(()=>{drawer.classList.add('open');backdrop.classList.add('open')});
+  drawer.setAttribute('aria-hidden','false');
+  btn?.setAttribute('aria-expanded','true');
+}
+function closeDrawer(){
+  const drawer=$('sideDrawer'),backdrop=$('drawerBackdrop'),btn=$('drawerMenuBtn');
+  if(!drawer||!backdrop)return;
+  drawer.classList.remove('open');
+  backdrop.classList.remove('open');
+  drawer.setAttribute('aria-hidden','true');
+  btn?.setAttribute('aria-expanded','false');
+  setTimeout(()=>{if(!drawer.classList.contains('open'))backdrop.hidden=true},220);
+}
+function highlightDrawer(view){
+  document.querySelectorAll('.drawer-nav [data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+}
 
-function bindEvents(){$('moreMenuBtn')?.addEventListener('click',openMoreMenu);$('closeMoreMenu')?.addEventListener('click',closeMoreMenu);$('moreMenuBackdrop')?.addEventListener('click',closeMoreMenu);document.querySelectorAll('.more-menu-item[data-view]').forEach(b=>b.addEventListener('click',()=>{showView(b.dataset.view);closeMoreMenu()}));
+function bindEvents(){
+  $('drawerMenuBtn')?.addEventListener('click',openDrawer);
+  $('closeDrawer')?.addEventListener('click',closeDrawer);
+  $('drawerBackdrop')?.addEventListener('click',closeDrawer);
+
 document.addEventListener('click',e=>{
-    const nav=e.target.closest('[data-view]');if(nav){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));$(nav.dataset.view).classList.add('active');nav.classList.add('active');return}
+    const nav=e.target.closest('[data-view]');if(nav){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));const target=$(nav.dataset.view);if(target)target.classList.add('active');const bottom=document.querySelector(`.nav [data-view="${nav.dataset.view}"]`);if(bottom)bottom.classList.add('active');highlightDrawer(nav.dataset.view);closeDrawer();return}
     const t=e.target.closest('[data-toggle-earned]');if(t)return toggleEarn(Number(t.dataset.toggleEarned));
     const o=e.target.closest('[data-open-badge]');if(o)return openBadge(Number(o.dataset.openBadge));
     const p=e.target.closest('[data-pin]');if(p)return togglePin(Number(p.dataset.pin));
