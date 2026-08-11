@@ -2135,3 +2135,56 @@ code{
     display:none;
   }
 }
+
+/* v13.15 — typography system: Oxanium display + Inter UI */
+:root{
+  --font-display:"Oxanium","Segoe UI",system-ui,sans-serif;
+  --font-body:"Inter","Segoe UI",Roboto,system-ui,-apple-system,sans-serif;
+}
+
+html,
+body,
+button,
+input,
+select,
+textarea{
+  font-family:var(--font-body);
+}
+
+h1,
+h2,
+h3,
+.page-bar-copy h1,
+.section-title h2,
+.room-title-row h3,
+.room-game-head strong,
+.side-drawer-head strong,
+.brand-banner-placeholder .brand-wordmark > strong{
+  font-family:var(--font-display);
+  letter-spacing:.015em;
+}
+
+.page-bar-copy h1,
+.section-title h2,
+.room-title-row h3{
+  font-weight:700;
+}
+
+.room-game-head strong{
+  font-weight:650;
+}
+
+/* Keep small labels, scores, controls and body copy maximally readable. */
+.label,
+.sub,
+.page-header-subtitle,
+.level-chip,
+.status-tag,
+.mode-tag,
+.tag,
+.field,
+.btn,
+.mini,
+p{
+  font-family:var(--font-body);
+}

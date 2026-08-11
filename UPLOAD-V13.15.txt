@@ -1,0 +1,20 @@
+ACTIVATE TRACKER v13.15 — OXANIUM + INTER
+
+TYPOGRAPHY
+- Oxanium: headlines, page titles, room/game headings, major section headings.
+- Inter: body copy, scores, buttons, filters, labels and controls.
+- Fonts load from Google Fonts.
+- If fonts are unavailable/offline before they have been cached, the app falls back cleanly to the device system fonts.
+
+ALSO
+- Removed the stray closing tag left from the duplicate-logo-bar cleanup.
+- Keeps the single temporary logo placeholder.
+- Retains v13.13 neon pink/blue high-score animation.
+- Retains v13.11 thicker borders.
+- Retains v13.10 landscape scrolling fix.
+
+UPLOAD TO GITHUB ROOT:
+index.html
+app.js
+style.css
+sw.js
