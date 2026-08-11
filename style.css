@@ -2065,3 +2065,41 @@ code{
     background:linear-gradient(90deg,#ffd23f,#fff0a0,#ffd23f);
   }
 }
+
+/* v13.13 — neon pink + cyan animated high-score frame */
+.level-chip.high-score-level{
+  border-color:rgba(86,224,255,.86) !important;
+  box-shadow:
+    0 0 10px rgba(67,218,255,.25),
+    0 0 18px rgba(255,55,190,.18),
+    0 0 30px rgba(92,76,255,.10);
+}
+
+.level-chip.high-score-level::before{
+  background:conic-gradient(
+    from 0deg,
+    transparent 0deg 260deg,
+    rgba(0,229,255,0) 260deg,
+    #00e5ff 286deg,
+    #79f2ff 302deg,
+    #755cff 318deg,
+    #ff38bd 338deg,
+    #ff78d7 350deg,
+    rgba(255,56,189,0) 360deg
+  );
+  filter:
+    drop-shadow(0 0 5px rgba(0,229,255,.85))
+    drop-shadow(0 0 7px rgba(255,56,189,.68));
+}
+
+@media (prefers-reduced-motion:reduce){
+  .level-chip.high-score-level::before{
+    animation:none;
+    background:linear-gradient(
+      90deg,
+      #00e5ff 0%,
+      #755cff 48%,
+      #ff38bd 100%
+    );
+  }
+}

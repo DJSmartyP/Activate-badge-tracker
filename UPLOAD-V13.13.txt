@@ -1,0 +1,16 @@
+ACTIVATE TRACKER v13.13 — NEON HIGH SCORE FRAME
+
+CHANGE
+- High-score border animation now uses the app palette:
+  • neon cyan / electric blue
+  • violet
+  • neon pink
+- The moving light has matching cyan and pink glow.
+- HIGH SCORE label remains gold so the achievement is still immediately distinct.
+- v13.12 high-score detection, v13.11 thicker borders, and v13.10 landscape scrolling remain included.
+
+UPLOAD:
+index.html
+app.js
+style.css
+sw.js
