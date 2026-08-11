@@ -1982,3 +1982,86 @@ code{
 .played-toggle{
   border-width:1.5px !important;
 }
+
+/* v13.12 — animated venue-high-score level tile */
+.level-chip.high-score-level{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  border-color:rgba(255,216,73,.82) !important;
+  background:
+    radial-gradient(circle at 16% 12%,rgba(255,221,91,.13),transparent 44%),
+    rgba(75,55,7,.10) !important;
+  box-shadow:
+    0 0 10px rgba(255,201,45,.26),
+    0 0 22px rgba(255,178,0,.10);
+}
+
+/* Animated light travelling around the frame. */
+.level-chip.high-score-level::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:-55%;
+  background:conic-gradient(
+    from 0deg,
+    transparent 0deg 285deg,
+    rgba(255,239,156,0) 285deg,
+    rgba(255,239,156,.95) 315deg,
+    #ffd23f 338deg,
+    rgba(255,194,26,.22) 354deg,
+    transparent 360deg
+  );
+  animation:highScoreBorderSpin 2.3s linear infinite;
+}
+
+/* Punch the centre back out, leaving only the moving border line visible. */
+.level-chip.high-score-level::after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:2px;
+  border-radius:calc(12px - 2px);
+  background:
+    radial-gradient(circle at 16% 12%,rgba(255,221,91,.12),transparent 44%),
+    rgba(14,16,25,.96);
+  pointer-events:none;
+}
+
+.level-chip.high-score-level > *{
+  position:relative;
+  z-index:1;
+}
+
+.level-chip-title-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.high-score-tag{
+  display:inline-flex;
+  align-items:center;
+  padding:3px 7px;
+  border-radius:999px;
+  border:1px solid rgba(255,218,83,.62);
+  background:rgba(255,193,7,.14);
+  color:#ffe790;
+  font-size:9px;
+  font-weight:950;
+  letter-spacing:.07em;
+  line-height:1;
+  box-shadow:0 0 8px rgba(255,203,49,.18);
+}
+
+@keyframes highScoreBorderSpin{
+  to{transform:rotate(360deg)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .level-chip.high-score-level::before{
+    animation:none;
+    background:linear-gradient(90deg,#ffd23f,#fff0a0,#ffd23f);
+  }
+}

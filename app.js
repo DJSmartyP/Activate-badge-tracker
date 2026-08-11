@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.11.0';
+const VERSION='13.12.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -670,14 +670,21 @@ function renderLevels(){
         if(levelMode==='complete'&&!done)continue;
         if(levelMode==='incomplete'&&done)continue;
 
+        const score=Number(info.score)||0;
+        const topScore=Number(info.topScore)||0;
+        const isHighScore=score>0 && topScore>0 && score===topScore;
+
         const scoreBits=[];
-        if(Number(info.score)>0)scoreBits.push(`Score ${info.score}`);
-        if(Number(info.topScore)>0)scoreBits.push(`Top ${info.topScore}`);
+        if(score>0)scoreBits.push(`Score ${score}`);
+        if(topScore>0)scoreBits.push(`Venue high ${topScore}`);
 
         levelItems.push(`
-          <div class="level-chip ${done?'level-chip-done':'level-chip-open'}">
+          <div class="level-chip ${done?'level-chip-done':'level-chip-open'} ${isHighScore?'high-score-level':''}">
             <div class="level-chip-main">
-              <strong>Level ${level}</strong>
+              <div class="level-chip-title-row">
+                <strong>Level ${level}</strong>
+                ${isHighScore?'<span class="high-score-tag">★ HIGH SCORE</span>':''}
+              </div>
               ${scoreBits.length?`<span>${scoreBits.join(' • ')}</span>`:''}
             </div>
             <span class="status-icon ${done?'status-icon-done':'status-icon-open'}">${done?'✓':'✕'}</span>

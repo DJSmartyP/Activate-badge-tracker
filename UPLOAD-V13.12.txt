@@ -1,0 +1,16 @@
+ACTIVATE TRACKER v13.12 — ANIMATED HIGH SCORE TILE
+
+NEW
+- If your imported score equals the imported venue high score for that level:
+  • the level tile gets a gold HIGH SCORE tag
+  • a bright gold light animates around the tile border
+  • the tile gets a subtle gold glow
+- The effect only appears when score > 0 and score === venue high score.
+- Reduced-motion accessibility disables the animation.
+- v13.11 thicker borders and v13.10 landscape scrolling are retained.
+
+UPLOAD:
+index.html
+app.js
+style.css
+sw.js
