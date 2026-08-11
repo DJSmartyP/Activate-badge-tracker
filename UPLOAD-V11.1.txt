@@ -1,0 +1,22 @@
+ACTIVATE TRACKER v11.1 — IMPORT HOTFIX
+
+FIXED
+- Reworked Activate-scores.ca CSV import.
+- Uses the actual Room / Game header row instead of assuming a fixed row number.
+- Uses modern file.text() loading instead of FileReader.
+- Shows visible import status on the Levels page.
+- Shows a clear error message if the CSV cannot be parsed.
+- Preserves scores, top scores, completed levels and merge behaviour.
+
+TESTED AGAINST
+DJ Smarty Activate Scores export:
+- 45 game rows detected
+- 48 completed levels detected
+
+UPLOAD TO GITHUB ROOT
+- index.html
+- app.js
+- style.css
+- sw.js
+
+No artwork files need replacing.

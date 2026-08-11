@@ -8,7 +8,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 
 'use strict';
 
-const VERSION='11.0.0';
+const VERSION='11.1.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -343,13 +343,25 @@ function exportBackup(){
 function ensureLevelProgress(){if(!state.levelProgress)state.levelProgress={games:{},importedAt:null,player:null};if(!state.levelProgress.games)state.levelProgress.games={}}
 function csvRows(t){let a=[],r=[],f='',q=false;for(let i=0;i<t.length;i++){let c=t[i];if(q){if(c==='"'&&t[i+1]==='"'){f+='"';i++}else if(c==='"')q=false;else f+=c}else if(c==='"')q=true;else if(c===','){r.push(f);f=''}else if(c==='\n'){r.push(f);a.push(r);r=[];f=''}else if(c!=='\r')f+=c}if(f||r.length){r.push(f);a.push(r)}return a}
 function importScores(t){
-  const rows=csvRows(t);
-  if(!String(rows[0]?.[0]||'').toLowerCase().startsWith('activate:')) throw Error('This does not look like an Activate-scores.ca export.');
-  ensureLevelProgress();
-  let games=0,newLevels=0;
+  const rows=csvRows(t).filter(r=>r.some(c=>String(c||'').trim()!==''));
+  if(!rows.length) throw Error('The selected CSV is empty.');
 
-  for(const r of rows.slice(2)){
-    const room=(r[0]||'').trim(), game=(r[1]||'').trim();
+  const headerIndex=rows.findIndex(r=>
+    String(r[0]||'').trim().toLowerCase()==='room' &&
+    String(r[1]||'').trim().toLowerCase()==='game'
+  );
+  if(headerIndex<0) throw Error('Could not find the Room / Game header row. Please use an export from Activate-scores.ca.');
+
+  ensureLevelProgress();
+
+  const playerRow=rows.slice(0,headerIndex).find(r=>String(r[0]||'').toLowerCase().startsWith('activate:'));
+  const player=playerRow ? String(playerRow[0]).replace(/^Activate:\s*/i,'').trim() : null;
+
+  let games=0,newLevels=0,totalCompleted=0;
+
+  for(const r of rows.slice(headerIndex+1)){
+    const room=String(r[0]||'').trim();
+    const game=String(r[1]||'').trim();
     if(!room||!game||game.toLowerCase()==='total') continue;
 
     const key=room+'||'+game;
@@ -361,32 +373,47 @@ function importScores(t){
       levels[level].complete=true;
     });
 
-    for(let i=2;i+2<r.length;i+=3){
-      const level=parseInt(r[i],10);
-      if(!(level>=1&&level<=10)) continue;
+    let foundLevel=false;
 
-      const score=Number(String(r[i+1]||'0').replace(/,/g,''))||0;
-      const topScore=Number(String(r[i+2]||'0').replace(/,/g,''))||0;
+    for(let i=2;i+2<r.length;i+=3){
+      const level=parseInt(String(r[i]||'').trim(),10);
+      if(!(level>=1&&level<=10)) continue;
+      foundLevel=true;
+
+      const score=Number(String(r[i+1]||'0').replace(/,/g,'').trim())||0;
+      const topScore=Number(String(r[i+2]||'0').replace(/,/g,'').trim())||0;
+
       const old=levels[level]||{score:0,topScore:0,complete:false};
       const wasComplete=!!old.complete;
       const complete=score>0||wasComplete;
 
       levels[level]={
-        score:Math.max(old.score||0,score),
-        topScore:topScore||old.topScore||0,
+        score:Math.max(Number(old.score)||0,score),
+        topScore:topScore || Number(old.topScore)||0,
         complete
       };
-      if(complete&&!wasComplete)newLevels++;
+
+      if(complete){
+        totalCompleted++;
+        if(!wasComplete)newLevels++;
+      }
     }
 
-    state.levelProgress.games[key]={room,game,levels};
-    games++;
+    if(foundLevel){
+      state.levelProgress.games[key]={room,game,levels};
+      games++;
+    }
   }
 
+  if(!games) throw Error('No game rows were found in this Activate-scores.ca export.');
+
   state.levelProgress.importedAt=new Date().toISOString();
-  state.levelProgress.player=String(rows[0][0]).replace(/^Activate:\s*/i,'').trim();
-  save();renderLevels();
-  return {games,newLevels};
+  state.levelProgress.player=player;
+  state.levelProgress.source='Activate-scores.ca';
+  save();
+  renderLevels();
+
+  return {games,newLevels,totalCompleted,player};
 }
 function allGamesForRoom(r){let c=GAME_CATALOG[r]||{};return[...new Set([...(c.cooperative||[]),...(c.competitive||[])])].sort()}
 function progressEntries(){
@@ -510,7 +537,27 @@ document.addEventListener('click',e=>{
     }
     const gt=e.target.closest('[data-game-toggle]');if(gt){const l=activeLocation(),g=gt.dataset.gameToggle;l.games=l.games.includes(g)?l.games.filter(x=>x!==g):[...l.games,g];renderAll();return}
   });
-  $('importScoresCsv').onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let result=importScores(r.result);toast(`Imported ${result.games} games • ${result.newLevels} new levels`)}catch(x){toast(x.message)}e.target.value=''};r.readAsText(f)};$('levelsRoom').onchange=renderLevels;$('levelsView').onchange=renderLevels;$('clearLevelProgress').onclick=()=>{if(confirm('Clear all imported level progress?')){state.levelProgress={games:{},importedAt:null,player:null};save();renderLevels()}};$('badgeSearch').addEventListener('input',renderBadges);$('competitiveSearch').addEventListener('input',renderCompetitive);$('competitiveRoom').addEventListener('change',renderCompetitive);$('targetRoom').addEventListener('change',renderBadges);$('badgeStatus').addEventListener('change',renderBadges);$('badgeAvailability').addEventListener('change',renderBadges);
+  $('importScoresCsv').onchange=async e=>{
+    const f=e.target.files?.[0];
+    if(!f)return;
+
+    const info=$('levelsImportInfo');
+    info.textContent=`Reading ${f.name}…`;
+
+    try{
+      const text=await f.text();
+      const result=importScores(text);
+      info.textContent=`Imported ${result.games} games • ${result.totalCompleted} completed levels${result.player?' • '+result.player:''}`;
+      toast(`Import complete • ${result.newLevels} new levels`);
+    }catch(err){
+      console.error('Activate-scores.ca import failed',err);
+      info.textContent=`Import failed: ${err?.message||'Unknown error'}`;
+      toast(err?.message||'Could not import Activate-scores.ca CSV');
+    }finally{
+      e.target.value='';
+    }
+  };
+  $('levelsRoom').onchange=renderLevels;$('levelsView').onchange=renderLevels;$('clearLevelProgress').onclick=()=>{if(confirm('Clear all imported level progress?')){state.levelProgress={games:{},importedAt:null,player:null};save();renderLevels()}};$('badgeSearch').addEventListener('input',renderBadges);$('competitiveSearch').addEventListener('input',renderCompetitive);$('competitiveRoom').addEventListener('change',renderCompetitive);$('targetRoom').addEventListener('change',renderBadges);$('badgeStatus').addEventListener('change',renderBadges);$('badgeAvailability').addEventListener('change',renderBadges);
   $('locationName').addEventListener('input',e=>{activeLocation().name=e.target.value;save();renderHome()});
   $('addLocation').onclick=()=>{const id='loc_'+Date.now();state.locations.push({id,name:'New location',rooms:[],games:[],roomCopies:{},roomInstances:[],venueMap:{Entrance:{front:null,left:null,right:null,back:null},Exit:{front:null,left:null,right:null,back:null}}});state.activeLocation=id;renderAll()};
   $('deleteLocation').onclick=()=>{if(state.locations.length===1)return toast('Keep at least one location');state.locations=state.locations.filter(l=>l.id!==state.activeLocation);state.activeLocation=state.locations[0].id;renderAll()};
