@@ -1,0 +1,18 @@
+ACTIVATE TRACKER v13.14 — SINGLE LOGO PLACEHOLDER
+
+CHANGE
+- Removed the duplicate/older logo placeholder bar.
+- Left one compact temporary Smarty's Activate Tracker placeholder.
+- Dynamic page bar remains directly underneath.
+- No final logo graphics are included yet.
+
+RETAINED
+- v13.13 neon pink/blue high-score animation
+- v13.11 thicker borders
+- v13.10 landscape scrolling fix
+
+UPLOAD:
+index.html
+app.js
+style.css
+sw.js
