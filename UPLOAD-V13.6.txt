@@ -1,0 +1,22 @@
+ACTIVATE TRACKER v13.6 — APP-WIDE RESPONSIVE FIT PASS
+
+REVIEW / FIXES
+- Added global box-sizing and overflow protection.
+- Every view now gets safe left/right gutters.
+- Content is capped and centred on large inner displays.
+- Narrow foldable cover screens get smaller but still safe gutters.
+- Landscape gets extra side breathing room.
+- Cards, rows and controls can wrap instead of forcing the page wider.
+- Inputs/selects/buttons can shrink to fit their container.
+- Long titles/text can wrap without pushing cards off-screen.
+- Modals/dialogs are capped to the viewport and scroll internally.
+- Drawer width is limited to the usable screen width.
+- Focus overlay keeps safe margins in portrait and landscape.
+- Levels page now uses the same safe-width rules as the rest of the app.
+- Existing v13.5 Room > Game > Levels layout retained.
+
+UPLOAD:
+index.html
+app.js
+style.css
+sw.js

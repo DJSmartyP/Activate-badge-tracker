@@ -1327,3 +1327,480 @@ html,body{overscroll-behavior-x:none}
     padding-right:9px;
   }
 }
+
+/* v13.5 — Room > Game > Levels hierarchy */
+#levelsSort{display:none !important}
+
+#levelsList{
+  display:grid;
+  gap:22px;
+}
+
+.room-section{
+  display:grid;
+  gap:12px;
+}
+.room-title-row{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  padding:0 2px;
+}
+.room-title-row .room-label{
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.14em;
+  color:var(--muted,#98a2b8);
+}
+.room-title-row h3{
+  margin:0;
+  font-size:20px;
+}
+
+.room-games{
+  display:grid;
+  gap:12px;
+}
+
+.room-game-card{
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;
+  padding:14px 16px;
+  background:rgba(255,255,255,.025);
+}
+.room-game-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+.room-game-head > div:first-child{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+.room-game-head strong{
+  font-size:16px;
+  line-height:1.2;
+}
+
+.mode-tag{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:84px;
+  padding:5px 8px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+.coop-game{
+  border-left:4px solid #54a8ff;
+  background:linear-gradient(90deg,rgba(50,125,255,.10),rgba(255,255,255,.02));
+}
+.coop-tag{
+  color:#9fd0ff;
+  border:1px solid rgba(84,168,255,.40);
+  background:rgba(84,168,255,.13);
+}
+.competitive-game{
+  border-left:4px solid #ff5fb6;
+  background:linear-gradient(90deg,rgba(255,64,173,.10),rgba(255,255,255,.02));
+}
+.competitive-tag{
+  color:#ff9fd3;
+  border:1px solid rgba(255,95,182,.42);
+  background:rgba(255,95,182,.13);
+}
+
+.status-tag{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:104px;
+  padding:7px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.status-played{
+  color:#7cf3ac;
+  border:1px solid rgba(88,229,145,.45);
+  background:rgba(66,190,123,.14);
+}
+.status-unplayed{
+  color:#ff8b9a;
+  border:1px solid rgba(255,94,116,.42);
+  background:rgba(205,58,78,.12);
+}
+.status-button{
+  cursor:pointer;
+  font:inherit;
+}
+
+.level-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:9px;
+  margin-top:12px;
+}
+.level-chip{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  min-height:48px;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.07);
+}
+.level-chip-main{
+  display:grid;
+  gap:2px;
+}
+.level-chip-main strong{
+  font-size:14px;
+}
+.level-chip-main span{
+  font-size:11px;
+  color:var(--muted,#9ba4b8);
+}
+.level-chip-done{
+  background:rgba(50,190,123,.08);
+}
+.level-chip-open{
+  background:rgba(205,58,78,.055);
+}
+.status-icon{
+  flex:0 0 26px;
+  width:26px;
+  height:26px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  font-size:14px;
+  font-weight:900;
+}
+.status-icon-done{
+  color:#78f0a9;
+  border:1px solid rgba(88,229,145,.45);
+  background:rgba(66,190,123,.15);
+}
+.status-icon-open{
+  color:#ff8b9a;
+  border:1px solid rgba(255,94,116,.40);
+  background:rgba(205,58,78,.11);
+}
+
+@media (max-width:700px){
+  .room-game-card{padding:12px}
+  .room-game-head{
+    align-items:flex-start;
+  }
+  .room-game-head > div:first-child{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:6px;
+  }
+  .mode-tag{
+    min-width:0;
+  }
+  .status-tag{
+    min-width:92px;
+    font-size:11px;
+  }
+  .level-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+/* =========================================================
+   v13.6 — app-wide responsive fit / safe-edge pass
+   Keeps every screen inside the viewport on narrow phones,
+   foldable cover screens, inner displays and landscape.
+   ========================================================= */
+
+*,*::before,*::after{box-sizing:border-box}
+
+html{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
+
+body{
+  width:100%;
+  max-width:100%;
+  margin:0;
+  overflow-x:hidden;
+}
+
+/* Prevent long text / flex children from forcing horizontal overflow. */
+main,
+.view,
+.view > *,
+.card,
+.item,
+.row,
+.toolbar,
+.filters,
+.level-room-group,
+.room-section,
+.room-game-card,
+.drawer,
+.modal,
+.modal-card,
+.focus-inner,
+.focus-card,
+.focus-shell{
+  min-width:0;
+  max-width:100%;
+}
+
+img,svg,canvas,video{
+  max-width:100%;
+  height:auto;
+}
+
+button,input,select,textarea{
+  max-width:100%;
+  min-width:0;
+}
+
+input,select,textarea{
+  width:100%;
+}
+
+/* Generic page gutter used across every normal screen. */
+.view{
+  width:100%;
+  padding-left:max(14px,env(safe-area-inset-left));
+  padding-right:max(14px,env(safe-area-inset-right));
+}
+
+/* If a view already supplies its own padding, this prevents nested content
+   from stretching to the physical display edge. */
+.view > .card,
+.view > .toolbar,
+.view > .filters,
+.view > .row,
+.view > .section,
+.view > article,
+.view > section{
+  width:100%;
+  max-width:1180px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* Common rows may wrap instead of overflowing. */
+.row,
+.toolbar,
+.filters{
+  flex-wrap:wrap;
+}
+
+.row > *,
+.toolbar > *,
+.filters > *{
+  min-width:0;
+}
+
+/* Text should break cleanly rather than widen cards. */
+.card,
+.item,
+.room-game-card,
+.level-chip,
+.detail,
+.sub,
+p,
+h1,h2,h3,h4,
+strong,
+b{
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
+
+/* Scrollable wide content stays inside its own box. */
+.table-wrap,
+.scroll-x,
+pre,
+code{
+  max-width:100%;
+  overflow-x:auto;
+}
+
+/* Drawer width must remain usable on the narrow cover screen. */
+.drawer{
+  width:min(320px,calc(100vw - 24px)) !important;
+  max-width:calc(100vw - 24px) !important;
+}
+
+/* Dialogs/modals never touch the display edge. */
+.modal,
+.overlay{
+  padding-left:max(16px,env(safe-area-inset-left));
+  padding-right:max(16px,env(safe-area-inset-right));
+}
+
+.modal-card,
+.dialog,
+.sheet{
+  width:min(720px,calc(100vw - 32px)) !important;
+  max-width:calc(100vw - 32px) !important;
+  max-height:calc(100dvh - 32px);
+  overflow:auto;
+}
+
+/* Form/control groups collapse gracefully. */
+@media (max-width:760px){
+  .toolbar,
+  .filters,
+  .row.wrap{
+    display:grid;
+    grid-template-columns:1fr;
+    width:100%;
+  }
+
+  .toolbar > *,
+  .filters > *,
+  .row.wrap > *{
+    width:100%;
+  }
+
+  .segmented{
+    width:100%;
+    display:grid !important;
+    grid-auto-flow:column;
+    grid-auto-columns:minmax(0,1fr);
+  }
+
+  .segmented > *{
+    min-width:0 !important;
+    width:100%;
+  }
+
+  .card,
+  .item{
+    width:100%;
+  }
+}
+
+/* Extra narrow foldable cover screens. */
+@media (max-width:430px){
+  .view{
+    padding-left:max(10px,env(safe-area-inset-left));
+    padding-right:max(10px,env(safe-area-inset-right));
+  }
+
+  .card,
+  .item,
+  .room-game-card{
+    border-radius:14px;
+  }
+
+  .room-game-head{
+    align-items:flex-start;
+    gap:10px;
+  }
+
+  .room-game-head > div:first-child{
+    min-width:0;
+    flex:1 1 auto;
+  }
+
+  .status-tag,
+  .play-state-pill,
+  .played-toggle{
+    flex:0 0 auto;
+    max-width:42%;
+    white-space:normal;
+    text-align:center;
+  }
+
+  .level-grid{
+    grid-template-columns:1fr !important;
+  }
+}
+
+/* Landscape phone/foldable: retain side breathing room globally. */
+@media (orientation:landscape) and (max-height:760px){
+  .view{
+    padding-left:max(22px,env(safe-area-inset-left));
+    padding-right:max(22px,env(safe-area-inset-right));
+  }
+
+  .view > .card,
+  .view > .toolbar,
+  .view > .filters,
+  .view > .row,
+  .view > article,
+  .view > section{
+    max-width:min(1180px,calc(100vw - 44px));
+  }
+
+  .modal-card,
+  .dialog,
+  .sheet{
+    width:min(900px,calc(100vw - 56px)) !important;
+    max-width:calc(100vw - 56px) !important;
+  }
+}
+
+/* Levels page inherits the same safe gutter instead of getting double-wide. */
+#levels{
+  width:100%;
+  max-width:100%;
+  padding-left:max(14px,env(safe-area-inset-left)) !important;
+  padding-right:max(14px,env(safe-area-inset-right)) !important;
+}
+#levels > *{
+  width:100%;
+  max-width:1180px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+@media (max-width:430px){
+  #levels{
+    padding-left:max(10px,env(safe-area-inset-left)) !important;
+    padding-right:max(10px,env(safe-area-inset-right)) !important;
+  }
+}
+
+@media (orientation:landscape) and (max-height:760px){
+  #levels{
+    padding-left:max(22px,env(safe-area-inset-left)) !important;
+    padding-right:max(22px,env(safe-area-inset-right)) !important;
+  }
+}
+
+/* Focus overlay: safe inset on all displays. */
+#focusOverlay{
+  padding-left:max(16px,env(safe-area-inset-left)) !important;
+  padding-right:max(16px,env(safe-area-inset-right)) !important;
+}
+#focusOverlay .focus-inner,
+#focusOverlay .focus-card,
+#focusOverlay .focus-shell,
+#focusOverlay > .modal-card{
+  max-width:calc(100vw - 32px) !important;
+}
+
+@media (orientation:landscape) and (min-width:700px){
+  #focusOverlay{
+    padding-left:max(34px,env(safe-area-inset-left)) !important;
+    padding-right:max(34px,env(safe-area-inset-right)) !important;
+  }
+
+  #focusOverlay .focus-inner,
+  #focusOverlay .focus-card,
+  #focusOverlay .focus-shell,
+  #focusOverlay > .modal-card{
+    max-width:calc(100vw - 68px) !important;
+  }
+}
