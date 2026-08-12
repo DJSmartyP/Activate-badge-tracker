@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.82.0';
+const VERSION='13.83.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -1027,7 +1027,7 @@ function renderHome(){
 
         <div class="home-trophy-title-row">
           <div class="home-trophy-title-copy">
-            <div class="big trophy-current-name ${tpClass}">${esc(tp.name)}</div>
+            <div class="big trophy-current-name ${tpClass}" data-text="${esc(tp.name)}">${esc(tp.name)}</div>
             <div class="sub">${tp.remaining?`${tp.current} / ${tp.target} badges • ${tp.remaining} to unlock`:'Unlocked • 100% complete'}</div>
           </div>
 
@@ -2986,6 +2986,6 @@ function bindEvents(){
   onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();ensureContentState();applyContentCatalog();renderAll()}});
 }
 
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1382',{updateViaCache:'none'}).catch(console.error));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1383',{updateViaCache:'none'}).catch(console.error));
 init();
 installBackGuard();

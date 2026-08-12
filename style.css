@@ -10657,3 +10657,303 @@ body{
 #brandBanner .brand-activate{
   position:relative !important;
 }
+
+
+/* =========================================================
+   v13.83 — PHASED ACTIVATE / HIGH-SCORE PLATE LIGHT /
+   TROPHY SWEEP-BOUNCE HIGHLIGHT
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   ACTIVATE: colours genuinely phase through the word.
+   Saturated magenta -> violet -> cyan -> blue.
+   --------------------------------------------------------- */
+#brandBanner .brand-activate,
+.brand-banner-final .brand-activate{
+  background:
+    linear-gradient(
+      90deg,
+      #FF38B8 0%,
+      #FF4FC8 12%,
+      #B45FFF 25%,
+      #687CFF 38%,
+      #39E0FF 50%,
+      #2F76FF 62%,
+      #8C67FF 75%,
+      #FF38B8 88%,
+      #46D9FF 100%
+    ) !important;
+
+  background-size:300% 100% !important;
+  background-position:0% 50% !important;
+
+  -webkit-background-clip:text !important;
+  background-clip:text !important;
+  -webkit-text-fill-color:transparent !important;
+  color:transparent !important;
+
+  animation:activateWordColourPhase 9s ease-in-out infinite !important;
+
+  text-shadow:
+    0 0 3px rgba(255,56,184,.55),
+    0 0 8px rgba(180,95,255,.38),
+    0 0 13px rgba(57,224,255,.42),
+    0 0 19px rgba(47,118,255,.28) !important;
+
+  filter:brightness(1.10) saturate(1.24) !important;
+}
+
+@keyframes activateWordColourPhase{
+  0%,100%{
+    background-position:0% 50%;
+    text-shadow:
+      0 0 3px rgba(255,56,184,.62),
+      0 0 8px rgba(255,79,200,.40),
+      0 0 13px rgba(180,95,255,.32),
+      0 0 19px rgba(70,217,255,.20);
+  }
+  35%{
+    background-position:48% 50%;
+    text-shadow:
+      0 0 3px rgba(180,95,255,.58),
+      0 0 8px rgba(104,124,255,.40),
+      0 0 13px rgba(57,224,255,.38),
+      0 0 19px rgba(47,118,255,.24);
+  }
+  70%{
+    background-position:100% 50%;
+    text-shadow:
+      0 0 3px rgba(57,224,255,.62),
+      0 0 8px rgba(47,118,255,.42),
+      0 0 13px rgba(140,103,255,.36),
+      0 0 19px rgba(255,56,184,.22);
+  }
+}
+
+/* ---------------------------------------------------------
+   PLAYER PLATE: use the same single travelling light segment
+   technique as the existing venue-high-score tiles.
+   No "two rotating bars".
+   --------------------------------------------------------- */
+#brandBanner .brand-lockup{
+  position:relative !important;
+  isolation:isolate !important;
+  overflow:hidden !important;
+
+  border-color:rgba(255,255,255,.62) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.12),
+    inset 0 -1px 0 rgba(var(--player-brand-safe-rgb),.14),
+    0 0 0 1px rgba(255,255,255,.16),
+    0 0 9px rgba(255,255,255,.14),
+    0 0 16px rgba(var(--player-brand-safe-rgb),.15),
+    0 7px 18px rgba(0,0,0,.24) !important;
+}
+
+/* Exactly one coloured travelling segment. */
+#brandBanner .brand-lockup::before{
+  content:"" !important;
+  display:block !important;
+  position:absolute !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+
+  inset:-55% !important;
+  padding:0 !important;
+
+  clip-path:none !important;
+  border:0 !important;
+
+  background:conic-gradient(
+    from 0deg,
+    transparent 0deg 260deg,
+    rgba(0,229,255,0) 260deg,
+    #00E5FF 286deg,
+    #79F2FF 302deg,
+    #755CFF 318deg,
+    #FF38BD 338deg,
+    #FF78D7 350deg,
+    rgba(255,56,189,0) 360deg
+  ) !important;
+
+  -webkit-mask:none !important;
+  mask:none !important;
+
+  filter:
+    drop-shadow(0 0 5px rgba(0,229,255,.85))
+    drop-shadow(0 0 7px rgba(255,56,189,.68)) !important;
+
+  animation:highScoreBorderSpin 6.4s linear infinite !important;
+}
+
+/* Punch the centre back out so only the edge light is visible. */
+#brandBanner .brand-lockup::after{
+  content:"" !important;
+  display:block !important;
+  position:absolute !important;
+  z-index:1 !important;
+  pointer-events:none !important;
+
+  inset:2px !important;
+
+  clip-path:polygon(
+    calc(var(--plate-cut) - 2px) 0,
+    calc(100% - var(--plate-cut) + 2px) 0,
+    100% 50%,
+    calc(100% - var(--plate-cut) + 2px) 100%,
+    calc(var(--plate-cut) - 2px) 100%,
+    0 50%
+  ) !important;
+
+  border:0 !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(var(--player-brand-safe-rgb),.27),
+      rgba(var(--player-brand-rgb),.14)
+    ),
+    rgba(7,10,19,.92) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.07),
+    inset 0 -1px 0 rgba(var(--player-brand-safe-rgb),.08) !important;
+}
+
+#brandBanner .player-brand-name,
+#brandBanner .brand-main{
+  position:relative !important;
+  z-index:3 !important;
+}
+
+/* Neutralise the old orbit animation concept completely. */
+@keyframes activatePlateOrbit{
+  from{transform:none}
+  to{transform:none}
+}
+
+/* ---------------------------------------------------------
+   TROPHY NAME:
+   Clean metallic text at rest.
+   Then white light sweeps L->R, reverses R->L, disappears.
+   There is NO permanent white glow.
+   --------------------------------------------------------- */
+.trophy-current-name{
+  position:relative !important;
+
+  /* Stop the old always-moving metallic shimmer. */
+  animation:none !important;
+
+  /* Keep the metal itself clean and still. */
+  background-position:50% 50% !important;
+  filter:none !important;
+  text-shadow:none !important;
+}
+
+/* Remove the later persistent metal drop-shadows too. */
+.trophy-current-name.trophy-bronze,
+.trophy-current-name.trophy-silver,
+.trophy-current-name.trophy-gold,
+.trophy-current-name.trophy-platinum{
+  filter:none !important;
+}
+
+/* Animated highlight exists only during the sweep portion. */
+.trophy-current-name::after{
+  content:attr(data-text);
+
+  position:absolute;
+  inset:0;
+  z-index:2;
+
+  display:block;
+  pointer-events:none;
+  white-space:nowrap;
+
+  color:transparent;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      transparent 39%,
+      rgba(255,255,255,.12) 44%,
+      rgba(255,255,255,.96) 50%,
+      rgba(255,255,255,.20) 56%,
+      transparent 62%,
+      transparent 100%
+    );
+
+  background-size:260% 100%;
+  background-position:-145% 50%;
+
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+
+  opacity:0;
+
+  filter:
+    drop-shadow(0 0 3px rgba(255,255,255,.82))
+    drop-shadow(0 0 8px rgba(255,255,255,.52));
+
+  animation:trophyNameLightBounce 10.5s ease-in-out infinite;
+}
+
+@keyframes trophyNameLightBounce{
+  /* Clean/resting trophy — absolutely no white sweep/glow. */
+  0%,20%{
+    opacity:0;
+    background-position:-145% 50%;
+  }
+
+  /* Fade in and sweep to the right. */
+  25%{
+    opacity:.12;
+    background-position:-125% 50%;
+  }
+  43%{
+    opacity:1;
+    background-position:120% 50%;
+  }
+
+  /* Tiny pause at the right edge before reversing. */
+  47%{
+    opacity:.92;
+    background-position:120% 50%;
+  }
+
+  /* Bounce back to the left. */
+  66%{
+    opacity:.82;
+    background-position:-125% 50%;
+  }
+
+  /* Disappear completely. */
+  73%,100%{
+    opacity:0;
+    background-position:-145% 50%;
+  }
+}
+
+/* ---------------------------------------------------------
+   Motion accessibility
+   --------------------------------------------------------- */
+@media (prefers-reduced-motion:reduce){
+  #brandBanner .brand-activate,
+  .brand-banner-final .brand-activate,
+  #brandBanner .brand-lockup::before,
+  .trophy-current-name::after{
+    animation:none !important;
+  }
+
+  #brandBanner .brand-activate,
+  .brand-banner-final .brand-activate{
+    background-position:50% 50% !important;
+  }
+
+  .trophy-current-name::after{
+    display:none !important;
+  }
+}
