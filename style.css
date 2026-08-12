@@ -11692,3 +11692,140 @@ body{
 #brandBanner .brand-lockup::after{
   inset:2px !important;
 }
+
+
+/* =========================================================
+   v13.90 — APP-WIDE TYPE MAX + VERY SLOW ACTIVATE PHASE
+   Font-size only typography pass. Existing component geometry untouched.
+   ========================================================= */
+
+#brandBanner .brand-activate,
+.brand-banner-final .brand-activate{
+  animation-duration:32s !important;
+  animation-timing-function:ease-in-out !important;
+}
+
+/* Global small copy */
+.sub,.label{font-size:14px !important;}
+.mini{font-size:13.5px !important;}
+.detail{font-size:15px !important;}
+.detail strong{font-size:13px !important;}
+.checkline{font-size:14px !important;}
+.section-title h2{font-size:18px !important;}
+
+/* Buttons / controls */
+.btn,
+.seg-btn,
+.icon-label-btn,
+.checkbtn,
+.pin-button,
+.toggle,
+.content-row-actions button{
+  font-size:15px !important;
+}
+input,select,textarea,button{font-size:max(15px,1em);}
+.field > label,.field .label{font-size:14px !important;}
+
+/* Chips / pills / tags */
+.pill,
+.tag,
+.selected-pill,
+.mode-pill,
+.mode-tag,
+.status-tag,
+.play-state-pill,
+.competitive-pill,
+.coop-tag,
+.award-legacy-tag,
+.availability-tag,
+.content-archived-pill{
+  font-size:12.5px !important;
+}
+.high-score-tag,
+.target-card.pinned-target::after{
+  font-size:11.5px !important;
+}
+
+/* Generic cards / badges / stats */
+.badge h3{font-size:17px !important;}
+.badge p{font-size:14px !important;}
+.target-card h3,.badge.target-card h3{font-size:20px !important;}
+.target-card p,.badge.target-card p{font-size:16.5px !important;}
+.target-card .sub,.badge.target-card .sub{font-size:15px !important;}
+.target-card .tag,.badge.target-card .tag{font-size:13.5px !important;}
+.metric .label{font-size:11.5px !important;}
+.metric b{font-size:20px !important;}
+.stat b{font-size:28px !important;}
+
+/* Home / trophy dashboard */
+.home-achievement-copy b{font-size:13px !important;}
+.home-achievement-copy small{font-size:10.5px !important;}
+.home-achievement-rank{font-size:13px !important;}
+.home-achievement-empty{font-size:12px !important;}
+.home-trophy-title-copy .sub{font-size:12.5px !important;}
+.trophy-counter-inner small,
+.home-trophy-live .trophy-counter-inner small{font-size:10.5px !important;}
+.trophy-counter-copy span:last-child{font-size:12px !important;}
+
+/* Levels / games / scores */
+.level-room-heading strong{font-size:17px !important;}
+.level-room-heading span{font-size:13.5px !important;}
+.room-title-row .room-label{font-size:12.5px !important;}
+.room-title-row h3{font-size:21px !important;}
+.room-game-head strong{font-size:17px !important;}
+.game-kind{font-size:12px !important;}
+.game-card-room{font-size:15px !important;}
+.game-how strong{font-size:13px !important;}
+.level-number{font-size:12.5px !important;}
+.level-chip-main strong{font-size:15.5px !important;}
+.level-chip-main span{font-size:12.5px !important;}
+.your-score{font-size:17px !important;}
+.top-score{font-size:12px !important;}
+
+/* Locations / competitive */
+.selected-venue-banner strong{font-size:19px !important;}
+.competitive-check-box{font-size:20px !important;}
+
+/* CSV / content manager / settings */
+.csv-report-head h4{font-size:19px !important;}
+.csv-report-chip{font-size:13.5px !important;}
+.csv-report-item{font-size:14px !important;}
+.csv-report-summary,.csv-report-empty{font-size:14px !important;}
+.content-main-button strong{font-size:17px !important;}
+.content-main-button span{font-size:13.5px !important;}
+.content-manager-row,
+.content-badge-part,
+.content-check-row{font-size:14px !important;}
+
+/* Drawer / page header */
+.drawer-nav button{font-size:18px !important;}
+.page-header-subtitle{font-size:13.5px !important;}
+
+/* Focus / modals */
+#focusOverlayBody .focus-meta{font-size:14.5px !important;}
+#focusOverlayBody .detail{font-size:16px !important;}
+#focusOverlayBody .detail strong{font-size:13px !important;}
+#focusOverlay .focus-actions .btn{font-size:15px !important;}
+#focusOverlay #focusPosition{font-size:13.5px !important;}
+
+@media (max-width:520px){
+  .sub,.label{font-size:13.5px !important;}
+
+  .pill,
+  .tag,
+  .selected-pill,
+  .mode-pill,
+  .mode-tag,
+  .status-tag,
+  .play-state-pill,
+  .competitive-pill,
+  .coop-tag,
+  .award-legacy-tag,
+  .availability-tag,
+  .content-archived-pill{
+    font-size:12px !important;
+  }
+
+  .page-header-subtitle{font-size:13px !important;}
+  .drawer-nav button{font-size:17.5px !important;}
+}
