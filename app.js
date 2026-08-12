@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.70.0';
+const VERSION='13.71.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -2561,8 +2561,23 @@ function updatePageHeader(view){
   if(title)title.textContent=meta.title;
   if(subtitle)subtitle.textContent=meta.subtitle;
   if(icon)icon.src=`icons/header/${meta.icon}.svg`;
+
   const pageBar=document.querySelector('.page-bar');
-  if(pageBar)pageBar.dataset.page=view;
+  const shell=document.querySelector('.app-header-shell');
+
+  if(pageBar){
+    pageBar.dataset.page=view;
+
+    // Promote the active page accent to the complete header shell.
+    // This lets the page colour blend upward behind the player's
+    // personalised tag without hard-coding a second palette.
+    const pageStyle=getComputedStyle(pageBar);
+    const accent=pageStyle.getPropertyValue('--page-accent').trim()||'#43E7FF';
+    const accentRgb=pageStyle.getPropertyValue('--page-accent-rgb').trim()||'67,231,255';
+
+    shell?.style.setProperty('--active-page-accent',accent);
+    shell?.style.setProperty('--active-page-accent-rgb',accentRgb);
+  }
 }
 
 
