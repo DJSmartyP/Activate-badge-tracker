@@ -5914,8 +5914,8 @@ h3,
   --page-accent-rgb:255,79,179;
 }
 .page-bar[data-page="levels"]{
-  --page-accent:#4676ff;          /* royal blue */
-  --page-accent-rgb:70,118,255;
+  --page-accent:#3157FF;          /* royal blue */
+  --page-accent-rgb:49,87,255;
 }
 .page-bar[data-page="competitive"]{
   --page-accent:#ff5a3d;          /* hot orange-red */
@@ -6685,5 +6685,54 @@ h3,
         rgba(5,7,15,.985) 100%
       ),
       #070912 !important;
+  }
+}
+
+
+/* =========================================================
+   v13.50 — DEEPER LEVELS COBALT + LARGER HEADER ICON ARTWORK
+   ========================================================= */
+
+.page-bar[data-page="levels"]{
+  --page-accent:#3157FF !important;
+  --page-accent-rgb:49,87,255 !important;
+}
+
+/*
+  Increase visible artwork size without increasing page-bar height.
+  Existing icon outer dimensions remain unchanged; padding is reduced.
+*/
+.page-bar .page-header-icon{
+  padding:2px !important;
+  object-fit:contain !important;
+}
+
+@media (max-width:430px){
+  .page-bar .page-header-icon{
+    width:44px !important;
+    min-width:44px !important;
+    height:44px !important;
+    flex-basis:44px !important;
+    padding:1px !important;
+  }
+}
+
+@media (min-width:700px){
+  .page-bar .page-header-icon{
+    width:48px !important;
+    min-width:48px !important;
+    height:48px !important;
+    flex-basis:48px !important;
+    padding:2px !important;
+  }
+}
+
+@media (orientation:landscape) and (max-height:760px){
+  .page-bar .page-header-icon{
+    width:43px !important;
+    min-width:43px !important;
+    height:43px !important;
+    flex-basis:43px !important;
+    padding:1px !important;
   }
 }

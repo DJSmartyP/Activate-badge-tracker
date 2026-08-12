@@ -1,0 +1,21 @@
+ACTIVATE TRACKER v13.50 — COBALT LEVELS + LARGER HEADER ICONS
+
+CHANGES
+- Levels accent changed to deeper cobalt #3157FF.
+- Levels SVG artwork updated to the same cobalt.
+- Page header icons appear larger without increasing header height.
+- This is achieved by reducing internal icon padding, not enlarging the page bar.
+- Fold cover, inner display and compact landscape remain separately tuned.
+
+RETAINED
+- Home cyan #43E7FF
+- Badges pink #FF4FB3
+- Competitive orange-red #FF5A3D with VS icon
+- Locations ultraviolet #9B62FF
+- Stats emerald #35E690 with circular analytics icon
+- Settings amber #FFC84A
+- Deep page-colour header fascias
+- Crisp semantic SVG icon family
+- Page-colour title halo
+
+UPLOAD EVERYTHING IN THIS ZIP TO THE GITHUB ROOT.
