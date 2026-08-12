@@ -7030,3 +7030,18 @@ h3,
     ) !important;
   }
 }
+
+
+/* =========================================================
+   v13.56 — BADGES GREEN / STATS PINK PAGE IDENTITY
+   ========================================================= */
+
+.page-bar[data-page="badges"]{
+  --page-accent:#35E690 !important;
+  --page-accent-rgb:53,230,144 !important;
+}
+
+.page-bar[data-page="stats"]{
+  --page-accent:#FF4FB3 !important;
+  --page-accent-rgb:255,79,179 !important;
+}
