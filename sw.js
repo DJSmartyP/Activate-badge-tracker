@@ -1,6 +1,10 @@
-const CACHE='activate-tracker-v13-77-0';
+const CACHE='activate-tracker-v13-79-0';
 const ASSETS=[
-  './','index.html','style.css','app.js','badges.json','rooms.json','manifest.webmanifest',
+  './',
+  'index.html',
+  'style.css?v=1379',
+  'app.js?v=1379',
+  'badges.json','rooms.json','manifest.webmanifest',
   'icon-192.png?v=131','icon-512.png?v=131','icon-maskable-512.png?v=131','favicon-64.png?v=131',
   'icons/home.svg','icons/badges.svg','icons/levels.svg','icons/competitive.svg','icons/locations.svg','icons/stats.svg','icons/settings.svg','icons/menu.svg','icons/more.svg','icons/backup.svg','icons/restore.svg',
   'icons/header/home.svg','icons/header/badges.svg','icons/header/levels.svg','icons/header/competitive.svg','icons/header/locations.svg','icons/header/stats.svg','icons/header/settings.svg','icons/header/menu.svg'
@@ -27,7 +31,7 @@ self.addEventListener('fetch', event => {
     // Network-first so replacing an image in GitHub is visible immediately.
     event.respondWith((async () => {
       try {
-        const fresh = await fetch(event.request, {cache:'no-store'});
+        const fresh = await fetch(event.request,{cache:'no-store'});
         const cache = await caches.open(CACHE);
         cache.put(event.request, fresh.clone());
         return fresh;
@@ -41,7 +45,7 @@ self.addEventListener('fetch', event => {
   // App shell: network first, cached fallback.
   event.respondWith((async () => {
     try {
-      const fresh = await fetch(event.request);
+      const fresh = await fetch(event.request,{cache:'no-store'});
       const cache = await caches.open(CACHE);
       cache.put(event.request, fresh.clone());
       return fresh;
