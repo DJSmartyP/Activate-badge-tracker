@@ -11460,3 +11460,145 @@ body{
     --activate-neon:#9B62FF;
   }
 }
+
+
+/* =========================================================
+   v13.88 — DUAL NEON NAMEPLATE PULSES
+   Thin permanent outline; thick energy belongs to the pulses.
+   ========================================================= */
+
+/* Keep the actual plate line restrained. */
+#brandBanner .brand-lockup{
+  border-width:1px !important;
+  border-color:rgba(255,255,255,.66) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.13),
+    inset 0 -1px 0 rgba(var(--player-brand-safe-rgb),.15),
+    0 0 0 1px rgba(255,255,255,.12),
+    0 0 8px rgba(var(--player-brand-safe-rgb),.12),
+    0 7px 18px rgba(0,0,0,.24) !important;
+}
+
+/*
+  Two broad energy pulses:
+  - electric blue/cyan
+  - neon pink/magenta
+  They sit roughly opposite one another and orbit together.
+  The bright cores are narrow enough to feel like pulses;
+  the drop-shadows create the thicker luminous bloom.
+*/
+#brandBanner .brand-lockup::before{
+  content:"" !important;
+  display:block !important;
+  position:absolute !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+
+  inset:-68% !important;
+
+  background:
+    conic-gradient(
+      from 0deg,
+
+      /* BLUE pulse */
+      transparent 0deg 20deg,
+      rgba(49,87,255,0) 20deg,
+      rgba(49,87,255,.25) 34deg,
+      #3157FF 46deg,
+      #43E7FF 58deg,
+      #B6FAFF 66deg,
+      #43E7FF 74deg,
+      rgba(49,87,255,.42) 88deg,
+      rgba(49,87,255,0) 104deg,
+
+      /* quiet gap */
+      transparent 104deg 198deg,
+
+      /* PINK pulse */
+      rgba(255,56,184,0) 198deg,
+      rgba(255,56,184,.28) 212deg,
+      #FF38B8 224deg,
+      #FF4FB3 236deg,
+      #FFD0F1 244deg,
+      #FF4FB3 252deg,
+      rgba(255,56,184,.46) 266deg,
+      rgba(255,56,184,0) 282deg,
+
+      /* quiet gap */
+      transparent 282deg 360deg
+    ) !important;
+
+  -webkit-mask:none !important;
+  mask:none !important;
+  border:0 !important;
+  clip-path:none !important;
+
+  /*
+    The pulse feels physically thicker because its glow blooms well
+    outside the 2px edge reveal, while the permanent border stays thin.
+  */
+  filter:
+    drop-shadow(0 0 7px rgba(67,231,255,1))
+    drop-shadow(0 0 14px rgba(49,87,255,.92))
+    drop-shadow(0 0 22px rgba(67,231,255,.58))
+    drop-shadow(0 0 7px rgba(255,56,184,1))
+    drop-shadow(0 0 14px rgba(255,79,179,.94))
+    drop-shadow(0 0 22px rgba(255,56,184,.56))
+    !important;
+
+  animation:dualNeonPlatePulseOrbit 6.2s linear infinite !important;
+}
+
+/* Mask the centre back out: the underlying line remains thin. */
+#brandBanner .brand-lockup::after{
+  content:"" !important;
+  display:block !important;
+  position:absolute !important;
+  z-index:1 !important;
+  pointer-events:none !important;
+
+  inset:2px !important;
+
+  clip-path:polygon(
+    calc(var(--plate-cut) - 2px) 0,
+    calc(100% - var(--plate-cut) + 2px) 0,
+    100% 50%,
+    calc(100% - var(--plate-cut) + 2px) 100%,
+    calc(var(--plate-cut) - 2px) 100%,
+    0 50%
+  ) !important;
+
+  border:0 !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(var(--player-brand-safe-rgb),.28),
+      rgba(var(--player-brand-rgb),.15)
+    ),
+    rgba(7,10,19,.93) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.07),
+    inset 0 -1px 0 rgba(var(--player-brand-safe-rgb),.08)
+    !important;
+}
+
+#brandBanner .player-brand-name,
+#brandBanner .brand-main{
+  position:relative !important;
+  z-index:4 !important;
+}
+
+@keyframes dualNeonPlatePulseOrbit{
+  from{ transform:rotate(0deg); }
+  to{ transform:rotate(360deg); }
+}
+
+@media (prefers-reduced-motion:reduce){
+  #brandBanner .brand-lockup::before{
+    animation:none !important;
+    transform:rotate(0deg) !important;
+  }
+}
