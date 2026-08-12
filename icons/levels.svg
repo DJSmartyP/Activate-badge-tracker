@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" fill="none">
+  <defs>
+    <linearGradient id="neonGrad" x1="24" y1="24" x2="232" y2="232" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff4fd8"/>
+      <stop offset="48%" stop-color="#9a6dff"/>
+      <stop offset="100%" stop-color="#43d7ff"/>
+    </linearGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="4.2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <style>
+      .st {
+        stroke:url(#neonGrad);
+        stroke-width:12;
+        stroke-linecap:round;
+        stroke-linejoin:round;
+        filter:url(#glow);
+      }
+      .st2 {
+        stroke:#dffbff;
+        stroke-opacity:.42;
+        stroke-width:4;
+        stroke-linecap:round;
+        stroke-linejoin:round;
+      }
+      .fillg {
+        fill:url(#neonGrad);
+        filter:url(#glow);
+      }
+      .txt {
+        fill:url(#neonGrad);
+        filter:url(#glow);
+        font-family:Arial,Helvetica,sans-serif;
+        font-weight:900;
+      }
+    </style>
+  </defs>
+  
+<path class="st" d="M42 184h46v-44h46v-44h46V52h34"/>
+<path class="st2" d="M42 204h172"/>
+<circle class="fillg" cx="65" cy="162" r="7"/>
+<circle class="fillg" cx="111" cy="118" r="7"/>
+<circle class="fillg" cx="157" cy="74" r="7"/>
+<path class="st2" d="M191 52h23v23"/>
+
+</svg>

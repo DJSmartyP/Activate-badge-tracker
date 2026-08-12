@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" fill="none">
+  <defs>
+    <linearGradient id="neonGrad" x1="24" y1="24" x2="232" y2="232" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff4fd8"/>
+      <stop offset="48%" stop-color="#9a6dff"/>
+      <stop offset="100%" stop-color="#43d7ff"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur1"/>
+      <feColorMatrix in="blur1" type="matrix" values="
+        1 0 0 0 0
+        0 1 0 0 0
+        0 0 1 0 0
+        0 0 0 0.9 0" result="blur2"/>
+      <feMerge>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <style>
+      .st {
+        stroke: url(#neonGrad);
+        stroke-width: 12;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        filter: url(#glow);
+      }
+      .st2 {
+        stroke: #dffbff;
+        stroke-opacity: .38;
+        stroke-width: 4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .fillg {
+        fill: url(#neonGrad);
+        filter: url(#glow);
+      }
+      .soft {
+        fill: #dffbff;
+        fill-opacity: .15;
+      }
+    </style>
+  </defs>
+  
+<circle class="st2" cx="128" cy="128" r="72"/>
+<circle class="fillg" cx="96" cy="128" r="10"/>
+<circle class="fillg" cx="128" cy="128" r="10"/>
+<circle class="fillg" cx="160" cy="128" r="10"/>
+
+</svg>
