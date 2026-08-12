@@ -7397,3 +7397,178 @@ h3,
     font-size:25px !important;
   }
 }
+
+
+/* =========================================================
+   v13.61 — PLAYER NAME IS PART OF THE MAIN TITLE
+   One shared font size for:
+   PLAYER'S | ACTIVATE TRACKER
+   ========================================================= */
+
+.brand-lockup{
+  --brand-row-size:clamp(29px,4vw,46px);
+  max-width:92% !important;
+  column-gap:13px !important;
+}
+
+/* Put the player identity on the SAME title row, rather than spanning
+   the title + kicker rows. */
+.player-brand-name,
+.brand-banner-final .player-brand-name{
+  grid-column:1 !important;
+  grid-row:1 !important;
+  align-self:end !important;
+  justify-self:end !important;
+
+  max-width:min(38vw,360px) !important;
+  padding:0 15px 0 0 !important;
+
+  font-size:var(--brand-row-size) !important;
+  line-height:.88 !important;
+  letter-spacing:.025em !important;
+}
+
+/* ACTIVATE and TRACKER now deliberately share exactly the same size
+   as the personalised player name. */
+.brand-activate,
+.brand-tracker{
+  font-size:var(--brand-row-size) !important;
+}
+
+/* Keep all three pieces sitting on the same visual baseline. */
+.brand-banner-final .brand-main{
+  align-items:baseline !important;
+  line-height:.88 !important;
+}
+
+/* Divider now follows the height of the larger player title. */
+.player-brand-name::after{
+  top:0 !important;
+  bottom:0 !important;
+}
+
+@media (max-width:820px){
+  .brand-lockup{
+    --brand-row-size:clamp(24px,5.2vw,35px);
+    max-width:95% !important;
+    column-gap:9px !important;
+  }
+
+  .player-brand-name,
+  .brand-banner-final .player-brand-name{
+    max-width:34vw !important;
+    padding-right:10px !important;
+    font-size:var(--brand-row-size) !important;
+  }
+
+  .brand-activate,
+  .brand-tracker{
+    font-size:var(--brand-row-size) !important;
+  }
+}
+
+@media (max-width:520px){
+  .brand-lockup{
+    --brand-row-size:clamp(18px,5.7vw,25px);
+    max-width:97% !important;
+    column-gap:7px !important;
+  }
+
+  .player-brand-name,
+  .brand-banner-final .player-brand-name{
+    max-width:32vw !important;
+    padding-right:8px !important;
+    font-size:var(--brand-row-size) !important;
+  }
+
+  .brand-activate,
+  .brand-tracker{
+    font-size:var(--brand-row-size) !important;
+  }
+}
+
+@media (orientation:landscape) and (max-height:760px){
+  .brand-lockup{
+    --brand-row-size:27px;
+    max-width:88% !important;
+  }
+
+  .player-brand-name,
+  .brand-banner-final .player-brand-name,
+  .brand-activate,
+  .brand-tracker{
+    font-size:var(--brand-row-size) !important;
+  }
+}
+
+@media (min-width:1100px) and (orientation:landscape){
+  .brand-lockup{
+    --brand-row-size:42px;
+    max-width:80% !important;
+  }
+
+  .player-brand-name,
+  .brand-banner-final .player-brand-name{
+    max-width:380px !important;
+    font-size:var(--brand-row-size) !important;
+  }
+
+  .brand-activate,
+  .brand-tracker{
+    font-size:var(--brand-row-size) !important;
+  }
+}
+
+
+/* =========================================================
+   v13.62 — NATURAL PERSONALISED BRAND LINE
+   PLAYER'S ACTIVATE TRACKER reads as one continuous title.
+   ========================================================= */
+
+.brand-lockup{
+  column-gap:.42em !important;
+}
+
+/* Player name is now plain title text — no divider, no tag treatment. */
+.player-brand-name,
+.brand-banner-final .player-brand-name{
+  padding:0 !important;
+  margin:0 !important;
+  border:0 !important;
+  background:none !important;
+  box-shadow:none !important;
+}
+
+/* Remove the illuminated separator entirely. */
+.player-brand-name::after,
+.brand-banner-final .player-brand-name::after{
+  content:none !important;
+  display:none !important;
+}
+
+/* Keep the player name and ACTIVATE visually joined like normal words. */
+.player-brand-name{
+  justify-self:end !important;
+}
+
+@media (max-width:820px){
+  .brand-lockup{
+    column-gap:.34em !important;
+  }
+  .player-brand-name,
+  .brand-banner-final .player-brand-name{
+    padding:0 !important;
+  }
+}
+
+@media (max-width:520px){
+  .brand-lockup{
+    column-gap:.28em !important;
+  }
+}
+
+@media (orientation:landscape) and (max-height:760px){
+  .brand-lockup{
+    column-gap:.34em !important;
+  }
+}
