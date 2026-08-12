@@ -1,0 +1,34 @@
+ACTIVATE TRACKER v13.26 — FINAL HEADER + VENUE HIGH SCORES
+
+FINAL HEADER FIX
+- Removed the legacy nested sticky offsets that created the large blank gap.
+- The app-header shell is now the ONLY sticky header container.
+- Logo placeholder and title bar sit directly together as one contiguous header.
+- Home/other content starts immediately below the title bar.
+- Narrow portrait and landscape have explicit compact sizing.
+- Keeps Tilt Neon + colour-matched neon heading treatment.
+
+VENUE HIGH SCORES
+- Levels filter now includes: Venue high scores.
+- Shows only co-op levels where:
+    your score > 0
+    venue high score > 0
+    your score === venue high score
+- Competitive games are excluded from this filter because they do not use level high-score data.
+- Levels summary always shows how many venue high scores you currently hold at the active Location.
+- In Venue high scores mode, summary becomes e.g.:
+    4 venue high scores • Watford
+
+RETAINED
+- Metallic trophy styling
+- Strong achieved/high-score effects
+- Context-aware Focus navigation
+- Pin control hard fix
+- Focus responsive text
+- Landscape scrolling fix
+
+UPLOAD TO GITHUB ROOT:
+index.html
+app.js
+style.css
+sw.js

@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.24.0';
+const VERSION='13.26.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -832,7 +832,7 @@ function renderLevels(){
   document.querySelectorAll('[data-levels-mode]').forEach(b=>b.classList.toggle('active',b.dataset.levelsMode===levelsDisplayMode));
 
   const visibleRooms=rooms.filter(r=>!selectedRoom||r===selectedRoom);
-  let totalGames=0,playedGames=0,totalLevels=0,completeLevels=0;
+  let totalGames=0,playedGames=0,totalLevels=0,completeLevels=0,venueHighScores=0;
 
   const roomHtml=visibleRooms.map(room=>{
     const roomEntries=entries.filter(x=>x.room===room);
@@ -865,13 +865,17 @@ function renderLevels(){
       for(let level=1;level<=10;level++){
         const info=g.levels?.[level]||g.levels?.[String(level)]||{};
         const done=!!info.complete;
-        totalLevels++; if(done)completeLevels++;
-        if(levelMode==='complete'&&!done)continue;
-        if(levelMode==='incomplete'&&done)continue;
-
         const score=Number(info.score)||0;
         const topScore=Number(info.topScore)||0;
         const isHighScore=score>0 && topScore>0 && score===topScore;
+
+        totalLevels++;
+        if(done)completeLevels++;
+        if(isHighScore)venueHighScores++;
+
+        if(levelMode==='complete'&&!done)continue;
+        if(levelMode==='incomplete'&&done)continue;
+        if(levelMode==='highscore'&&!isHighScore)continue;
 
         const scoreBits=[];
         if(score>0)scoreBits.push(`Score ${score}`);
@@ -914,6 +918,7 @@ function renderLevels(){
         if(gameMode==='played'&&!played)return;
         if(gameMode==='unplayed'&&played)return;
       }else{
+        if(levelMode==='highscore')return;
         if(levelMode==='complete'&&!played)return;
         if(levelMode==='incomplete'&&played)return;
         totalLevels++; if(played)completeLevels++;
@@ -947,8 +952,10 @@ function renderLevels(){
 
   if(levelsDisplayMode==='games'){
     $('levelsSummary').textContent=`${playedGames}/${totalGames} games played • ${esc(activeLocation().name)}`;
+  }else if(levelMode==='highscore'){
+    $('levelsSummary').textContent=`${venueHighScores} venue high score${venueHighScores===1?'':'s'} • ${esc(activeLocation().name)}`;
   }else{
-    $('levelsSummary').textContent=`${completeLevels}/${totalLevels} complete • ${esc(activeLocation().name)}`;
+    $('levelsSummary').textContent=`${completeLevels}/${totalLevels} complete • ${venueHighScores} venue high score${venueHighScores===1?'':'s'} • ${esc(activeLocation().name)}`;
   }
 
   $('levelsImportInfo').textContent=progress.importedAt

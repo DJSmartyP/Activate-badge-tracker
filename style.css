@@ -3215,3 +3215,301 @@ p,
     display:none;
   }
 }
+
+/* =========================================================
+   v13.25 — Tilt Neon for all display headings
+   Every heading glows in its own current text colour.
+   ========================================================= */
+:root{
+  --font-display:"Tilt Neon","Bruno Ace SC","Segoe UI",system-ui,sans-serif;
+  --font-page-title:"Tilt Neon","Bruno Ace SC","Segoe UI",system-ui,sans-serif;
+}
+
+/* All major titles/headings use Tilt Neon. */
+h1,
+h2,
+h3,
+.page-bar-copy h1,
+#pageHeaderTitle,
+.section-title h2,
+.room-title-row h3,
+.room-game-head strong,
+.side-drawer-head strong,
+.brand-banner-placeholder .brand-wordmark > strong,
+#focusOverlayBody .focus-title,
+.trophy-current-name,
+.trophy h3,
+.big{
+  font-family:var(--font-display) !important;
+  font-weight:400 !important;
+}
+
+/* Universal neon treatment:
+   use currentColor so the glow always matches the heading colour. */
+h1,
+h2,
+h3,
+.page-bar-copy h1,
+#pageHeaderTitle,
+.section-title h2,
+.room-title-row h3,
+.room-game-head strong,
+.side-drawer-head strong,
+.brand-banner-placeholder .brand-wordmark > strong,
+#focusOverlayBody .focus-title,
+.trophy h3{
+  text-shadow:
+    0 0 2px currentColor,
+    0 0 6px currentColor,
+    0 0 12px currentColor !important;
+}
+
+/* Page title keeps a slightly cleaner, controlled glow while still neon. */
+.page-bar-copy h1,
+#pageHeaderTitle{
+  text-shadow:
+    0 0 2px currentColor,
+    0 0 7px currentColor,
+    0 0 14px rgba(90,220,255,.38),
+    0 0 20px rgba(255,67,192,.14) !important;
+}
+
+/* Focus titles get enough glow to read dramatically without blurring. */
+#focusOverlayBody .focus-title{
+  text-shadow:
+    0 0 2px currentColor,
+    0 0 7px currentColor,
+    0 0 13px currentColor !important;
+}
+
+/* Metallic trophy names are gradient-clipped text, so currentColor is
+   transparent. Preserve their metal-specific glow with drop-shadow. */
+.trophy-current-name{
+  text-shadow:none !important;
+  font-family:var(--font-display) !important;
+}
+.trophy-current-name.trophy-bronze{
+  filter:
+    drop-shadow(0 0 3px rgba(222,126,66,.82))
+    drop-shadow(0 0 10px rgba(205,111,49,.42)) !important;
+}
+.trophy-current-name.trophy-silver{
+  filter:
+    drop-shadow(0 0 3px rgba(235,245,255,.82))
+    drop-shadow(0 0 10px rgba(210,228,245,.42)) !important;
+}
+.trophy-current-name.trophy-gold{
+  filter:
+    drop-shadow(0 0 3px rgba(255,224,104,.88))
+    drop-shadow(0 0 11px rgba(255,199,43,.52)) !important;
+}
+.trophy-current-name.trophy-platinum{
+  filter:
+    drop-shadow(0 0 3px rgba(225,251,255,.92))
+    drop-shadow(0 0 10px rgba(131,225,255,.46))
+    drop-shadow(0 0 16px rgba(185,150,255,.22)) !important;
+}
+
+/* Trophy-card headings keep their metal colour and glow in that same colour. */
+.trophy.trophy-bronze h3{
+  text-shadow:
+    0 0 2px #d07b3e,
+    0 0 7px #d07b3e,
+    0 0 13px rgba(208,123,62,.48) !important;
+}
+.trophy.trophy-silver h3{
+  text-shadow:
+    0 0 2px #d7e2ec,
+    0 0 7px #d7e2ec,
+    0 0 13px rgba(215,226,236,.44) !important;
+}
+.trophy.trophy-gold h3{
+  text-shadow:
+    0 0 2px #ffd24a,
+    0 0 8px #ffd24a,
+    0 0 15px rgba(255,210,74,.52) !important;
+}
+.trophy.trophy-platinum h3{
+  text-shadow:
+    0 0 2px #c4f4ff,
+    0 0 8px #c4f4ff,
+    0 0 14px rgba(132,226,255,.52),
+    0 0 20px rgba(184,145,255,.18) !important;
+}
+
+/* Keep general body/UI text in Bruno Ace SC. */
+body,
+button,
+input,
+select,
+textarea,
+p,
+li,
+dd,
+dt,
+.label,
+.sub,
+.page-header-subtitle,
+.level-chip,
+.status-tag,
+.mode-tag,
+.tag,
+.field,
+.btn,
+.mini{
+  font-family:var(--font-body) !important;
+}
+
+/* Narrow screens: reduce glow radius slightly to keep smaller headings crisp. */
+@media (max-width:430px){
+  h1,
+  h2,
+  h3,
+  .section-title h2,
+  .room-title-row h3,
+  .room-game-head strong,
+  #focusOverlayBody .focus-title{
+    text-shadow:
+      0 0 2px currentColor,
+      0 0 5px currentColor,
+      0 0 9px currentColor !important;
+  }
+}
+
+/* Reduced motion doesn't affect neon; glow remains static. */
+
+/* =========================================================
+   v13.26 — FINAL header structure
+   One sticky shell; children never apply their own sticky offsets.
+   ========================================================= */
+.app-header-shell{
+  position:sticky !important;
+  top:0 !important;
+  z-index:120 !important;
+  flex:0 0 auto !important;
+  width:100%;
+  background:#070912;
+}
+
+/* Remove legacy nested-sticky behavior that caused the giant blank gap. */
+.app-header-shell .brand-banner-wrap,
+.app-header-shell .page-bar,
+.app-header-shell .page-header,
+.app-header-shell .header-bar{
+  position:relative !important;
+  top:auto !important;
+  inset:auto !important;
+}
+
+/* Temporary logo placeholder stays compact until final artwork arrives. */
+.app-header-shell .brand-banner-wrap{
+  z-index:2 !important;
+  padding:
+    max(7px,env(safe-area-inset-top))
+    max(12px,env(safe-area-inset-right))
+    5px
+    max(12px,env(safe-area-inset-left)) !important;
+}
+
+.app-header-shell .brand-wordmark{
+  height:clamp(50px,6vw,64px) !important;
+  min-height:50px !important;
+}
+
+/* Finalised title bar: compact, aligned, no content overlap. */
+.app-header-shell .page-bar{
+  z-index:3 !important;
+  min-height:74px !important;
+  margin:0 !important;
+  padding:
+    8px
+    max(14px,env(safe-area-inset-right))
+    8px
+    max(14px,env(safe-area-inset-left)) !important;
+  display:grid !important;
+  grid-template-columns:54px minmax(0,1fr) !important;
+  gap:12px !important;
+  align-items:center !important;
+}
+
+.app-header-shell + .view,
+.app-header-shell ~ .view{
+  margin-top:0 !important;
+}
+
+/* Active content starts immediately below the header and owns scrolling. */
+.view.active{
+  scroll-padding-top:0 !important;
+}
+
+/* Keep page title clean and consistently neon. */
+#pageHeaderTitle{
+  font-family:var(--font-display) !important;
+  font-size:clamp(28px,4vw,38px) !important;
+  font-weight:400 !important;
+  text-transform:none !important;
+  letter-spacing:.02em !important;
+  color:#f7fbff !important;
+  text-shadow:
+    0 0 2px currentColor,
+    0 0 7px currentColor,
+    0 0 14px rgba(0,229,255,.36),
+    0 0 18px rgba(255,56,189,.14) !important;
+}
+
+.page-header-subtitle{
+  margin-top:4px !important;
+  line-height:1.1 !important;
+}
+
+/* Fold front / narrow portrait */
+@media (max-width:430px){
+  .app-header-shell .brand-banner-wrap{
+    padding-left:max(8px,env(safe-area-inset-left)) !important;
+    padding-right:max(8px,env(safe-area-inset-right)) !important;
+  }
+
+  .app-header-shell .brand-wordmark{
+    height:54px !important;
+  }
+
+  .app-header-shell .page-bar{
+    min-height:70px !important;
+    grid-template-columns:50px minmax(0,1fr) !important;
+    gap:9px !important;
+    padding-left:max(9px,env(safe-area-inset-left)) !important;
+    padding-right:max(9px,env(safe-area-inset-right)) !important;
+  }
+
+  #pageHeaderTitle{
+    font-size:32px !important;
+  }
+}
+
+/* Landscape: compact header, still one contiguous block. */
+@media (orientation:landscape) and (max-height:760px){
+  .app-header-shell .brand-banner-wrap{
+    padding-top:max(4px,env(safe-area-inset-top)) !important;
+    padding-bottom:3px !important;
+  }
+
+  .app-header-shell .brand-wordmark{
+    height:48px !important;
+    min-height:48px !important;
+  }
+
+  .app-header-shell .page-bar{
+    min-height:60px !important;
+    padding-top:5px !important;
+    padding-bottom:5px !important;
+  }
+
+  #pageHeaderTitle{
+    font-size:30px !important;
+  }
+}
+
+/* Venue-high-score filter cue */
+#levelsView option[value="highscore"]{
+  font-weight:700;
+}
