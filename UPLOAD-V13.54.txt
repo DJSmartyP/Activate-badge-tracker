@@ -1,0 +1,26 @@
+ACTIVATE TRACKER v13.54 — SPECIFIC REQUIREMENT “ADD PART” FIX
+
+FIXED
+- Settings > Content Manager > Badges > Specific rooms / games.
+- “+ Add part” now immediately adds a visible blank requirement row.
+- Existing filled and partially-filled rows are preserved when another part is added.
+- Removing a part correctly renumbers the remaining rows.
+- Blank editor rows are allowed while editing, but blank requirements are still excluded when Save is pressed.
+
+CAUSE
+- v13.53 reused the persisted-catalogue normalizer for the live editor.
+- That normalizer intentionally removes empty requirements, so the newly-created blank row disappeared immediately.
+
+RETAINED
+- 117 verified badges.
+- Trophies separate from badges.
+- Global badge achievements.
+- Earned-under-earlier-terms snapshots.
+- Any Room / Specific / Multipart model.
+- Marathon fixed three-part requirement.
+- Riddle 7 Any Room.
+- Bronze/Silver/Gold persistent; Platinum dynamic.
+- Full self-contained GitHub Pages package.
+
+UPLOAD
+Upload EVERYTHING inside this ZIP to the GitHub repository root and overwrite existing files.

@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.53.0';
+const VERSION='13.54.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -1266,8 +1266,19 @@ function setContentModalOpen(open){
 }
 
 
+function editorRequirementParts(parts){
+  // Editor rows must preserve blank parts while the user is filling them in.
+  // The persisted catalogue still strips blank requirements on Save.
+  return (Array.isArray(parts)?parts:[]).map(p=>({
+    rooms:[...new Set((Array.isArray(p?.rooms)?p.rooms:splitRequirementNames(p?.room)).map(normaliseContentName).filter(Boolean))],
+    games:[...new Set((Array.isArray(p?.games)?p.games:splitRequirementNames(p?.game)).map(normaliseContentName).filter(Boolean))],
+    level:p?.level?Math.max(1,Math.min(99,Number(p.level)||1)):null
+  }));
+}
+
 function renderBadgePartRows(parts){
-  return normaliseRequirementParts(parts).map((p,i)=>`
+  const rows=editorRequirementParts(parts);
+  return rows.map((p,i)=>`
     <div class="content-badge-part" data-badge-part>
       <div class="content-badge-part-head">
         <strong>Part ${i+1}</strong>
@@ -1290,12 +1301,13 @@ function renderBadgePartRows(parts){
     </div>`).join('');
 }
 
-function collectBadgeRequirementParts(){
-  return [...document.querySelectorAll('#contentBadgeParts [data-badge-part]')].map(row=>({
+function collectBadgeRequirementParts(keepBlank=false){
+  const parts=[...document.querySelectorAll('#contentBadgeParts [data-badge-part]')].map(row=>({
     rooms:splitRequirementNames(row.querySelector('[data-badge-part-rooms]')?.value||''),
     games:splitRequirementNames(row.querySelector('[data-badge-part-games]')?.value||''),
     level:row.querySelector('[data-badge-part-level]')?.value||null
-  })).filter(p=>p.rooms.length||p.games.length);
+  }));
+  return keepBlank?parts:parts.filter(p=>p.rooms.length||p.games.length);
 }
 
 function openContentEditor(type,id=null){
@@ -2436,7 +2448,7 @@ function bindEvents(){
     if(e.target.closest('[data-add-badge-part]')){
       const wrap=$('contentBadgeParts');
       if(wrap){
-        const parts=collectBadgeRequirementParts();
+        const parts=collectBadgeRequirementParts(true);
         parts.push({rooms:[],games:[],level:null});
         wrap.innerHTML=renderBadgePartRows(parts);
       }
@@ -2450,7 +2462,7 @@ function bindEvents(){
       if(wrap&&!wrap.querySelector('[data-badge-part]')){
         wrap.innerHTML=renderBadgePartRows([{rooms:[],games:[],level:null}]);
       }else if(wrap){
-        const parts=collectBadgeRequirementParts();
+        const parts=collectBadgeRequirementParts(true);
         wrap.innerHTML=renderBadgePartRows(parts);
       }
       return;
