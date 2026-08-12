@@ -1,0 +1,25 @@
+ACTIVATE TRACKER v13.43 — PAGE-MATCHED ICON GLOW
+
+CHANGE
+- Header icon glow now clearly matches each page's unique accent colour.
+- Icon dock border, internal glow and corner lights inherit page colour.
+- Hamburger glow inherits the same page colour.
+- SVG icon artwork itself is preserved; only its halo changes.
+- Mobile glow is slightly tighter to stay crisp on the Fold cover screen.
+
+PAGE COLOURS RETAINED
+- Home — Electric cyan
+- Badges — Neon pink
+- Levels — Royal blue
+- Competitive — Hot orange-red
+- Locations — Ultraviolet
+- Stats — Emerald green
+- Settings — Amber gold
+
+BASE
+- Built directly from v13.42.
+- Working SVG icon folder retained.
+- Existing page accent system retained.
+- No feature removals.
+
+UPLOAD EVERYTHING IN THIS ZIP TO GITHUB ROOT.
