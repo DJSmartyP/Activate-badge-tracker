@@ -10480,3 +10480,139 @@ body{
     min-height:50px !important;
   }
 }
+
+
+/* =========================================================
+   v13.81 — CALMER TROPHY SHIMMER + ACTIVATE EDGE ENERGY
+   ========================================================= */
+
+/* Slow the trophy-name metallic movement considerably. */
+.trophy-current-name{
+  animation-duration:7.6s !important;
+  animation-timing-function:ease-in-out !important;
+}
+
+/* One extra natural word-space between PLAYER'S and ACTIVATE only.
+   ACTIVATE -> TRACKER retains its existing internal spacing. */
+#brandBanner .brand-lockup{
+  gap:.52em !important;
+}
+#brandBanner .brand-main{
+  gap:.28em !important;
+}
+
+/* Allow the plate pseudo-element to draw an animated edge cleanly. */
+#brandBanner .brand-lockup{
+  position:relative !important;
+  overflow:visible !important;
+  isolation:isolate !important;
+}
+
+/*
+  Activate-themed travelling edge:
+  cyan -> white -> pink -> violet moving around the shaped plate.
+  The mask leaves only a thin animated border, so the player's chosen
+  plate colour remains the dominant fill.
+*/
+#brandBanner .brand-lockup::before{
+  content:"" !important;
+  display:block !important;
+  position:absolute !important;
+  z-index:3 !important;
+  pointer-events:none !important;
+
+  inset:-2px !important;
+  padding:2px !important;
+
+  clip-path:polygon(
+    var(--plate-cut) 0,
+    calc(100% - var(--plate-cut)) 0,
+    100% 50%,
+    calc(100% - var(--plate-cut)) 100%,
+    var(--plate-cut) 100%,
+    0 50%
+  ) !important;
+
+  background:
+    conic-gradient(
+      from 0deg,
+      transparent 0deg 35deg,
+      #43E7FF 55deg,
+      rgba(255,255,255,.98) 82deg,
+      #FF4FB3 112deg,
+      #9B62FF 145deg,
+      transparent 175deg 250deg,
+      rgba(67,231,255,.10) 285deg,
+      transparent 320deg 360deg
+    ) !important;
+
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0) !important;
+  -webkit-mask-composite:xor !important;
+  mask-composite:exclude !important;
+
+  filter:
+    drop-shadow(0 0 3px rgba(67,231,255,.58))
+    drop-shadow(0 0 5px rgba(255,79,179,.38)) !important;
+
+  animation:activatePlateOrbit 8.5s linear infinite !important;
+}
+
+/* A very faint secondary aura follows the orbit without adding clutter. */
+#brandBanner .brand-lockup::after{
+  content:"" !important;
+  display:block !important;
+  position:absolute !important;
+  z-index:-1 !important;
+  pointer-events:none !important;
+
+  inset:-5px !important;
+
+  clip-path:polygon(
+    var(--plate-cut) 0,
+    calc(100% - var(--plate-cut)) 0,
+    100% 50%,
+    calc(100% - var(--plate-cut)) 100%,
+    var(--plate-cut) 100%,
+    0 50%
+  ) !important;
+
+  border:1px solid rgba(255,255,255,.10) !important;
+  background:transparent !important;
+
+  box-shadow:
+    0 0 12px rgba(67,231,255,.08),
+    0 0 18px rgba(255,79,179,.06) !important;
+}
+
+@keyframes activatePlateOrbit{
+  to{ transform:rotate(360deg); }
+}
+
+/* Keep the slightly wider PLAYER'S -> ACTIVATE gap proportionate on phones. */
+@media (max-width:820px){
+  #brandBanner .brand-lockup{
+    gap:.46em !important;
+  }
+  #brandBanner .brand-main{
+    gap:.24em !important;
+  }
+}
+
+@media (max-width:520px){
+  #brandBanner .brand-lockup{
+    gap:.40em !important;
+  }
+  #brandBanner .brand-main{
+    gap:.20em !important;
+  }
+}
+
+/* Honour motion accessibility preferences. */
+@media (prefers-reduced-motion:reduce){
+  .trophy-current-name,
+  #brandBanner .brand-lockup::before{
+    animation:none !important;
+  }
+}
