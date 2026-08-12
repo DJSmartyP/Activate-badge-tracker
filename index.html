@@ -36,9 +36,7 @@
   </nav>
 </aside>
 
-  <div id="splash" class="launch-splash" aria-label="Activate Tracker loading"></div>
   <div id="toast" class="toast" aria-live="polite"></div>
-</div>
 <main class="app">
 <header class="app-header-shell">
 
@@ -120,7 +118,7 @@
     
 <section id="badges" class="view">
   <div class="toolbar">
-    <input id="badgeSearch" class="field" type="search" placeholder="Search targets, rooms or games">
+    <input id="badgeSearch" class="field" type="search" placeholder="Search badges, rooms or games">
 <select id="targetRoom" class="field">
       <option value="">All rooms</option>
     </select>
@@ -157,6 +155,7 @@
     <div>
       <div class="row between"><h2>Locations</h2><button class="btn primary" id="addLocation">+ Add</button></div>
       <div id="selectedVenueBanner" class="selected-venue-banner"></div>
+      <div id="locationCatalogReview"></div>
       <div id="locationList" class="stack"></div>
     </div>
     <div class="card">
@@ -247,9 +246,35 @@
 <div class="settings-import-block">
 <div class="card"><h3>Import game progress</h3><p class="sub">Import a CSV export from <strong>Activate-scores.ca</strong>. The file is processed locally on this device and updates co-op levels, scores and competitive Played / Not played status.</p><div class="row wrap"><label class="btn primary">Import Activate-scores.ca CSV<input id="importScoresCsv" type="file" accept=".csv,text/csv" hidden></label><button id="clearLevelProgress" class="btn danger">Clear imported progress</button></div><div id="levelsImportInfo" class="sub top-gap"></div></div>
 </div>
+
+<div class="card top-gap content-manager-card">
+  <div class="row between content-manager-title-row">
+    <div>
+      <div class="label">Master catalogue</div>
+      <h2>Manage Rooms, Games &amp; Badges</h2>
+    </div>
+    <span id="contentManagerCount" class="pill"></span>
+  </div>
+  <p class="sub">Edit the master catalogue without rebuilding the app. Badge achievements are global across Locations. Requirement edits never revoke an earned badge, and archived items keep historical progress.</p>
+
+  <div class="segmented content-manager-tabs" role="group" aria-label="Content type">
+    <button type="button" class="seg-btn active" data-content-tab="rooms">Rooms</button>
+    <button type="button" class="seg-btn" data-content-tab="games">Games</button>
+    <button type="button" class="seg-btn" data-content-tab="badges">Badges</button>
+  </div>
+
+  <div class="content-manager-controls top-gap">
+    <input id="contentSearch" class="field" type="search" placeholder="Search catalogue">
+    <label class="content-show-archived"><input id="contentShowArchived" type="checkbox"> Show archived</label>
+    <button id="contentAddBtn" class="btn primary" type="button">+ Add room</button>
+  </div>
+
+  <div id="contentManagerList" class="content-manager-list top-gap"></div>
+</div>
+
 <div class="card">
         <h2>Settings</h2>
-        <p class="sub">Version <strong>13.50.0</strong> — clean rebuild.</p>
+        <p class="sub">Version <strong>13.53.0</strong> — clean rebuild.</p>
         <div class="row wrap">
           <button class="btn primary icon-label-btn" id="exportBackup"><img src="icons/backup.svg" alt="">Backup app data</button>
           <label class="btn icon-label-btn"><img src="icons/restore.svg" alt="">Restore app data<input id="importBackup" type="file" accept="application/json" hidden></label>
@@ -262,6 +287,30 @@
       </div>
     </section>
   </main>
+
+<div id="contentEditorModal" class="modal" aria-hidden="true">
+  <div class="sheet content-editor-sheet">
+    <div class="row between">
+      <div>
+        <div class="label">Content manager</div>
+        <h2 id="contentEditorTitle">Edit item</h2>
+        <div id="contentEditorSubtitle" class="sub"></div>
+      </div>
+      <button id="closeContentEditor" class="iconbtn" type="button" aria-label="Close content editor">✕</button>
+    </div>
+
+    <div id="contentEditorBody" class="content-editor-body top-gap"></div>
+
+    <div class="content-editor-actions top-gap">
+      <button id="contentArchiveBtn" class="btn danger" type="button" hidden>Archive</button>
+      <div class="row wrap">
+        <button id="contentCancelBtn" class="btn ghost" type="button">Cancel</button>
+        <button id="contentSaveBtn" class="btn primary" type="button">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="badgeModal" class="modal">
     <div class="sheet">
       <div class="row between"><h2 id="modalTitle"></h2><button id="closeModal" class="iconbtn">✕</button></div>

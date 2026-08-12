@@ -1,0 +1,67 @@
+ACTIVATE TRACKER v13.51 — CONTENT MANAGER
+
+NEW: SETTINGS > MANAGE ROOMS, GAMES & BADGES
+
+ROOMS
+- Add rooms.
+- Rename rooms.
+- Archive / restore rooms.
+- Existing Location room selections and level-progress keys are migrated on rename.
+- Archived rooms retain historical progress.
+- New rooms are NOT automatically enabled at existing Locations.
+
+GAMES
+- Add games.
+- Rename games.
+- Move games between rooms.
+- Choose Co-op, Competitive, or both.
+- Configure Co-op level count (1–99).
+- Add / edit competitive how-to-play description.
+- Archive / restore games.
+- New games default to unavailable at existing Locations that already use that room.
+- Existing Locations receive a Catalogue Review notice.
+- Rename / room-move migrates existing saved progress.
+
+BADGES
+- Add badges.
+- Edit built-in and custom badges.
+- Archive / restore badges without deleting achievement history.
+- Requirement modes:
+  * Global / no room required
+  * Specific room
+  * Specific game
+  * Room + game
+- Optional level requirement.
+- Supports multiple alternative rooms/games separated with " / ".
+- Standard / Easter Egg / Riddle types.
+- Editable requirement text, tip, hint and spoiler/solution.
+- Badge edits preserve earned state because base/custom badge positions remain stable.
+
+LOCATIONS
+- Locations remain a separate availability layer over the master catalogue.
+- Adding a room does not silently add it to venues.
+- Adding a game to an existing room does not silently make it available at existing venues.
+- Location page shows Catalogue Review notices after relevant catalogue changes.
+- Badges continue to derive Available Here from the active Location.
+
+DATA SAFETY
+- New schemaVersion 2 content overlay is stored inside the existing app backup state.
+- Bundled badges.json / rooms.json remain the default catalogue.
+- User changes are merged over defaults at runtime.
+- Existing progress is not intentionally reset.
+- Archived content is retained rather than destructively deleted.
+- Legacy per-location level progress is preserved.
+- Trophy helper indices are safely recalculated when custom badges are added.
+
+ALSO RETAINED
+- v13.50 page colours and larger header icons.
+- Competitive VS icon.
+- Distinct Levels and Stats icons.
+- Fold / inner-display responsive styling.
+- Existing backup / restore and CSV import.
+
+UPLOAD
+Upload EVERYTHING inside this ZIP to the GitHub repository root, preserving the icons/ folder structure.
+
+NOTE
+This update is designed to work with the existing badges.json and rooms.json already in your GitHub repository.

@@ -1,0 +1,43 @@
+ACTIVATE TRACKER v13.52 — MULTI-ROOM / MULTI-GAME BADGE REQUIREMENTS
+
+ADDED TO BADGE EDITOR
+- Multiple rooms can be listed with " / ".
+- Multiple games can be listed with " / ".
+- Each dependency has an explicit matching rule:
+  * ANY LISTED ROOM
+  * ALL LISTED ROOMS
+  * ANY LISTED GAME
+  * ALL LISTED GAMES
+- Room matching and game matching are independent, so a badge can require:
+  * any one of several rooms
+  * every listed room
+  * any one of several games
+  * every listed game
+  * every listed room AND every listed game
+  * any combination of those rules
+- Global / no-room badges remain supported.
+
+MARATHON
+- The built-in "The Marathon" badge defaults to ALL listed rooms + ALL listed games.
+- This preserves the intended requirement for Relay, Mega Relay and Laser Relay across their required rooms.
+- You can override the matching rule in Content Manager if Activate changes it later.
+
+LOCATION LOGIC
+- A badge using ALL matching is Available Here only when the active Location contains every required room/game.
+- ANY matching preserves the existing alternative-room behaviour such as "Mega Laser / Trench".
+- Moving a game to another room never silently enables it at existing Locations; affected venues are flagged for review.
+
+RETAINED FROM v13.51
+- Add / edit / archive Rooms.
+- Add / edit / move / archive Games.
+- Co-op / Competitive / both.
+- Configurable co-op level count.
+- Add / edit / archive Badges.
+- Global / Room / Game / Room+Game badge dependencies.
+- Settings Content Manager.
+- Location catalogue-review notices.
+- Existing progress migration and backup state.
+- v13.50 page colours and larger header icons.
+
+UPLOAD
+Upload EVERYTHING inside this ZIP to the GitHub repository root, preserving folders.

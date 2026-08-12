@@ -6736,3 +6736,226 @@ h3,
     padding:1px !important;
   }
 }
+
+
+/* =========================================================
+   v13.51 — CONTENT MANAGER
+   ========================================================= */
+
+.content-manager-card{
+  border-color:rgba(var(--page-accent-rgb),.32);
+  overflow:hidden;
+}
+.content-manager-title-row{gap:12px}
+.content-manager-title-row h2{margin:2px 0 0}
+.content-manager-tabs{
+  width:100%;
+  margin-top:14px;
+}
+.content-manager-tabs .seg-btn{
+  flex:1 1 0;
+  min-height:44px;
+}
+.content-manager-controls{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto auto;
+  gap:10px;
+  align-items:center;
+}
+.content-show-archived{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-height:44px;
+  padding:0 10px;
+  white-space:nowrap;
+  color:var(--muted);
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:rgba(255,255,255,.025);
+}
+.content-show-archived input{width:18px;height:18px}
+.content-manager-list{display:grid;gap:8px}
+.content-manager-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:rgba(10,14,28,.78);
+}
+.content-manager-row.content-archived{opacity:.62}
+.content-main-button{
+  appearance:none;
+  border:0;
+  background:transparent;
+  color:inherit;
+  text-align:left;
+  padding:3px;
+  min-width:0;
+  cursor:pointer;
+}
+.content-main-button strong,
+.content-main-button span{display:block}
+.content-main-button strong{font-size:16px}
+.content-main-button span{
+  margin-top:3px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.35;
+}
+.content-row-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.content-archived-pill{
+  display:inline-flex;
+  align-items:center;
+  min-height:28px;
+  padding:0 8px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;
+  color:var(--muted);
+  font-size:11px;
+}
+.danger-outline{
+  border-color:rgba(255,94,113,.34)!important;
+  color:#ff9aaa!important;
+}
+.content-editor-sheet{width:min(760px,100%)}
+.content-editor-body{display:block}
+.content-form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.content-textarea{
+  width:100%;
+  min-height:88px;
+  resize:vertical;
+  line-height:1.45;
+}
+.content-number{max-width:150px}
+.content-check-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.content-check{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-height:44px;
+  padding:0 12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:rgba(255,255,255,.025);
+}
+.content-check input{width:19px;height:19px}
+.content-field-disabled{opacity:.42}
+.content-editor-actions{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  border-top:1px solid var(--line);
+  padding-top:12px;
+}
+.catalog-review-card{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:10px;
+  align-items:start;
+  margin:8px 0 12px;
+  padding:11px 12px;
+  border:1px solid rgba(255,200,74,.38);
+  border-radius:13px;
+  background:rgba(255,200,74,.065);
+}
+.catalog-review-card strong{color:#ffe39a}
+.catalog-review-card .sub{margin-top:3px;line-height:1.4}
+
+@media (max-width:620px){
+  .content-manager-controls{grid-template-columns:1fr}
+  .content-show-archived{width:100%}
+  .content-manager-controls .btn{width:100%}
+  .content-manager-row{grid-template-columns:1fr}
+  .content-row-actions{justify-content:flex-start}
+  .content-form-grid{grid-template-columns:1fr}
+  .content-editor-actions{
+    align-items:stretch;
+    flex-direction:column-reverse;
+  }
+  .content-editor-actions>.row{width:100%}
+  .content-editor-actions .btn{flex:1 1 auto}
+  #contentArchiveBtn{width:100%}
+}
+
+
+/* =========================================================
+   v13.52 — MULTI-ROOM / MULTI-GAME BADGE REQUIREMENTS
+   ========================================================= */
+
+.content-dependency-head{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:6px;
+}
+.content-dependency-head .label{margin:0}
+.content-match-select{
+  width:auto!important;
+  min-width:150px;
+  max-width:210px;
+  padding-top:7px!important;
+  padding-bottom:7px!important;
+}
+
+@media (max-width:520px){
+  .content-dependency-head{
+    align-items:stretch;
+    flex-direction:column;
+    gap:5px;
+  }
+  .content-match-select{
+    width:100%!important;
+    max-width:none;
+  }
+}
+
+
+/* =========================================================
+   v13.53 — FINAL BADGE SCOPE + GLOBAL AWARDS
+   ========================================================= */
+
+.content-badge-parts{
+  display:grid;
+  gap:10px;
+}
+.content-badge-part{
+  padding:12px;
+  border:1px solid rgba(var(--page-accent-rgb),.24);
+  border-radius:14px;
+  background:rgba(255,255,255,.025);
+}
+.content-badge-part-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+.award-legacy-tag{
+  border-color:rgba(255,200,74,.48)!important;
+  color:#ffe39a!important;
+}
+.award-legacy-detail{
+  border:1px solid rgba(255,200,74,.35);
+  background:rgba(255,200,74,.07)!important;
+}

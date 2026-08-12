@@ -1,9 +1,11 @@
 'use strict';
 
-const VERSION='13.50.0';
+const VERSION='13.53.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
+let TROPHIES=[];
+let BASE_BADGES=[], BASE_ROOMS=[], BASE_GAMES=[], BASE_GAME_CATALOG={}, BASE_COMPETITIVE_INFO={}, BASE_GAME_ENTITIES=[], BADGE_ENTITIES=[];
 let state=null;
 let modalBadgeIndex=null;
 let focusIndex=0;
@@ -11,7 +13,18 @@ let focusBadgeIndex=null;
 let focusContext={source:'single',indices:[]};
 
 let levelsDisplayMode='levels';
+let contentManagerTab='rooms';
+let contentEditing=null;
 const defaultState=()=>({
+  schemaVersion:3,
+  content:{rooms:{},games:{},badges:{}},
+  badgeAwards:{},
+  trophies:{
+    bronze:{earned:false,earnedAt:null},
+    silver:{earned:false,earnedAt:null},
+    gold:{earned:false,earnedAt:null},
+    platinum:{earned:false,earnedAt:null}
+  },
   earned:{},
   pins:[],
   notes:{},
@@ -27,10 +40,727 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const save=()=>localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
 const toast=msg=>{const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600)};
 const activeLocation=()=>state.locations.find(l=>l.id===state.activeLocation)||state.locations[0];
-const earnedCount=()=>BADGES.slice(0,BASE_BADGE_COUNT||BADGES.length).filter((_,i)=>state.earned[i]).length;
+const earnedCount=()=>activeTrackedBadgeIndices().filter(i=>state.earned[i]).length;
 const roomTypeFromInstance=n=>n==='Entrance'||n==='Exit'?n:n.replace(/\s+\d+$/,'');
 const roomParts=b=>(b.room||'').split(/\s*\/\s*/).map(x=>x.trim()).filter(Boolean);
 const gameParts=b=>(b.game||'').split(/\s*\/\s*/).map(x=>x.trim()).filter(Boolean);
+
+
+/* =========================================================
+   v13.51 — CONTENT CATALOGUE / STABLE ENTITY LAYER
+   Bundled JSON remains the default catalogue. User edits live in
+   state.content and are merged over the defaults at runtime.
+   ========================================================= */
+
+const contentSlug=s=>String(s??'').trim().toLowerCase()
+  .replace(/&/g,' and ')
+  .replace(/[^a-z0-9]+/g,'-')
+  .replace(/^-+|-+$/g,'')||'item';
+
+const newContentId=prefix=>`${prefix}:custom:${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
+const baseRoomId=name=>`room:base:${contentSlug(name)}`;
+const baseGameId=(room,name)=>`game:base:${contentSlug(room)}:${contentSlug(name)}`;
+const baseBadgeId=index=>`badge:base:${index}`;
+
+function ensureContentState(){
+  if(!state.content || typeof state.content!=='object')state.content={};
+  if(!state.content.rooms || typeof state.content.rooms!=='object')state.content.rooms={};
+  if(!state.content.games || typeof state.content.games!=='object')state.content.games={};
+  if(!state.content.badges || typeof state.content.badges!=='object')state.content.badges={};
+  state.schemaVersion=Math.max(Number(state.schemaVersion)||1,3);
+}
+
+function buildBaseGameEntities(){
+  const map=new Map();
+  Object.entries(BASE_GAME_CATALOG||{}).forEach(([room,catalog])=>{
+    const add=(game,mode)=>{
+      const key=`${room}||${game}`;
+      const id=baseGameId(room,game);
+      const existing=map.get(key)||{
+        id,
+        custom:false,
+        baseRoomName:room,
+        baseRoomId:baseRoomId(room),
+        baseName:game,
+        cooperative:false,
+        competitive:false,
+        levels:10,
+        baseCompetitiveKey:`${room}||${game}`
+      };
+      existing[mode]=true;
+      map.set(key,existing);
+    };
+    (catalog?.cooperative||[]).forEach(g=>add(g,'cooperative'));
+    (catalog?.competitive||[]).forEach(g=>add(g,'competitive'));
+  });
+  BASE_GAME_ENTITIES=[...map.values()];
+}
+
+function allRoomEntities({includeArchived=true}={}){
+  ensureContentState();
+  const base=BASE_ROOMS.map(name=>{
+    const id=baseRoomId(name),o=state.content.rooms[id]||{};
+    return {
+      id,custom:false,baseName:name,
+      name:String(o.name||name).trim()||name,
+      archived:!!o.archived
+    };
+  });
+  const custom=Object.values(state.content.rooms)
+    .filter(x=>x?.custom)
+    .map(x=>({
+      id:x.id,custom:true,baseName:null,
+      name:String(x.name||'New room').trim()||'New room',
+      archived:!!x.archived,
+      createdAt:x.createdAt||''
+    }));
+  const rows=[...base,...custom];
+  return includeArchived?rows:rows.filter(x=>!x.archived);
+}
+
+function roomEntityById(id){return allRoomEntities({includeArchived:true}).find(x=>x.id===id)||null}
+function roomNameById(id){return roomEntityById(id)?.name||''}
+
+function allGameEntities({includeArchived=true}={}){
+  ensureContentState();
+  const base=BASE_GAME_ENTITIES.map(base=>{
+    const o=state.content.games[base.id]||{};
+    return {
+      ...base,
+      name:String(o.name||base.baseName).trim()||base.baseName,
+      roomId:o.roomId||base.baseRoomId,
+      cooperative:o.cooperative===undefined?!!base.cooperative:!!o.cooperative,
+      competitive:o.competitive===undefined?!!base.competitive:!!o.competitive,
+      levels:Math.max(1,Math.min(99,Number(o.levels)||Number(base.levels)||10)),
+      description:o.description===undefined?'':String(o.description||''),
+      archived:!!o.archived
+    };
+  });
+  const custom=Object.values(state.content.games)
+    .filter(x=>x?.custom)
+    .map(x=>({
+      id:x.id,custom:true,baseName:null,baseRoomName:null,baseCompetitiveKey:null,
+      name:String(x.name||'New game').trim()||'New game',
+      roomId:x.roomId||'',
+      cooperative:!!x.cooperative,
+      competitive:!!x.competitive,
+      levels:Math.max(1,Math.min(99,Number(x.levels)||10)),
+      description:String(x.description||''),
+      archived:!!x.archived,
+      createdAt:x.createdAt||''
+    }));
+  const rows=[...base,...custom];
+  return includeArchived?rows:rows.filter(x=>!x.archived);
+}
+
+function gameEntityById(id){return allGameEntities({includeArchived:true}).find(x=>x.id===id)||null}
+
+function gameEntityByDisplay(room,game){
+  return allGameEntities({includeArchived:true}).find(x=>
+    x.name===game && roomNameById(x.roomId)===room
+  )||null;
+}
+
+function levelCountForGame(room,game){
+  const entity=gameEntityByDisplay(room,game);
+  return Math.max(1,Math.min(99,Number(entity?.levels)||10));
+}
+
+
+const TROPHY_DEFS=[
+  {id:'bronze',name:'Bronze',need:25,description:'25 badges'},
+  {id:'silver',name:'Silver',need:50,description:'50 badges'},
+  {id:'gold',name:'Gold',need:75,description:'75 badges'},
+  {id:'platinum',name:'Platinum',need:'all',description:'100% of current active badges'}
+];
+
+const BASE_MULTIPART_RULES={
+  'Activated':'every-game-level',
+  'Completionist':'every-game',
+  'Keener':'every-game',
+  'The Grand Tour':'every-room'
+};
+
+function ensureTrophyState(){
+  state.trophies=state.trophies&&typeof state.trophies==='object'?state.trophies:{};
+  TROPHY_DEFS.forEach(t=>{
+    const old=state.trophies[t.id];
+    state.trophies[t.id]=old&&typeof old==='object'
+      ? {earned:!!old.earned,earnedAt:old.earnedAt||null}
+      : {earned:false,earnedAt:null};
+  });
+}
+
+function migrateLegacyTrophyState(){
+  ensureTrophyState();
+
+  const old=Array.isArray(state._trophyIndices)?state._trophyIndices:[];
+  if(old.length){
+    const [bronzeIndex,silverIndex,goldIndex,platinumIndex]=old;
+    if(state.earned?.[bronzeIndex])state.trophies.bronze.earned=true;
+    if(state.earned?.[silverIndex])state.trophies.silver.earned=true;
+    if(state.earned?.[goldIndex])state.trophies.gold.earned=true;
+    // Platinum is deliberately not grandfathered. It represents
+    // 100% of the CURRENT active badge catalogue.
+    [bronzeIndex,silverIndex,goldIndex,platinumIndex].forEach(i=>{
+      if(i===undefined)return;
+      delete state.earned?.[i];
+    });
+    if(Array.isArray(state.pins))state.pins=state.pins.filter(i=>!old.includes(Number(i)));
+    if(Array.isArray(state.history))state.history=state.history.filter(h=>!old.includes(Number(h.badge)));
+  }else{
+    // v13.52 without _trophyIndices could have helper trophies directly
+    // after the base/custom badge array. Remove only obvious legacy helpers.
+    Object.keys(state.earned||{}).map(Number).filter(Number.isInteger).forEach(i=>{
+      if(i>=BASE_BADGES.length+Object.values(state.content?.badges||{}).filter(x=>x?.custom).length){
+        delete state.earned[i];
+      }
+    });
+  }
+  state._trophyIndices=[];
+}
+
+function splitRequirementNames(value){
+  return String(value||'').split(/\s*\/\s*/).map(x=>x.trim()).filter(Boolean);
+}
+
+function defaultBadgeAvailabilityType(base,room,game){
+  if(BASE_MULTIPART_RULES[base?.name])return 'multipart';
+  // Riddle 7.0 is venue-dependent: all cooperative S-games present
+  // at that facility. It intentionally has no fixed room/game list.
+  if(/^Riddle 7\.0$/i.test(String(base?.name||'').trim()))return 'any';
+  return (String(room||'').trim()||String(game||'').trim())?'specific':'any';
+}
+
+function defaultBadgeRequirements(base,room,game,level){
+  const rooms=splitRequirementNames(room);
+  const games=splitRequirementNames(game);
+  const numericLevel=level?Number(level)||null:null;
+
+  // The Marathon has three fixed paired requirements. This is not
+  // "multipart" because the list is fixed rather than expanding with a venue.
+  if(/^The Marathon$/i.test(String(base?.name||'').trim()) && rooms.length===3 && games.length===3){
+    return rooms.map((r,i)=>({rooms:[r],games:[games[i]],level:numericLevel}));
+  }
+
+  if(!rooms.length&&!games.length)return [];
+  return [{rooms,games,level:numericLevel}];
+}
+
+function normaliseRequirementParts(parts){
+  return (Array.isArray(parts)?parts:[]).map(p=>({
+    rooms:[...new Set((Array.isArray(p?.rooms)?p.rooms:splitRequirementNames(p?.room)).map(normaliseContentName).filter(Boolean))],
+    games:[...new Set((Array.isArray(p?.games)?p.games:splitRequirementNames(p?.game)).map(normaliseContentName).filter(Boolean))],
+    level:p?.level?Math.max(1,Math.min(99,Number(p.level)||1)):null
+  })).filter(p=>p.rooms.length||p.games.length);
+}
+
+function applyBadgeCatalog(){
+  ensureContentState();
+  migrateLegacyTrophyState();
+
+  const records=[];
+  BASE_BADGES.forEach((base,index)=>{
+    const id=baseBadgeId(index),o=state.content.badges[id]||{};
+    const room=o.room===undefined?(base.room||''):o.room;
+    const game=o.game===undefined?(base.game||''):o.game;
+    const level=o.level===undefined?(base.level||''):o.level;
+    const availabilityType=o.availabilityType||defaultBadgeAvailabilityType(base,room,game);
+    const multipartRule=o.multipartRule||BASE_MULTIPART_RULES[base.name]||'every-game';
+    const requirements=normaliseRequirementParts(
+      o.requirements===undefined?defaultBadgeRequirements(base,room,game,level):o.requirements
+    );
+
+    const badge={
+      ...base,
+      name:o.name===undefined?base.name:o.name,
+      how:o.how===undefined?base.how:o.how,
+      room,game,level,
+      availabilityType,
+      multipartRule,
+      requirements,
+      tip:o.tip===undefined?(base.tip||''):o.tip,
+      hint:o.hint===undefined?(base.hint||''):o.hint,
+      solution:o.solution===undefined?(base.solution||''):o.solution,
+      category:o.category===undefined?(base.category||'standard'):o.category,
+      type:'badge',
+      _id:id,_custom:false,_archived:!!o.archived
+    };
+    records.push({id,index,custom:false,baseIndex:index,badge,archived:badge._archived});
+  });
+
+  const customs=Object.values(state.content.badges)
+    .filter(x=>x?.custom)
+    .sort((a,b)=>String(a.createdAt||a.id).localeCompare(String(b.createdAt||b.id)));
+
+  customs.forEach(x=>{
+    const requirements=normaliseRequirementParts(x.requirements);
+    const badge={
+      name:String(x.name||'New badge'),
+      how:String(x.how||''),
+      room:String(x.room||''),
+      game:String(x.game||''),
+      level:x.level||'',
+      availabilityType:x.availabilityType||((x.room||x.game)?'specific':'any'),
+      multipartRule:x.multipartRule||'every-game',
+      requirements,
+      tip:String(x.tip||''),
+      hint:String(x.hint||''),
+      solution:String(x.solution||''),
+      category:x.category||'standard',
+      type:'badge',
+      _id:x.id,_custom:true,_archived:!!x.archived
+    };
+    records.push({id:x.id,index:records.length,custom:true,baseIndex:null,badge,archived:badge._archived});
+  });
+
+  BADGE_ENTITIES=records;
+  BADGES=records.map(x=>x.badge);
+  BASE_BADGE_COUNT=BADGES.filter(b=>!b?._archived).length;
+  ensureBadgeAwardState();
+}
+
+function badgeIdAt(index){return BADGE_ENTITIES[index]?.id||BADGES[index]?._id||`badge:legacy:${index}`}
+
+function badgeRequirementSnapshot(b){
+  return {
+    name:String(b?.name||''),
+    how:String(b?.how||''),
+    availabilityType:b?.availabilityType||'any',
+    multipartRule:b?.multipartRule||'',
+    requirements:normaliseRequirementParts(b?.requirements),
+    room:String(b?.room||''),
+    game:String(b?.game||''),
+    level:String(b?.level||'')
+  };
+}
+
+function badgeRequirementSignature(b){
+  return JSON.stringify(badgeRequirementSnapshot(b));
+}
+
+function ensureBadgeAwardState(){
+  state.badgeAwards=state.badgeAwards&&typeof state.badgeAwards==='object'?state.badgeAwards:{};
+
+  BADGES.forEach((b,i)=>{
+    if(!state.earned?.[i])return;
+    const id=badgeIdAt(i);
+    if(!state.badgeAwards[id]){
+      const history=(state.history||[]).find(h=>Number(h.badge)===i);
+      state.badgeAwards[id]={
+        earnedAt:history?.date||new Date().toISOString().slice(0,10),
+        name:b.name,
+        requirement:badgeRequirementSnapshot(b),
+        requirementSignature:badgeRequirementSignature(b)
+      };
+    }
+  });
+}
+
+function awardTermsChanged(index){
+  if(!state.earned?.[index])return false;
+  const award=state.badgeAwards?.[badgeIdAt(index)];
+  if(!award?.requirementSignature)return false;
+  return award.requirementSignature!==badgeRequirementSignature(BADGES[index]);
+}
+
+function recordBadgeAward(index){
+  const b=BADGES[index];
+  const id=badgeIdAt(index);
+  const date=new Date().toISOString().slice(0,10);
+  state.badgeAwards??={};
+  state.badgeAwards[id]={
+    earnedAt:date,
+    name:b?.name||'Badge',
+    requirement:badgeRequirementSnapshot(b),
+    requirementSignature:badgeRequirementSignature(b)
+  };
+  return date;
+}
+
+function clearBadgeAward(index){
+  if(state.badgeAwards)delete state.badgeAwards[badgeIdAt(index)];
+}
+
+function badgeRequirements(b){
+  return normaliseRequirementParts(b?.requirements?.length?b.requirements:defaultBadgeRequirements(b,b?.room,b?.game,b?.level));
+}
+
+function badgeSpecificRooms(b){
+  return [...new Set(badgeRequirements(b).flatMap(p=>p.rooms||[]))];
+}
+
+function badgeSpecificGames(b){
+  return [...new Set(badgeRequirements(b).flatMap(p=>p.games||[]))];
+}
+
+function multipartRuleLabel(rule){
+  if(rule==='every-room')return 'Every room';
+  if(rule==='every-game-level')return 'Every game level';
+  if(rule==='every-room-game')return 'Every room & game';
+  return 'Every game';
+}
+
+function badgeScopeLabel(b){
+  if(b?.availabilityType==='multipart')return `Multipart • ${multipartRuleLabel(b.multipartRule)}`;
+  if(b?.availabilityType==='specific'){
+    const parts=badgeRequirements(b);
+    if(parts.length>1)return `Specific • ${parts.length} required parts`;
+    const p=parts[0]||{rooms:[],games:[]};
+    const bits=[];
+    if(p.rooms?.length)bits.push(p.rooms.join(' / '));
+    if(p.games?.length)bits.push(p.games.join(' / ')+(p.level?` • L${p.level}`:''));
+    return `Specific${bits.length?' • '+bits.join(' • '):''}`;
+  }
+  return 'Any Room';
+}
+
+function requirementPartLabel(part){
+  const bits=[];
+  if(part.rooms?.length)bits.push(`Room: ${part.rooms.join(' / ')}`);
+  if(part.games?.length)bits.push(`Game: ${part.games.join(' / ')}`);
+  if(part.level)bits.push(`Level ${part.level}`);
+  return bits.join(' • ');
+}
+
+function badgeRequirementMarkup(b){
+  if(b?.availabilityType==='multipart'){
+    return `<div class="detail"><strong>Availability</strong>${esc(multipartRuleLabel(b.multipartRule))} at the active Location</div>`;
+  }
+  if(b?.availabilityType==='specific'){
+    const parts=badgeRequirements(b);
+    return parts.map((p,i)=>`<div class="detail"><strong>${parts.length>1?`Required part ${i+1}`:'Room / game'}</strong>${esc(requirementPartLabel(p))}</div>`).join('');
+  }
+  return `<div class="detail"><strong>Availability</strong>Any Room</div>`;
+}
+
+function partAvailableHere(part,l=activeLocation()){
+  const rooms=part.rooms||[],games=part.games||[];
+  const excluded=new Set(l.excludedGames||[]);
+  const entries=inferredGamesForLocation(l).filter(x=>!excluded.has(x.game));
+
+  if(rooms.length&&games.length){
+    return entries.some(x=>rooms.includes(x.room)&&games.includes(x.game));
+  }
+  if(rooms.length)return rooms.some(r=>l.rooms.includes(r));
+  if(games.length)return entries.some(x=>games.includes(x.game));
+  return true;
+}
+
+function syncTrophies(){
+  ensureTrophyState();
+  const n=earnedCount();
+  const total=BASE_BADGE_COUNT;
+  const today=new Date().toISOString().slice(0,10);
+
+  [['bronze',25],['silver',50],['gold',75]].forEach(([id,need])=>{
+    if(n>=need&&!state.trophies[id].earned){
+      state.trophies[id].earned=true;
+      state.trophies[id].earnedAt=today;
+    }
+    // Bronze / Silver / Gold are permanent once achieved.
+  });
+
+  const platinumNow=total>0&&n>=total;
+  if(platinumNow&&!state.trophies.platinum.earned){
+    state.trophies.platinum.earnedAt=today;
+  }
+  state.trophies.platinum.earned=platinumNow;
+  if(!platinumNow)state.trophies.platinum.earnedAt=null;
+
+  TROPHIES=TROPHY_DEFS.map(t=>({
+    ...t,
+    earned:!!state.trophies[t.id]?.earned,
+    earnedAt:state.trophies[t.id]?.earnedAt||null
+  }));
+}
+
+function applyContentCatalog(){
+  ensureContentState();
+
+  const activeRooms=allRoomEntities({includeArchived:false});
+  ROOMS=activeRooms.map(x=>x.name);
+
+  GAME_CATALOG={};
+  COMPETITIVE_INFO={};
+
+  allGameEntities({includeArchived:false}).forEach(game=>{
+    const room=roomEntityById(game.roomId);
+    if(!room || room.archived)return;
+    const roomName=room.name;
+    GAME_CATALOG[roomName]??={cooperative:[],competitive:[]};
+
+    if(game.cooperative && !GAME_CATALOG[roomName].cooperative.includes(game.name)){
+      GAME_CATALOG[roomName].cooperative.push(game.name);
+    }
+    if(game.competitive && !GAME_CATALOG[roomName].competitive.includes(game.name)){
+      GAME_CATALOG[roomName].competitive.push(game.name);
+    }
+
+    if(game.competitive){
+      const raw=game.baseCompetitiveKey?BASE_COMPETITIVE_INFO[game.baseCompetitiveKey]:null;
+      const source=typeof raw==='string'?{description:raw}:{...(raw||{})};
+      if(game.description)source.description=game.description;
+      COMPETITIVE_INFO[`${roomName}||${game.name}`]=source;
+    }
+  });
+
+  Object.values(GAME_CATALOG).forEach(c=>{
+    c.cooperative.sort((a,b)=>a.localeCompare(b));
+    c.competitive.sort((a,b)=>a.localeCompare(b));
+  });
+  GAMES=[...new Set(Object.values(GAME_CATALOG).flatMap(c=>[...(c.cooperative||[]),...(c.competitive||[])]))].sort((a,b)=>a.localeCompare(b));
+
+  applyBadgeCatalog();
+  syncTrophies();
+}
+
+function activeTrackedBadgeIndices(){
+  return BADGES.map((b,i)=>[b,i]).filter(([b])=>!b?._archived).map(([,i])=>i);
+}
+
+function replaceDelimitedName(value,oldName,newName){
+  const parts=String(value||'').split(/\s*\/\s*/).map(x=>x.trim()).filter(Boolean);
+  if(!parts.length)return value||'';
+  return parts.map(x=>x===oldName?newName:x).join(' / ');
+}
+
+function addCatalogReview(location,message){
+  ensureLocationShape(location);
+  location.catalogReview=Array.isArray(location.catalogReview)?location.catalogReview:[];
+  if(!location.catalogReview.includes(message))location.catalogReview.push(message);
+  location.catalogReview=location.catalogReview.slice(-8);
+}
+
+function forEachProgressStore(fn){
+  if(state.levelProgress)fn(state.levelProgress);
+  Object.values(state.levelProgressByLocation||{}).forEach(fn);
+}
+
+function mergeGameProgress(a={},b={}){
+  const levels={...(a.levels||{})};
+  Object.entries(b.levels||{}).forEach(([n,v])=>{
+    const old=levels[n]||{};
+    levels[n]={
+      ...old,...v,
+      score:Math.max(Number(old.score)||0,Number(v?.score)||0),
+      topScore:Math.max(Number(old.topScore)||0,Number(v?.topScore)||0),
+      complete:!!old.complete||!!v?.complete
+    };
+  });
+  return {...a,...b,levels};
+}
+
+function renameProgressRoom(store,oldName,newName){
+  if(!store)return;
+  const games=store.games||{};
+  Object.keys(games).forEach(key=>{
+    const cut=key.indexOf('||');if(cut<0)return;
+    const room=key.slice(0,cut),game=key.slice(cut+2);
+    if(room!==oldName)return;
+    const next=`${newName}||${game}`;
+    games[next]=mergeGameProgress(games[next],games[key]);
+    games[next].room=newName;
+    delete games[key];
+  });
+  const comp=store.competitive||{};
+  Object.keys(comp).forEach(key=>{
+    const cut=key.indexOf('||');if(cut<0)return;
+    const room=key.slice(0,cut),game=key.slice(cut+2);
+    if(room!==oldName)return;
+    comp[`${newName}||${game}`]=!!comp[`${newName}||${game}`]||!!comp[key];
+    delete comp[key];
+  });
+}
+
+function renameProgressGame(store,oldName,newName){
+  if(!store)return;
+  const games=store.games||{};
+  Object.keys(games).forEach(key=>{
+    const cut=key.indexOf('||');if(cut<0)return;
+    const room=key.slice(0,cut),game=key.slice(cut+2);
+    if(game!==oldName)return;
+    const next=`${room}||${newName}`;
+    games[next]=mergeGameProgress(games[next],games[key]);
+    games[next].game=newName;
+    delete games[key];
+  });
+  const comp=store.competitive||{};
+  Object.keys(comp).forEach(key=>{
+    const cut=key.indexOf('||');if(cut<0)return;
+    const room=key.slice(0,cut),game=key.slice(cut+2);
+    if(game!==oldName)return;
+    comp[`${room}||${newName}`]=!!comp[`${room}||${newName}`]||!!comp[key];
+    delete comp[key];
+  });
+}
+
+function moveProgressGame(store,gameName,oldRoom,newRoom){
+  if(!store || oldRoom===newRoom)return;
+  const oldKey=`${oldRoom}||${gameName}`,newKey=`${newRoom}||${gameName}`;
+  if(store.games?.[oldKey]){
+    store.games[newKey]=mergeGameProgress(store.games[newKey],store.games[oldKey]);
+    store.games[newKey].room=newRoom;
+    delete store.games[oldKey];
+  }
+  if(store.competitive?.[oldKey]){
+    store.competitive[newKey]=!!store.competitive[newKey]||!!store.competitive[oldKey];
+    delete store.competitive[oldKey];
+  }
+}
+
+function migrateBadgeReference(kind,oldName,newName){
+  const field=kind==='room'?'room':'game';
+  const partField=kind==='room'?'rooms':'games';
+
+  const updateParts=parts=>normaliseRequirementParts(parts).map(p=>({
+    ...p,
+    [partField]:(p[partField]||[]).map(x=>x===oldName?newName:x)
+  }));
+
+  BASE_BADGES.forEach((base,index)=>{
+    const id=baseBadgeId(index),o=state.content.badges[id]||{};
+    const current=o[field]===undefined?(base[field]||''):o[field];
+    const changed=replaceDelimitedName(current,oldName,newName);
+    const next={...o};
+    if(changed!==current)next[field]=changed;
+    if(Array.isArray(o.requirements))next.requirements=updateParts(o.requirements);
+    if(JSON.stringify(next)!==JSON.stringify(o))state.content.badges[id]=next;
+  });
+
+  Object.values(state.content.badges).filter(x=>x?.custom).forEach(x=>{
+    x[field]=replaceDelimitedName(x[field]||'',oldName,newName);
+    if(Array.isArray(x.requirements))x.requirements=updateParts(x.requirements);
+  });
+}
+
+function migrateRoomName(oldName,newName){
+  if(!oldName || !newName || oldName===newName)return;
+  state.locations.forEach(l=>{
+    ensureLocationShape(l);
+    l.rooms=l.rooms.map(x=>x===oldName?newName:x);
+    if(l.roomCopies?.[oldName]!==undefined){
+      l.roomCopies[newName]=l.roomCopies[oldName];
+      delete l.roomCopies[oldName];
+    }
+
+    const renameInstance=x=>typeof x==='string'&&x.startsWith(oldName+' ')?newName+x.slice(oldName.length):x;
+    l.roomInstances=(l.roomInstances||[]).map(x=>{
+      if(typeof x==='string')return renameInstance(x);
+      if(x&&typeof x==='object'){
+        const copy={...x};
+        if(copy.name)copy.name=renameInstance(copy.name);
+        if(copy.type===oldName)copy.type=newName;
+        return copy;
+      }
+      return x;
+    });
+
+    const oldMap=l.venueMap||{};
+    const nextMap={};
+    Object.entries(oldMap).forEach(([key,val])=>{
+      const nextKey=renameInstance(key);
+      const obj={...(val||{})};
+      ['front','left','right','back'].forEach(dir=>{if(obj[dir])obj[dir]=renameInstance(obj[dir])});
+      nextMap[nextKey]=obj;
+    });
+    l.venueMap=nextMap;
+  });
+  forEachProgressStore(store=>renameProgressRoom(store,oldName,newName));
+  migrateBadgeReference('room',oldName,newName);
+}
+
+function migrateGameName(oldName,newName){
+  if(!oldName || !newName || oldName===newName)return;
+  state.locations.forEach(l=>{
+    ensureLocationShape(l);
+    l.games=l.games.map(x=>x===oldName?newName:x);
+    l.excludedGames=l.excludedGames.map(x=>x===oldName?newName:x);
+  });
+  forEachProgressStore(store=>renameProgressGame(store,oldName,newName));
+  migrateBadgeReference('game',oldName,newName);
+}
+
+function migrateBadgeRoomForMovedGame(gameName,oldRoom,newRoom){
+  BASE_BADGES.forEach((base,index)=>{
+    const id=baseBadgeId(index),o=state.content.badges[id]||{};
+    const game=o.game===undefined?(base.game||''):o.game;
+    const room=o.room===undefined?(base.room||''):o.room;
+    if(gameParts({game}).includes(gameName) && roomParts({room}).includes(oldRoom)){
+      state.content.badges[id]={...o,room:replaceDelimitedName(room,oldRoom,newRoom)};
+    }
+  });
+  Object.values(state.content.badges).filter(x=>x?.custom).forEach(x=>{
+    if(gameParts({game:x.game}).includes(gameName) && roomParts({room:x.room}).includes(oldRoom)){
+      x.room=replaceDelimitedName(x.room,oldRoom,newRoom);
+    }
+  });
+}
+
+function migrateGameRoom(gameName,oldRoom,newRoom){
+  if(!oldRoom || !newRoom || oldRoom===newRoom)return;
+  forEachProgressStore(store=>moveProgressGame(store,gameName,oldRoom,newRoom));
+  migrateBadgeRoomForMovedGame(gameName,oldRoom,newRoom);
+
+  state.locations.forEach(l=>{
+    ensureLocationShape(l);
+    const wasAvailable=l.rooms.includes(oldRoom)&&!l.excludedGames.includes(gameName);
+    const newRoomPresent=l.rooms.includes(newRoom);
+
+    // Moving a game must never silently change venue availability.
+    // If the destination room exists at this Location, keep the game
+    // excluded until the Location is reviewed.
+    if(newRoomPresent && !l.excludedGames.includes(gameName)){
+      l.excludedGames.push(gameName);
+    }
+
+    if(wasAvailable || newRoomPresent){
+      addCatalogReview(
+        l,
+        `${gameName} moved from ${oldRoom} to ${newRoom}. It is unavailable here until this venue is reviewed.`
+      );
+    }
+  });
+}
+
+function excludeNewGameFromExistingLocations(gameName,roomName){
+  state.locations.forEach(l=>{
+    ensureLocationShape(l);
+    if(!l.rooms.includes(roomName))return;
+    if(!l.excludedGames.includes(gameName))l.excludedGames.push(gameName);
+    addCatalogReview(l,`New game ${gameName} was added to ${roomName}. It is unavailable here until you restore it.`);
+  });
+}
+
+function normaliseContentName(value){return String(value||'').trim().replace(/\s+/g,' ')}
+
+function roomNameExists(name,exceptId=null){
+  return allRoomEntities({includeArchived:true}).some(x=>x.id!==exceptId&&x.name.toLowerCase()===name.toLowerCase());
+}
+function gameNameExists(name,exceptId=null){
+  return allGameEntities({includeArchived:true}).some(x=>x.id!==exceptId&&x.name.toLowerCase()===name.toLowerCase());
+}
+
+function badgeNameExists(name,exceptId=null){
+  return BADGE_ENTITIES.some(x=>x.id!==exceptId&&String(x.badge.name||'').toLowerCase()===name.toLowerCase());
+}
+
+function contentRequirementType(b){
+  const room=!!String(b?.room||'').trim(),game=!!String(b?.game||'').trim();
+  if(room&&game)return 'roomgame';
+  if(room)return 'room';
+  if(game)return 'game';
+  return 'global';
+}
+
+function validateDelimitedReferences(value,type){
+  const parts=String(value||'').split(/\s*\/\s*/).map(x=>x.trim()).filter(Boolean);
+  if(!parts.length)return true;
+  const names=type==='room'
+    ? allRoomEntities({includeArchived:true}).map(x=>x.name)
+    : allGameEntities({includeArchived:true}).map(x=>x.name);
+  return parts.every(x=>names.includes(x));
+}
 
 function roomGameEntries(room){
   const c=GAME_CATALOG[room]||{competitive:[],cooperative:[]};
@@ -81,25 +811,8 @@ function competitiveEntries(l=activeLocation()){
 
 
 const isTrophy=b=>b && b.type==='trophy';
-const isEasterEggBadge=b=>!isTrophy(b) && /^Easter Egg\b/i.test(b?.name||'');
-function addTrophyTargets(){
-  BASE_BADGE_COUNT=BADGES.length;
-  BADGES=[
-    ...BADGES.map(b=>({...b,type:b.type||'badge'})),
-    {name:'Bronze Trophy',type:'trophy',how:'Achieve 25 badges.',room:'',game:'',level:'',trophyNeed:25},
-    {name:'Silver Trophy',type:'trophy',how:'Achieve 50 badges.',room:'',game:'',level:'',trophyNeed:50},
-    {name:'Gold Trophy',type:'trophy',how:'Achieve 75 badges.',room:'',game:'',level:'',trophyNeed:75},
-    {name:'Platinum Trophy',type:'trophy',how:'Achieve 100% of tracked badges.',room:'',game:'',level:'',trophyNeed:'all'}
-  ];
-}
-function syncTrophyEarned(){
-  const badgeCount=Object.keys(state.earned||{}).map(Number).filter(i=>i<BASE_BADGE_COUNT && state.earned[i]).length;
-  BADGES.forEach((b,i)=>{
-    if(!isTrophy(b))return;
-    const earned=b.trophyNeed==='all'?badgeCount>=BASE_BADGE_COUNT:badgeCount>=b.trophyNeed;
-    if(earned)state.earned[i]=true; else delete state.earned[i];
-  });
-}
+const isEasterEggBadge=b=>!isTrophy(b) && (b?.category==='easter-egg'||/^Easter Egg\b/i.test(b?.name||''));
+const isRiddleBadge=b=>!isTrophy(b) && (b?.category==='riddle'||/^Riddle\b/i.test(b?.name||''));
 
 
 function gamesForSelectedRooms(){
@@ -117,13 +830,14 @@ function loadState(){
   state.history=Array.isArray(state.history)?state.history:[];
   state.earned=state.earned||{};
   state.notes=state.notes||{};
-  state.locations.forEach(ensureLocationShape);ensureLevelProgressStore();activeLevelProgress();
+  state.locations.forEach(ensureLocationShape);ensureContentState();ensureTrophyState();state.badgeAwards=state.badgeAwards||{};ensureLevelProgressStore();activeLevelProgress();
 }
 
 function ensureLocationShape(l){
   l.rooms=Array.isArray(l.rooms)?l.rooms:[];
   l.games=Array.isArray(l.games)?l.games:[];
   l.excludedGames=Array.isArray(l.excludedGames)?l.excludedGames:[];
+  l.catalogReview=Array.isArray(l.catalogReview)?l.catalogReview:[];
   l.roomCopies=l.roomCopies||{};
   l.roomInstances=Array.isArray(l.roomInstances)?l.roomInstances:[];
   l.venueMap=l.venueMap||{};
@@ -132,40 +846,46 @@ function ensureLocationShape(l){
 }
 
 function availableHere(b){
-  if(isTrophy(b)) return true;
-  const l=activeLocation();
-  const rp=roomParts(b), gp=gameParts(b);
-  const roomOk=!rp.length ? true : (l.rooms.length>0 && rp.some(r=>l.rooms.includes(r)));
-  const enabled=enabledGameNames(l);
-  const gameOk=!gp.length ? true : gp.some(g=>enabled.includes(g));
-  return roomOk && gameOk;
+  if(b?._archived)return false;
+  const type=b?.availabilityType||defaultBadgeAvailabilityType(b,b?.room,b?.game);
+
+  // Any Room includes venue-relative rules such as Riddle 7.0.
+  if(type==='any')return true;
+
+  // Multipart badges are defined relative to the active venue's current
+  // catalogue, so they are valid at any configured Location.
+  if(type==='multipart')return true;
+
+  const parts=badgeRequirements(b);
+  return parts.length?parts.every(p=>partAvailableHere(p,activeLocation())):true;
 }
 
 function currentTrophy(){
-  const n=earnedCount();
-  if(n>=BASE_BADGE_COUNT)return 'Platinum';
-  if(n>=75)return 'Gold';
-  if(n>=50)return 'Silver';
-  if(n>=25)return 'Bronze';
+  ensureTrophyState();
+  if(state.trophies.platinum.earned)return 'Platinum';
+  if(state.trophies.gold.earned)return 'Gold';
+  if(state.trophies.silver.earned)return 'Silver';
+  if(state.trophies.bronze.earned)return 'Bronze';
   return 'No trophy yet';
 }
 
 function nextTrophyText(){
+  ensureTrophyState();
   const n=earnedCount();
-  if(n<25)return `${25-n} to Bronze`;
-  if(n<50)return `${50-n} to Silver`;
-  if(n<75)return `${75-n} to Gold`;
-  if(n<BASE_BADGE_COUNT)return `${BASE_BADGE_COUNT-n} to Platinum`;
+  if(!state.trophies.bronze.earned)return `${Math.max(0,25-n)} to Bronze`;
+  if(!state.trophies.silver.earned)return `${Math.max(0,50-n)} to Silver`;
+  if(!state.trophies.gold.earned)return `${Math.max(0,75-n)} to Gold`;
+  if(!state.trophies.platinum.earned)return `${Math.max(0,BASE_BADGE_COUNT-n)} to Platinum`;
   return '100% complete';
 }
 
 function trophyProgress(){
+  ensureTrophyState();
   const n=earnedCount();
-  if(n<25) return {name:'Bronze', current:n, target:25, remaining:25-n};
-  if(n<50) return {name:'Silver', current:n, target:50, remaining:50-n};
-  if(n<75) return {name:'Gold', current:n, target:75, remaining:75-n};
-  if(n<BASE_BADGE_COUNT) return {name:'Platinum', current:n, target:BASE_BADGE_COUNT, remaining:BASE_BADGE_COUNT-n};
-  return {name:'Platinum', current:BASE_BADGE_COUNT, target:BASE_BADGE_COUNT, remaining:0};
+  if(!state.trophies.bronze.earned)return {name:'Bronze',current:n,target:25,remaining:Math.max(0,25-n)};
+  if(!state.trophies.silver.earned)return {name:'Silver',current:n,target:50,remaining:Math.max(0,50-n)};
+  if(!state.trophies.gold.earned)return {name:'Gold',current:n,target:75,remaining:Math.max(0,75-n)};
+  return {name:'Platinum',current:n,target:BASE_BADGE_COUNT,remaining:Math.max(0,BASE_BADGE_COUNT-n)};
 }
 
 function renderHome(){
@@ -233,18 +953,22 @@ function renderHome(){
         </div>
       </aside>
     </div>`;
-  $('trophies').innerHTML=[['Bronze',25],['Silver',50],['Gold',75],['Platinum',total]].map(([name,need])=>{
-    const metal=`trophy-${name.toLowerCase()}`;
-    const unlocked=n>=need;
+  $('trophies').innerHTML=TROPHIES.map(t=>{
+    const need=t.need==='all'?total:t.need;
+    const metal=`trophy-${t.id}`;
+    const unlocked=!!t.earned;
+    const progress=t.id==='platinum'
+      ? (need?Math.min(100,n/need*100):0)
+      : (unlocked?100:(need?Math.min(100,n/need*100):0));
     return `<div class="card trophy ${metal} ${unlocked?'unlocked':'locked'}">
       <div class="trophy-shimmer" aria-hidden="true"></div>
       <div class="row between">
         <span class="cup" aria-hidden="true">🏆</span>
         <span class="pill">${unlocked?'Unlocked':`${Math.max(0,need-n)} left`}</span>
       </div>
-      <h3>${name}</h3>
-      <div class="sub">${name==='Platinum'?'100% of tracked badges':`${need} badges`}</div>
-      <div class="progress top-gap"><span style="width:${need?Math.min(100,n/need*100):0}%"></span></div>
+      <h3>${esc(t.name)}</h3>
+      <div class="sub">${t.id==='platinum'?'100% of current active badges':`${need} badges • permanent once earned`}</div>
+      <div class="progress top-gap"><span style="width:${progress}%"></span></div>
     </div>`;
   }).join('');
   $('homePins').innerHTML=state.pins.length?state.pins.map((i,idx)=>`<div class="item row between"><div><b>${esc(BADGES[i].name)}</b><div class="sub">${esc(BADGES[i].room||'Any room')}</div></div><button class="mini" data-open-focus="${idx}">Open</button></div>`).join(''):'<div class="item sub">No pinned badges.</div>';
@@ -288,9 +1012,10 @@ function filteredBadgeIndices(){
   const avail=$('badgeAvailability')?.value||'all';
 
   return BADGES.map((b,i)=>[b,i]).filter(([b,i])=>{
+    if(b?._archived)return false;
     const text=JSON.stringify(b).toLowerCase();
     const qok=!q||text.includes(q);
-    const roomOk=!room || (!isTrophy(b) && roomParts(b).includes(room));
+    const roomOk=!room || badgeSpecificRooms(b).includes(room);
     const sok=status==='all'
       ||(status==='todo'&&!state.earned[i])
       ||(status==='done'&&state.earned[i])
@@ -312,38 +1037,46 @@ function recentBadgeIndices(){
 }
 
 function renderBadges(){
-  syncTrophyEarned();
+  syncTrophies();
   const rooms=availableFocusRooms();
   const roomSel=$('targetRoom');
   const chosen=roomSel.value||'';
-  roomSel.innerHTML='<option value="">All targets</option>'+rooms.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
+  roomSel.innerHTML='<option value="">All badges</option>'+rooms.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
   roomSel.value=rooms.includes(chosen)?chosen:'';
 
   const rows=filteredBadgeIndices().map(i=>[BADGES[i],i]);
 
   $('pinCount').textContent=`${state.pins.length} / ${MAX_PINS}`;
   $('pinList').innerHTML=state.pins.length?state.pins.map((i,idx)=>`<div class="item row between">
-    <div><b>${esc(BADGES[i].name)}</b><div class="sub">${isTrophy(BADGES[i])?'Trophy':esc(BADGES[i].room||'Global')} • ${esc(BADGES[i].how)}</div></div>
+    <div><b>${esc(BADGES[i].name)}</b><div class="sub">${esc(badgeScopeLabel(BADGES[i]))} • ${esc(BADGES[i].how)}</div></div>
     <div class="row"><button class="mini" data-open-focus="${idx}">Open</button><button type="button" class="mini" data-unpin-badge="${i}" aria-label="Unpin ${esc(BADGES[i].name)}">✕</button></div>
-  </div>`).join(''):'<div class="item sub">No pinned targets.</div>';
+  </div>`).join(''):'<div class="item sub">No pinned badges.</div>';
 
   $('badgeCount').textContent=`${rows.length} shown`;
   $('badgeList').innerHTML=rows.length?rows.map(([b,i])=>`<article class="badge target-card clickable-badge ${availableHere(b)?'available-here':'other-location'} ${state.earned[i]?'done completed-target':''} ${state.pins.includes(i)?'pinned-target':''}" data-open-focus-badge="${i}" data-focus-source="badges">
-    <button class="checkbtn" data-toggle-earned="${i}" ${isTrophy(b)?'disabled':''}>${state.earned[i]?'✓':''}</button>
+    <button class="checkbtn" data-toggle-earned="${i}">${state.earned[i]?'✓':''}</button>
     <div><h3>${esc(b.name)}</h3><p>${esc(b.how)}</p><div class="tags">
-      <span class="tag">${isTrophy(b)?'Trophy':isEasterEggBadge(b)?'Badge • Easter Egg':'Badge'}</span>
-      ${b.room?`<span class="tag">${esc(b.room)}</span>`:''}
-      ${b.game?`<span class="tag">${esc(b.game)}${b.level?' • L'+esc(b.level):''}</span>`:''}
-      ${!isTrophy(b)?`<span class="tag availability-tag ${availableHere(b)?'ok':'away'}">${availableHere(b)?'Available here':'Other location'}</span>`:''}
+      <span class="tag">${isEasterEggBadge(b)?'Badge • Easter Egg':isRiddleBadge(b)?'Badge • Riddle':'Badge'}</span>
+      <span class="tag">${esc(badgeScopeLabel(b))}</span>
+      ${awardTermsChanged(i)?'<span class="tag award-legacy-tag">Earned under earlier terms</span>':''}
+      <span class="tag availability-tag ${availableHere(b)?'ok':'away'}">${availableHere(b)?'Available here':'Other location'}</span>
     </div></div>
     <div class="row"><button type="button" class="mini pin-button ${state.pins.includes(i)?'active':''}" data-pin-badge="${i}" aria-pressed="${state.pins.includes(i)?'true':'false'}" aria-label="${state.pins.includes(i)?'Unpin':'Pin'} ${esc(b.name)}" title="${state.pins.includes(i)?'Unpin badge':'Pin badge'}">${state.pins.includes(i)?'📌':'📍'}</button><button class="mini" data-open-focus-badge="${i}" title="Open badge">›</button></div>
-  </article>`).join(''):'<div class="item sub">No targets match those filters.</div>';
+  </article>`).join(''):'<div class="item sub">No badges match those filters.</div>';
 }
 
 function renderLocations(){
   const l=activeLocation();
 
   $('selectedVenueBanner').innerHTML=`<span class="label">Current venue</span><strong>${esc(l.name)}</strong>`;
+  if($('locationCatalogReview')){
+    const notices=Array.isArray(l.catalogReview)?l.catalogReview:[];
+    $('locationCatalogReview').innerHTML=notices.length?`
+      <div class="catalog-review-card">
+        <div><strong>Catalogue review</strong><div class="sub">${notices.map(esc).join('<br>')}</div></div>
+        <button class="mini" data-clear-catalog-review>Clear</button>
+      </div>`:'';
+  }
 
   $('locationList').innerHTML=state.locations.map(x=>`<button class="item location-choice ${x.id===l.id?'active selected-location':''}" data-location="${x.id}">
     <div class="row between">
@@ -434,20 +1167,472 @@ function openCompetitiveGame(room,game){
 }
 
 function renderStats(){
-  const n=earnedCount(), here=BADGES.filter((b,i)=>availableHere(b)&&!state.earned[i]).length, away=BADGES.filter((b,i)=>!availableHere(b)&&!state.earned[i]).length;
+  const tracked=activeTrackedBadgeIndices();
+  const n=earnedCount(), here=tracked.filter(i=>availableHere(BADGES[i])&&!state.earned[i]).length, away=tracked.filter(i=>!availableHere(BADGES[i])&&!state.earned[i]).length;
   $('statsCards').innerHTML=`<div class="stat"><span class="label">Earned</span><b>${n}</b></div><div class="stat"><span class="label">Available here</span><b>${here}</b></div><div class="stat"><span class="label">Other location</span><b>${away}</b></div><div class="stat"><span class="label">Pinned</span><b>${state.pins.length}</b></div>`;
-  const byRoom={};BADGES.forEach((b,i)=>{if(state.earned[i])roomParts(b).forEach(r=>byRoom[r]=(byRoom[r]||0)+1)});
+  const byRoom={};BADGES.forEach((b,i)=>{if(state.earned[i])badgeSpecificRooms(b).forEach(r=>byRoom[r]=(byRoom[r]||0)+1)});
   $('roomStats').innerHTML=Object.entries(byRoom).sort((a,b)=>b[1]-a[1]).map(([r,c])=>`<div class="item row between"><span>${esc(r)}</span><b>${c}</b></div>`).join('')||'<div class="item sub">No room-specific badges earned yet.</div>';
   $('historyList').innerHTML=state.history.map(h=>`<div class="item"><b>${esc(BADGES[h.badge]?.name||'Badge')}</b><div class="sub">${esc(h.date||'')}</div></div>`).join('')||'<div class="item sub">No history yet.</div>';
 }
 
-function renderAll(){ensureLevelProgress();renderHome();renderBadges();renderLocations();renderCompetitive();renderLevels();renderStats();save()}
+
+/* =========================================================
+   v13.51 — SETTINGS CONTENT MANAGER
+   ========================================================= */
+
+function contentModeLabel(game){
+  if(game.cooperative&&game.competitive)return 'Co-op + Competitive';
+  if(game.competitive)return 'Competitive';
+  return 'Co-op';
+}
+
+function badgeDependencyLabel(b){
+  return badgeScopeLabel(b);
+}
+
+function renderContentManager(){
+  const list=$('contentManagerList');
+  if(!list)return;
+
+  document.querySelectorAll('[data-content-tab]').forEach(b=>b.classList.toggle('active',b.dataset.contentTab===contentManagerTab));
+
+  const q=($('contentSearch')?.value||'').trim().toLowerCase();
+  const showArchived=!!$('contentShowArchived')?.checked;
+  const add=$('contentAddBtn');
+  if(add)add.textContent=`+ Add ${contentManagerTab==='rooms'?'room':contentManagerTab==='games'?'game':'badge'}`;
+
+  let rows=[];
+  if(contentManagerTab==='rooms'){
+    rows=allRoomEntities({includeArchived:true})
+      .filter(x=>showArchived||!x.archived)
+      .filter(x=>!q||x.name.toLowerCase().includes(q))
+      .sort((a,b)=>Number(a.archived)-Number(b.archived)||a.name.localeCompare(b.name))
+      .map(x=>({
+        id:x.id,name:x.name,archived:x.archived,
+        sub:`${x.custom?'Custom':'Built-in'} room`,
+        type:'rooms'
+      }));
+  }else if(contentManagerTab==='games'){
+    rows=allGameEntities({includeArchived:true})
+      .filter(x=>showArchived||!x.archived)
+      .filter(x=>{
+        const text=`${x.name} ${roomNameById(x.roomId)} ${contentModeLabel(x)}`.toLowerCase();
+        return !q||text.includes(q);
+      })
+      .sort((a,b)=>Number(a.archived)-Number(b.archived)||roomNameById(a.roomId).localeCompare(roomNameById(b.roomId))||a.name.localeCompare(b.name))
+      .map(x=>({
+        id:x.id,name:x.name,archived:x.archived,
+        sub:`${roomNameById(x.roomId)||'No room'} • ${contentModeLabel(x)}${x.cooperative?` • ${x.levels} levels`:''}`,
+        type:'games'
+      }));
+  }else{
+    rows=BADGE_ENTITIES
+      .filter(x=>showArchived||!x.archived)
+      .filter(x=>{
+        const text=`${x.badge.name} ${x.badge.how} ${x.badge.room} ${x.badge.game}`.toLowerCase();
+        return !q||text.includes(q);
+      })
+      .sort((a,b)=>Number(a.archived)-Number(b.archived)||String(a.badge.name).localeCompare(String(b.badge.name)))
+      .map(x=>({
+        id:x.id,name:x.badge.name,archived:x.archived,
+        sub:`${x.custom?'Custom':'Built-in'} badge • ${badgeDependencyLabel(x.badge)}`,
+        type:'badges'
+      }));
+  }
+
+  if($('contentManagerCount'))$('contentManagerCount').textContent=`${rows.length} shown`;
+
+  list.innerHTML=rows.length?rows.map(x=>`
+    <div class="content-manager-row ${x.archived?'content-archived':''}">
+      <button class="content-main-button" data-edit-content-type="${x.type}" data-edit-content-id="${esc(x.id)}">
+        <strong>${esc(x.name)}</strong>
+        <span>${esc(x.sub)}</span>
+      </button>
+      <div class="content-row-actions">
+        ${x.archived?'<span class="content-archived-pill">Archived</span>':''}
+        <button class="mini" data-edit-content-type="${x.type}" data-edit-content-id="${esc(x.id)}">Edit</button>
+        <button class="mini ${x.archived?'':'danger-outline'}" data-toggle-content-archive="${x.type}" data-content-id="${esc(x.id)}">${x.archived?'Restore':'Archive'}</button>
+      </div>
+    </div>`).join(''):'<div class="item sub">Nothing matches this search.</div>';
+}
+
+function contentEditorHeader(title,sub=''){
+  $('contentEditorTitle').textContent=title;
+  $('contentEditorSubtitle').textContent=sub;
+}
+
+function setContentModalOpen(open){
+  $('contentEditorModal')?.classList.toggle('open',!!open);
+}
+
+
+function renderBadgePartRows(parts){
+  return normaliseRequirementParts(parts).map((p,i)=>`
+    <div class="content-badge-part" data-badge-part>
+      <div class="content-badge-part-head">
+        <strong>Part ${i+1}</strong>
+        <button class="mini danger-outline" type="button" data-remove-badge-part aria-label="Remove requirement part">Remove</button>
+      </div>
+      <div class="content-form-grid">
+        <div>
+          <label class="label">Room(s)</label>
+          <input class="field" data-badge-part-rooms list="contentRoomNames" value="${esc((p.rooms||[]).join(' / '))}" placeholder="e.g. Mega Laser / Trench">
+        </div>
+        <div>
+          <label class="label">Game(s)</label>
+          <input class="field" data-badge-part-games list="contentGameNames" value="${esc((p.games||[]).join(' / '))}" placeholder="e.g. Defuse">
+        </div>
+      </div>
+      <div class="top-gap">
+        <label class="label">Level (optional)</label>
+        <input class="field content-number" data-badge-part-level type="number" min="1" max="99" value="${p.level||''}">
+      </div>
+    </div>`).join('');
+}
+
+function collectBadgeRequirementParts(){
+  return [...document.querySelectorAll('#contentBadgeParts [data-badge-part]')].map(row=>({
+    rooms:splitRequirementNames(row.querySelector('[data-badge-part-rooms]')?.value||''),
+    games:splitRequirementNames(row.querySelector('[data-badge-part-games]')?.value||''),
+    level:row.querySelector('[data-badge-part-level]')?.value||null
+  })).filter(p=>p.rooms.length||p.games.length);
+}
+
+function openContentEditor(type,id=null){
+  ensureContentState();
+  contentEditing={type,id,isNew:!id};
+  const body=$('contentEditorBody');
+  const archiveBtn=$('contentArchiveBtn');
+
+  if(type==='rooms'){
+    const room=id?roomEntityById(id):null;
+    contentEditorHeader(id?'Edit room':'Add room',id?(room?.custom?'Custom room':'Built-in room'):'New rooms are not automatically added to existing Locations.');
+    body.innerHTML=`
+      <label class="label" for="contentRoomName">Room name</label>
+      <input id="contentRoomName" class="field" value="${esc(room?.name||'')}" maxlength="80" autocomplete="off">
+      <p class="sub top-gap">Renaming a room migrates saved Location selections and level-progress keys so existing progress is retained.</p>`;
+    if(archiveBtn){
+      archiveBtn.hidden=!id;
+      archiveBtn.textContent=room?.archived?'Restore room':'Archive room';
+    }
+  }else if(type==='games'){
+    const game=id?gameEntityById(id):null;
+    const rooms=allRoomEntities({includeArchived:true}).filter(r=>!r.archived || r.id===game?.roomId);
+    contentEditorHeader(id?'Edit game':'Add game',id?(game?.custom?'Custom game':'Built-in game'):'New games default to unavailable at existing Locations that already use the selected room.');
+    body.innerHTML=`
+      <div class="content-form-grid">
+        <div>
+          <label class="label" for="contentGameName">Game name</label>
+          <input id="contentGameName" class="field" value="${esc(game?.name||'')}" maxlength="80" autocomplete="off">
+        </div>
+        <div>
+          <label class="label" for="contentGameRoom">Room</label>
+          <select id="contentGameRoom" class="field">
+            ${rooms.map(r=>`<option value="${esc(r.id)}" ${r.id===game?.roomId?'selected':''}>${esc(r.name)}${r.archived?' • archived':''}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="content-check-row top-gap">
+        <label class="content-check"><input id="contentGameCoop" type="checkbox" ${game?.cooperative!==false?'checked':''}><span>Co-op</span></label>
+        <label class="content-check"><input id="contentGameCompetitive" type="checkbox" ${game?.competitive?'checked':''}><span>Competitive</span></label>
+      </div>
+      <div id="contentGameLevelWrap" class="top-gap">
+        <label class="label" for="contentGameLevels">Co-op levels</label>
+        <input id="contentGameLevels" class="field content-number" type="number" min="1" max="99" value="${game?.levels||10}">
+      </div>
+      <div id="contentGameDescriptionWrap" class="top-gap">
+        <label class="label" for="contentGameDescription">Competitive description</label>
+        <textarea id="contentGameDescription" class="field content-textarea" placeholder="Optional how-to-play description">${esc(game?.description||'')}</textarea>
+      </div>
+      <p class="sub top-gap">Moving or renaming a game migrates saved progress. Affected Locations are flagged for review rather than silently changing venue availability.</p>`;
+    if(archiveBtn){
+      archiveBtn.hidden=!id;
+      archiveBtn.textContent=game?.archived?'Restore game':'Archive game';
+    }
+    const refresh=()=>{
+      const coop=!!$('contentGameCoop')?.checked;
+      const comp=!!$('contentGameCompetitive')?.checked;
+      $('contentGameLevelWrap')?.classList.toggle('content-field-disabled',!coop);
+      if($('contentGameLevels'))$('contentGameLevels').disabled=!coop;
+      $('contentGameDescriptionWrap')?.classList.toggle('content-field-disabled',!comp);
+      if($('contentGameDescription'))$('contentGameDescription').disabled=!comp;
+    };
+    $('contentGameCoop')?.addEventListener('change',refresh);
+    $('contentGameCompetitive')?.addEventListener('change',refresh);
+    refresh();
+  }else{
+    const rec=id?BADGE_ENTITIES.find(x=>x.id===id):null;
+    const b=rec?.badge||{};
+    const availabilityType=b.availabilityType||defaultBadgeAvailabilityType(b,b.room,b.game);
+    const roomNames=allRoomEntities({includeArchived:true}).map(x=>x.name);
+    const gameNames=allGameEntities({includeArchived:true}).map(x=>x.name);
+    const parts=badgeRequirements(b);
+    contentEditorHeader(
+      id?'Edit badge':'Add badge',
+      id
+        ? (rec?.custom?'Custom badge':'Built-in badge')
+        : 'Use Any Room unless the badge names fixed rooms/games. Multipart is reserved for EVERY room/game rules.'
+    );
+    body.innerHTML=`
+      <label class="label" for="contentBadgeName">Badge name</label>
+      <input id="contentBadgeName" class="field" value="${esc(b.name||'')}" maxlength="120" autocomplete="off">
+
+      <label class="label top-gap" for="contentBadgeHow">Requirement / how to earn</label>
+      <textarea id="contentBadgeHow" class="field content-textarea" placeholder="What must be done to earn this badge?">${esc(b.how||'')}</textarea>
+
+      <div class="content-form-grid top-gap">
+        <div>
+          <label class="label" for="contentBadgeRequirement">Availability type</label>
+          <select id="contentBadgeRequirement" class="field">
+            <option value="any" ${availabilityType==='any'?'selected':''}>Any Room</option>
+            <option value="specific" ${availabilityType==='specific'?'selected':''}>Specific rooms / games</option>
+            <option value="multipart" ${availabilityType==='multipart'?'selected':''}>Multipart — EVERY room / game</option>
+          </select>
+        </div>
+        <div>
+          <label class="label" for="contentBadgeCategory">Badge type</label>
+          <select id="contentBadgeCategory" class="field">
+            <option value="standard" ${(b.category||'standard')==='standard'?'selected':''}>Standard</option>
+            <option value="easter-egg" ${b.category==='easter-egg'?'selected':''}>Easter Egg</option>
+            <option value="riddle" ${b.category==='riddle'?'selected':''}>Riddle</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="contentBadgeSpecificWrap" class="top-gap">
+        <div class="row between wrap">
+          <div>
+            <div class="label">Specific requirement parts</div>
+            <div class="sub">Every part below is required. Within one part, “ / ” means alternative rooms or games.</div>
+          </div>
+          <button class="mini" type="button" data-add-badge-part>+ Add part</button>
+        </div>
+        <div id="contentBadgeParts" class="content-badge-parts top-gap">
+          ${renderBadgePartRows(parts.length?parts:[{rooms:[],games:[],level:null}])}
+        </div>
+        <datalist id="contentRoomNames">${roomNames.map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
+        <datalist id="contentGameNames">${gameNames.map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
+      </div>
+
+      <div id="contentBadgeMultipartWrap" class="top-gap">
+        <label class="label" for="contentBadgeMultipartRule">Multipart rule</label>
+        <select id="contentBadgeMultipartRule" class="field">
+          <option value="every-room" ${b.multipartRule==='every-room'?'selected':''}>Every room at the active Location</option>
+          <option value="every-game" ${(b.multipartRule||'every-game')==='every-game'?'selected':''}>Every game at the active Location</option>
+          <option value="every-game-level" ${b.multipartRule==='every-game-level'?'selected':''}>Every game level at the active Location</option>
+          <option value="every-room-game" ${b.multipartRule==='every-room-game'?'selected':''}>Every room and every game</option>
+        </select>
+      </div>
+
+      <label class="label top-gap" for="contentBadgeTip">Tip / watch out</label>
+      <textarea id="contentBadgeTip" class="field content-textarea">${esc(b.tip||'')}</textarea>
+
+      <label class="label top-gap" for="contentBadgeHint">Hint</label>
+      <textarea id="contentBadgeHint" class="field content-textarea">${esc(b.hint||'')}</textarea>
+
+      <label class="label top-gap" for="contentBadgeSolution">Solution / spoiler</label>
+      <textarea id="contentBadgeSolution" class="field content-textarea">${esc(b.solution||'')}</textarea>
+
+      <p class="sub top-gap"><strong>Any Room</strong> also covers venue-relative rules such as Riddle 7. <strong>Multipart</strong> is only for rules that explicitly mean EVERY room/game at that Location.</p>`;
+    if(archiveBtn){
+      archiveBtn.hidden=!id;
+      archiveBtn.textContent=b?._archived?'Restore badge':'Archive badge';
+    }
+    $('contentBadgeRequirement')?.addEventListener('change',refreshBadgeRequirementFields);
+    refreshBadgeRequirementFields();
+  }
+
+  setContentModalOpen(true);
+  requestAnimationFrame(()=>body.querySelector('input,select,textarea')?.focus());
+}
+
+function refreshBadgeRequirementFields(){
+  const type=$('contentBadgeRequirement')?.value||'any';
+  $('contentBadgeSpecificWrap')?.classList.toggle('hidden',type!=='specific');
+  $('contentBadgeMultipartWrap')?.classList.toggle('hidden',type!=='multipart');
+}
+
+function saveContentEditor(){
+  if(!contentEditing)return;
+  const {type,id,isNew}=contentEditing;
+  ensureContentState();
+
+  if(type==='rooms'){
+    const name=normaliseContentName($('contentRoomName')?.value);
+    if(!name)return toast('Enter a room name');
+    if(roomNameExists(name,id))return toast('A room with that name already exists');
+
+    if(isNew){
+      const newId=newContentId('room');
+      state.content.rooms[newId]={id:newId,custom:true,name,archived:false,createdAt:new Date().toISOString()};
+    }else{
+      const current=roomEntityById(id);if(!current)return;
+      const oldName=current.name;
+      const prior=state.content.rooms[id]||{};
+      state.content.rooms[id]={...prior,id,custom:!!current.custom,name,archived:!!current.archived};
+      if(oldName!==name)migrateRoomName(oldName,name);
+    }
+  }
+
+  if(type==='games'){
+    const name=normaliseContentName($('contentGameName')?.value);
+    const roomId=$('contentGameRoom')?.value||'';
+    const cooperative=!!$('contentGameCoop')?.checked;
+    const competitive=!!$('contentGameCompetitive')?.checked;
+    const levels=Math.max(1,Math.min(99,Number($('contentGameLevels')?.value)||10));
+    const description=String($('contentGameDescription')?.value||'').trim();
+
+    if(!name)return toast('Enter a game name');
+    if(!roomId||!roomEntityById(roomId))return toast('Choose a room');
+    if(!cooperative&&!competitive)return toast('Choose Co-op, Competitive, or both');
+    if(gameNameExists(name,id))return toast('A game with that name already exists');
+
+    const roomName=roomNameById(roomId);
+    if(isNew){
+      const newId=newContentId('game');
+      state.content.games[newId]={id:newId,custom:true,name,roomId,cooperative,competitive,levels,description,archived:false,createdAt:new Date().toISOString()};
+      excludeNewGameFromExistingLocations(name,roomName);
+    }else{
+      const current=gameEntityById(id);if(!current)return;
+      const oldName=current.name,oldRoom=roomNameById(current.roomId);
+      const prior=state.content.games[id]||{};
+      state.content.games[id]={
+        ...prior,id,custom:!!current.custom,name,roomId,cooperative,competitive,levels,description,archived:!!current.archived
+      };
+      if(oldName!==name)migrateGameName(oldName,name);
+      if(oldRoom!==roomName)migrateGameRoom(name,oldRoom,roomName);
+    }
+  }
+
+  if(type==='badges'){
+    const name=normaliseContentName($('contentBadgeName')?.value);
+    const how=String($('contentBadgeHow')?.value||'').trim();
+    const availabilityType=$('contentBadgeRequirement')?.value||'any';
+    const category=$('contentBadgeCategory')?.value||'standard';
+    const multipartRule=$('contentBadgeMultipartRule')?.value||'every-game';
+    let requirements=availabilityType==='specific'?collectBadgeRequirementParts():[];
+
+    if(!name)return toast('Enter a badge name');
+    if(!how)return toast('Enter the badge requirement');
+    if(badgeNameExists(name,id))return toast('A badge with that name already exists');
+
+    if(availabilityType==='specific'&&!requirements.length){
+      return toast('Add at least one specific room or game requirement');
+    }
+
+    for(const part of requirements){
+      if(part.rooms.length&&!part.rooms.every(r=>allRoomEntities({includeArchived:true}).some(x=>x.name===r))){
+        return toast('One of those room names is not in the catalogue');
+      }
+      if(part.games.length&&!part.games.every(g=>allGameEntities({includeArchived:true}).some(x=>x.name===g))){
+        return toast('One of those game names is not in the catalogue');
+      }
+      if(part.level){
+        const n=Number(part.level);
+        if(!Number.isInteger(n)||n<1||n>99)return toast('Level must be between 1 and 99');
+        part.level=n;
+      }else part.level=null;
+    }
+
+    requirements=normaliseRequirementParts(requirements);
+    const flatRooms=[...new Set(requirements.flatMap(p=>p.rooms||[]))];
+    const flatGames=[...new Set(requirements.flatMap(p=>p.games||[]))];
+    const levels=[...new Set(requirements.map(p=>p.level).filter(Boolean))];
+
+    const data={
+      name,how,availabilityType,multipartRule,requirements,category,
+      room:availabilityType==='specific'?flatRooms.join(' / '):'',
+      game:availabilityType==='specific'?flatGames.join(' / '):'',
+      level:availabilityType==='specific'&&levels.length===1?String(levels[0]):'',
+      tip:String($('contentBadgeTip')?.value||'').trim(),
+      hint:String($('contentBadgeHint')?.value||'').trim(),
+      solution:String($('contentBadgeSolution')?.value||'').trim()
+    };
+
+    if(isNew){
+      const newId=newContentId('badge');
+      state.content.badges[newId]={id:newId,custom:true,...data,archived:false,createdAt:new Date().toISOString()};
+    }else{
+      const rec=BADGE_ENTITIES.find(x=>x.id===id);if(!rec)return;
+      const prior=state.content.badges[id]||{};
+      state.content.badges[id]={...prior,id,custom:!!rec.custom,...data,archived:!!rec.archived};
+      // Earned status and award snapshot intentionally remain untouched.
+    }
+
+  }
+
+  applyContentCatalog();
+  syncTrophies();
+  save();
+  setContentModalOpen(false);
+  renderAll();
+  renderContentManager();
+  toast(isNew?'Added':'Saved');
+}
+
+function setContentArchived(type,id,archived){
+  ensureContentState();
+  if(type==='rooms'){
+    const room=roomEntityById(id);if(!room)return;
+    const prior=state.content.rooms[id]||{};
+    state.content.rooms[id]={...prior,id,custom:!!room.custom,name:room.name,archived};
+    if(archived){
+      state.locations.filter(l=>l.rooms.includes(room.name)).forEach(l=>addCatalogReview(l,`${room.name} was archived from the master catalogue. Historical progress is retained.`));
+    }
+  }else if(type==='games'){
+    const game=gameEntityById(id);if(!game)return;
+    const prior=state.content.games[id]||{};
+    state.content.games[id]={
+      ...prior,id,custom:!!game.custom,name:game.name,roomId:game.roomId,
+      cooperative:game.cooperative,competitive:game.competitive,levels:game.levels,
+      description:game.description||'',archived
+    };
+    if(archived){
+      const room=roomNameById(game.roomId);
+      state.locations.filter(l=>l.rooms.includes(room)&&!l.excludedGames.includes(game.name))
+        .forEach(l=>addCatalogReview(l,`${game.name} was archived from ${room}. Historical progress is retained.`));
+    }
+  }else{
+    const rec=BADGE_ENTITIES.find(x=>x.id===id);if(!rec)return;
+    const prior=state.content.badges[id]||{};
+    state.content.badges[id]={...prior,id,custom:!!rec.custom,archived};
+    if(archived){
+      state.pins=state.pins.filter(i=>i!==rec.index);
+      if(Number(focusBadgeIndex)===rec.index)$('focusOverlay')?.classList.remove('open');
+    }
+  }
+
+  applyContentCatalog();
+  syncTrophies();
+  save();
+  renderAll();
+  renderContentManager();
+  toast(archived?'Archived':'Restored');
+}
+
+function toggleContentArchived(type,id){
+  if(type==='rooms'){
+    const x=roomEntityById(id);if(x)setContentArchived(type,id,!x.archived);
+  }else if(type==='games'){
+    const x=gameEntityById(id);if(x)setContentArchived(type,id,!x.archived);
+  }else{
+    const x=BADGE_ENTITIES.find(y=>y.id===id);if(x)setContentArchived(type,id,!x.archived);
+  }
+}
+
+function renderAll(){ensureLevelProgress();renderHome();renderBadges();renderLocations();renderCompetitive();renderLevels();renderStats();renderContentManager();save()}
 
 function toggleEarn(i){
-  if(isTrophy(BADGES[i])){toast('Trophies unlock automatically from target progress');return}
-  if(state.earned[i]){delete state.earned[i];state.history=state.history.filter(h=>h.badge!==i)}
-  else{state.earned[i]=true;state.history.unshift({badge:i,date:new Date().toISOString().slice(0,10)})}
-  syncTrophyEarned();
+  if(state.earned[i]){
+    delete state.earned[i];
+    state.history=state.history.filter(h=>Number(h.badge)!==Number(i));
+    clearBadgeAward(i);
+  }else{
+    state.earned[i]=true;
+    const date=recordBadgeAward(i);
+    state.history.unshift({badge:i,date});
+  }
+  syncTrophies();
   renderAll();updatePageHeader('home');
 }
 
@@ -456,8 +1641,16 @@ function togglePin(i){return toggleBadgePin(i)}
 function openBadge(i){
   modalBadgeIndex=i;const b=BADGES[i];
   $('modalTitle').textContent=b.name;
-  $('modalBody').innerHTML=`<div class="detail"><strong>How to earn</strong>${esc(b.how)}</div>${b.room?`<div class="detail"><strong>Room / game</strong>${esc(b.room)}${b.game?' • '+esc(b.game):''}${b.level?' • Level '+esc(b.level):''}</div>`:''}${b.tip?`<div class="detail"><strong>Tip / watch out</strong>${esc(b.tip)}</div>`:''}${b.hint?`<div class="detail"><strong>Hint</strong>${esc(b.hint)}</div>`:''}${b.solution?`<div class="detail"><strong>Spoiler solution</strong><button id="revealSolution" class="btn ghost">Reveal</button><div id="solutionText" style="display:none;margin-top:8px">${esc(b.solution)}</div></div>`:''}`;
-  $('modalEarn').textContent=isTrophy(b)?(state.earned[i]?'Trophy unlocked':'Trophy progress automatic'):(state.earned[i]?'Mark not earned':'Mark earned');$('modalEarn').disabled=isTrophy(b);
+  const award=state.badgeAwards?.[badgeIdAt(i)];
+  $('modalBody').innerHTML=`
+    <div class="detail"><strong>How to earn</strong>${esc(b.how)}</div>
+    ${badgeRequirementMarkup(b)}
+    ${state.earned[i]&&awardTermsChanged(i)?`<div class="detail award-legacy-detail"><strong>Earned under earlier terms</strong>This badge remains earned. Award recorded ${esc(award?.earnedAt||'previously')}.</div>`:''}
+    ${b.tip?`<div class="detail"><strong>Tip / watch out</strong>${esc(b.tip)}</div>`:''}
+    ${b.hint?`<div class="detail"><strong>Hint</strong>${esc(b.hint)}</div>`:''}
+    ${b.solution?`<div class="detail"><strong>Spoiler solution</strong><button id="revealSolution" class="btn ghost">Reveal</button><div id="solutionText" style="display:none;margin-top:8px">${esc(b.solution)}</div></div>`:''}`;
+  $('modalEarn').textContent=state.earned[i]?'Mark not earned':'Mark earned';
+  $('modalEarn').disabled=false;
   $('modalPin').textContent=state.pins.includes(i)?'Unpin':'Pin';
   $('badgeModal').classList.add('open');
   if($('revealSolution'))$('revealSolution').onclick=()=>{$('solutionText').style.display='block';$('revealSolution').style.display='none'};
@@ -763,7 +1956,7 @@ function importScores(t){
       continue;
     }
 
-    // Cooperative (including games that also have a competitive mode): parse L1-L10.
+    // Cooperative (including games that also have a competitive mode): parse configured level count.
     const key=room+'||'+game;
     const prior=progress.games[key]||{room,game,levels:{}};
     const levels={...(prior.levels||{})};
@@ -775,7 +1968,7 @@ function importScores(t){
     let foundLevel=false;
     for(let i=2;i+2<r.length;i+=3){
       const level=parseInt(String(r[i]||'').trim(),10);
-      if(!(level>=1&&level<=10))continue;
+      if(!(level>=1&&level<=levelCountForGame(room,game)))continue;
       foundLevel=true;
 
       const score=Number(String(r[i+1]||'0').replace(/,/g,'').trim())||0;
@@ -852,7 +2045,7 @@ function gamePlayEntries(){
     if(x.mode==='competitive'){
       return {room:x.room,game:x.game,mode:'competitive',played:!!x.played};
     }
-    const played=[1,2,3,4,5,6,7,8,9,10].some(n=>!!x.levels?.[n]?.complete);
+    const played=Array.from({length:levelCountForGame(x.room,x.game)},(_,i)=>i+1).some(n=>!!x.levels?.[n]?.complete);
     return {room:x.room,game:x.game,mode:'cooperative',played};
   }).sort((a,b)=>a.room.localeCompare(b.room)||a.game.localeCompare(b.game)||a.mode.localeCompare(b.mode));
 }
@@ -913,7 +2106,7 @@ function renderLevels(){
     const gameBlocks=[];
 
     coop.forEach(g=>{
-      const played=[1,2,3,4,5,6,7,8,9,10].some(n=>!!g.levels?.[n]?.complete);
+      const played=Array.from({length:levelCountForGame(g.room,g.game)},(_,i)=>i+1).some(n=>!!g.levels?.[n]?.complete);
       totalGames++; if(played)playedGames++;
 
       if(levelsDisplayMode==='games'){
@@ -933,7 +2126,7 @@ function renderLevels(){
       }
 
       const levelItems=[];
-      for(let level=1;level<=10;level++){
+      for(let level=1;level<=levelCountForGame(g.room,g.game);level++){
         const info=g.levels?.[level]||g.levels?.[String(level)]||{};
         const done=!!info.complete;
         const score=Number(info.score)||0;
@@ -1040,9 +2233,17 @@ async function init(){
   try{
     const [badgeRes,roomRes]=await Promise.all([fetch('badges.json',{cache:'no-store'}),fetch('rooms.json',{cache:'no-store'})]);
     if(!badgeRes.ok||!roomRes.ok)throw new Error('Data files failed to load');
-    BADGES=await badgeRes.json();addTrophyTargets();
-    const roomData=await roomRes.json();ROOMS=roomData.rooms||[];GAMES=roomData.games||[];GAME_CATALOG=roomData.catalog||{};COMPETITIVE_INFO=roomData.competitiveInfo||{};
-    loadState();syncTrophyEarned();bindEvents();renderAll();
+    BASE_BADGES=await badgeRes.json();
+    const roomData=await roomRes.json();
+    BASE_ROOMS=[...(roomData.rooms||[])];
+    BASE_GAMES=[...(roomData.games||[])];
+    BASE_GAME_CATALOG=structuredClone(roomData.catalog||{});
+    BASE_COMPETITIVE_INFO=structuredClone(roomData.competitiveInfo||{});
+    buildBaseGameEntities();
+    loadState();
+    applyContentCatalog();
+    bindEvents();
+    renderAll();
 }catch(err){
     console.error(err);
     
@@ -1127,7 +2328,11 @@ function appBack(){
     $('badgeModal').classList.remove('open');
     return true;
   }
-  if($('drawer')?.classList.contains('open') || $('drawerBackdrop')?.classList.contains('open')){
+  if($('contentEditorModal')?.classList.contains('open')){
+    setContentModalOpen(false);
+    return true;
+  }
+  if($('sideDrawer')?.classList.contains('open') || $('drawerBackdrop')?.classList.contains('open')){
     closeDrawer?.();
     return true;
   }
@@ -1228,6 +2433,51 @@ function bindEvents(){
   listen('drawerBackdrop','click',closeDrawer);
 
   document.addEventListener('click',e=>{
+    if(e.target.closest('[data-add-badge-part]')){
+      const wrap=$('contentBadgeParts');
+      if(wrap){
+        const parts=collectBadgeRequirementParts();
+        parts.push({rooms:[],games:[],level:null});
+        wrap.innerHTML=renderBadgePartRows(parts);
+      }
+      return;
+    }
+    const removePart=e.target.closest('[data-remove-badge-part]');
+    if(removePart){
+      const row=removePart.closest('[data-badge-part]');
+      const wrap=$('contentBadgeParts');
+      row?.remove();
+      if(wrap&&!wrap.querySelector('[data-badge-part]')){
+        wrap.innerHTML=renderBadgePartRows([{rooms:[],games:[],level:null}]);
+      }else if(wrap){
+        const parts=collectBadgeRequirementParts();
+        wrap.innerHTML=renderBadgePartRows(parts);
+      }
+      return;
+    }
+
+    const contentTab=e.target.closest('[data-content-tab]');
+    if(contentTab){
+      contentManagerTab=contentTab.dataset.contentTab;
+      renderContentManager();
+      return;
+    }
+    const editContent=e.target.closest('[data-edit-content-type]');
+    if(editContent){
+      openContentEditor(editContent.dataset.editContentType,editContent.dataset.editContentId);
+      return;
+    }
+    const archiveContent=e.target.closest('[data-toggle-content-archive]');
+    if(archiveContent){
+      toggleContentArchived(archiveContent.dataset.toggleContentArchive,archiveContent.dataset.contentId);
+      return;
+    }
+    if(e.target.closest('[data-clear-catalog-review]')){
+      activeLocation().catalogReview=[];
+      save();renderLocations();toast('Catalogue review cleared');
+      return;
+    }
+
     const nav=e.target.closest('[data-view]');if(nav){showView(nav.dataset.view);return}
 
     // Nested badge controls MUST be handled before the clickable badge card.
@@ -1327,7 +2577,7 @@ function bindEvents(){
     if(!target)return;
 
     if(isTrophy(target)){
-      syncTrophyEarned();
+      syncTrophies();
       toast(state.earned[i]?'Trophy already achieved':'Trophies unlock automatically');
       openBadgeFocus(i,{newContext:false});
       return;
@@ -1340,7 +2590,7 @@ function bindEvents(){
 
     state.earned[i]=true;
     state.history.unshift({badge:i,date:new Date().toISOString().slice(0,10)});
-    syncTrophyEarned();
+    syncTrophies();
 
     // An earned badge leaves Focus/pins, but earning from the Badges list does
     // not otherwise alter the user's active list except where the current
@@ -1386,6 +2636,19 @@ function bindEvents(){
     openBadgeFocus(i,{newContext:false});
   });
 
+  listen('contentSearch','input',renderContentManager);
+  listen('contentShowArchived','change',renderContentManager);
+  onClick('contentAddBtn',()=>openContentEditor(contentManagerTab));
+  onClick('closeContentEditor',()=>setContentModalOpen(false));
+  onClick('contentCancelBtn',()=>setContentModalOpen(false));
+  onClick('contentSaveBtn',saveContentEditor);
+  onClick('contentArchiveBtn',()=>{
+    if(!contentEditing?.id)return;
+    toggleContentArchived(contentEditing.type,contentEditing.id);
+    setContentModalOpen(false);
+  });
+  onClick('contentEditorModal',e=>{if(e.target.id==='contentEditorModal')setContentModalOpen(false)});
+
   onClick('exportBackup',exportBackup);
   onChange('importBackup',e=>{
     const f=e.target.files?.[0];if(!f)return;
@@ -1398,14 +2661,19 @@ function bindEvents(){
       state.history=Array.isArray(state.history)?state.history:[];
       state.earned=state.earned||{};
       state.notes=state.notes||{};
+      ensureContentState();
+      ensureTrophyState();
+      state.badgeAwards=state.badgeAwards||{};
       ensureLevelProgressStore();
       activeLevelProgress();
+      applyContentCatalog();
+      syncTrophies();
       save();
       renderAll();
       toast('Backup restored')}catch{toast('Could not read backup')}};
     r.readAsText(f)
   });
-  onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();renderAll()}});
+  onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();ensureContentState();applyContentCatalog();renderAll()}});
 }
 
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(console.error));

@@ -1,0 +1,79 @@
+ACTIVATE TRACKER v13.53 — FINAL CATALOGUE RULES
+
+BADGES
+- Current supplied catalogue verified and packaged: 117 badges.
+- Trophies are now completely separate from the Badges array, so the Badges page no longer shows 121.
+- Badge achievements are GLOBAL across Locations.
+- Once a badge is earned, changing its name, room, game, level or requirement does NOT revoke it.
+- The app stores an award snapshot. If the definition later changes, the badge can show "Earned under earlier terms".
+- Archived badges preserve earned history but do not count as current active badges.
+
+BADGE AVAILABILITY MODEL
+1. ANY ROOM
+   - No fixed room/game requirement.
+   - Venue-relative rules such as Riddle 7.0 use Any Room.
+2. SPECIFIC ROOMS / GAMES
+   - Any explicitly named room/game is preserved.
+   - One requirement part can contain alternative rooms/games separated with " / ".
+   - Multiple requirement parts are ALL required.
+   - The Marathon is represented as three fixed paired parts:
+     Hide -> Relay -> Level 5
+     Mega Grid -> Mega Relay -> Level 5
+     Mega Laser -> Laser Relay -> Level 5
+3. MULTIPART
+   - Reserved for requirements that explicitly mean EVERY applicable room/game at the active Location.
+   - Current built-in multipart rules:
+     Activated -> every game level
+     Completionist -> every game
+     Keener -> every game
+     The Grand Tour -> every room
+
+RIDDLE 7.0
+- Any Room.
+- Its own requirement text remains venue-relative: every cooperative game at that facility beginning with S, level 7.
+
+TROPHIES
+- Stored separately from badges.
+- Bronze: permanent once earned at 25.
+- Silver: permanent once earned at 50.
+- Gold: permanent once earned at 75.
+- Platinum: dynamic 100% of the CURRENT active badge catalogue.
+- Adding a new active badge can therefore make Platinum incomplete until the new badge is earned.
+- Archiving a badge removes it from the active Platinum denominator.
+
+CONTENT MANAGER
+- Badge editor now uses:
+  Any Room
+  Specific rooms / games
+  Multipart — EVERY room / game
+- Removed the v13.52 Any/All room/game selectors.
+- Specific requirements can have multiple structured parts.
+- Rooms/Games management and Location review behaviour remain intact.
+
+LOCATIONS
+- Locations determine whether an unearned badge is available there.
+- They never own earned-badge state.
+- New rooms/games are not silently enabled at existing Locations.
+- Game moves/additions continue to flag Locations for review.
+
+DATA / MIGRATION
+- Existing localStorage key is preserved.
+- Schema upgraded to v3 in-place.
+- Existing earned badges, pins, notes, history, Locations and level progress are retained.
+- Legacy trophy helper objects are migrated out of the badge array.
+- Existing v13.52 Bronze/Silver/Gold achievement state is preserved where present.
+- Platinum is recalculated against the current active badge set.
+
+PACKAGE
+- This ZIP is now self-contained for GitHub Pages:
+  badges.json
+  rooms.json
+  manifest.webmanifest
+  PWA icons
+  app shell
+  semantic SVG page icons
+- Removed missing highscores.svg from the service-worker preload.
+- Removed old splash preload and splash markup.
+
+UPLOAD
+Upload EVERYTHING inside this ZIP to the GitHub repository root and overwrite existing files.
