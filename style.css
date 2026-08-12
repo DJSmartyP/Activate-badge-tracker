@@ -7720,3 +7720,35 @@ body{
       linear-gradient(180deg,#070912 0%,#05060d 58%,#03040a 100%) !important;
   }
 }
+
+
+/* =========================================================
+   v13.66 — TROPHY PROGRESS NAME EMPHASIS
+   ========================================================= */
+
+/* Primary target when the Trophy Progress renderer supplies the class. */
+.trophy-progress-name{
+  font-size:clamp(24px,3.1vw,34px) !important;
+  font-weight:900 !important;
+  line-height:1.05 !important;
+  letter-spacing:.025em !important;
+}
+
+/* Fallbacks for the existing Trophy Progress card structure. */
+#trophyProgress h3,
+.trophy-progress h3,
+.trophy-progress-card h3{
+  font-size:clamp(24px,3.1vw,34px) !important;
+  font-weight:900 !important;
+  line-height:1.05 !important;
+  letter-spacing:.025em !important;
+}
+
+@media (max-width:520px){
+  .trophy-progress-name,
+  #trophyProgress h3,
+  .trophy-progress h3,
+  .trophy-progress-card h3{
+    font-size:26px !important;
+  }
+}
