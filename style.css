@@ -10957,3 +10957,179 @@ body{
     display:none !important;
   }
 }
+
+
+/* =========================================================
+   v13.84 — STRONGER PLAYER EDGE GLOW + OBVIOUS ACTIVATE PHASE
+   ========================================================= */
+
+/* ACTIVATE now exactly matches PLAYER'S and TRACKER text size. */
+#brandBanner .brand-activate,
+.brand-banner-final .brand-activate{
+  font-size:calc(var(--brand-row-size) + 2px) !important;
+
+  /*
+    Oversized colour field: only a narrow section is visible at once,
+    so moving it makes the dominant colour visibly change.
+  */
+  background:
+    linear-gradient(
+      90deg,
+      #FF32B8 0%,
+      #FF32B8 11%,
+      #D548FF 20%,
+      #9A5FFF 30%,
+      #596DFF 40%,
+      #33DFFF 50%,
+      #20BFFF 60%,
+      #3470FF 70%,
+      #8960FF 80%,
+      #E33DFF 90%,
+      #FF32B8 100%
+    ) !important;
+
+  background-size:420% 100% !important;
+  background-position:0% 50% !important;
+
+  -webkit-background-clip:text !important;
+  background-clip:text !important;
+  -webkit-text-fill-color:transparent !important;
+  color:transparent !important;
+
+  animation:activateWordColourPhaseStrong 8.8s ease-in-out infinite !important;
+
+  filter:brightness(1.12) saturate(1.34) !important;
+}
+
+/* Clearly distinct dominant-colour stages: pink -> violet -> cyan/blue -> violet -> pink. */
+@keyframes activateWordColourPhaseStrong{
+  0%,100%{
+    background-position:0% 50%;
+    text-shadow:
+      0 0 3px rgba(255,50,184,.82),
+      0 0 8px rgba(255,50,184,.58),
+      0 0 16px rgba(227,61,255,.34),
+      0 0 24px rgba(255,50,184,.18);
+  }
+
+  25%{
+    background-position:34% 50%;
+    text-shadow:
+      0 0 3px rgba(154,95,255,.84),
+      0 0 8px rgba(137,96,255,.58),
+      0 0 16px rgba(89,109,255,.38),
+      0 0 24px rgba(154,95,255,.20);
+  }
+
+  50%{
+    background-position:68% 50%;
+    text-shadow:
+      0 0 3px rgba(51,223,255,.90),
+      0 0 8px rgba(32,191,255,.64),
+      0 0 16px rgba(52,112,255,.42),
+      0 0 25px rgba(51,223,255,.22);
+  }
+
+  75%{
+    background-position:100% 50%;
+    text-shadow:
+      0 0 3px rgba(137,96,255,.84),
+      0 0 8px rgba(227,61,255,.56),
+      0 0 16px rgba(255,50,184,.36),
+      0 0 24px rgba(137,96,255,.20);
+  }
+}
+
+/* Player plate: stronger high-score-style ambient glow. */
+#brandBanner .brand-lockup{
+  border-width:2px !important;
+  border-color:rgba(0,229,255,.84) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.15),
+    inset 0 -1px 0 rgba(var(--player-brand-safe-rgb),.16),
+    0 0 0 1px rgba(255,56,189,.25),
+    0 0 12px rgba(0,229,255,.48),
+    0 0 25px rgba(255,56,189,.31),
+    0 0 38px rgba(117,92,255,.16),
+    0 7px 18px rgba(0,0,0,.25) !important;
+}
+
+/*
+  Bigger/brighter travelling segment.
+  Same high-score palette, but with a broader lit arc and stronger bloom.
+*/
+#brandBanner .brand-lockup::before{
+  inset:-62% !important;
+
+  background:conic-gradient(
+    from 0deg,
+    transparent 0deg 226deg,
+    rgba(0,229,255,0) 226deg,
+    rgba(0,229,255,.30) 246deg,
+    #00E5FF 266deg,
+    #91F8FF 288deg,
+    #755CFF 314deg,
+    #FF38BD 336deg,
+    #FF91E1 353deg,
+    rgba(255,56,189,0) 360deg
+  ) !important;
+
+  filter:
+    drop-shadow(0 0 8px rgba(0,229,255,1))
+    drop-shadow(0 0 12px rgba(255,56,189,.96))
+    drop-shadow(0 0 20px rgba(117,92,255,.62)) !important;
+
+  animation:highScoreBorderSpin 5.8s linear infinite !important;
+}
+
+/* Expose a visibly thicker illuminated frame — ~4px rather than ~2px. */
+#brandBanner .brand-lockup::after{
+  inset:4px !important;
+
+  clip-path:polygon(
+    calc(var(--plate-cut) - 4px) 0,
+    calc(100% - var(--plate-cut) + 4px) 0,
+    100% 50%,
+    calc(100% - var(--plate-cut) + 4px) 100%,
+    calc(var(--plate-cut) - 4px) 100%,
+    0 50%
+  ) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(var(--player-brand-safe-rgb),.28),
+      rgba(var(--player-brand-rgb),.15)
+    ),
+    rgba(7,10,19,.93) !important;
+}
+
+/* The text remains safely above the brighter border animation. */
+#brandBanner .player-brand-name,
+#brandBanner .brand-main{
+  z-index:4 !important;
+}
+
+@media (max-width:520px){
+  /* Preserve the stronger edge without eating too far into the compact plate. */
+  #brandBanner .brand-lockup::after{
+    inset:3px !important;
+    clip-path:polygon(
+      calc(var(--plate-cut) - 3px) 0,
+      calc(100% - var(--plate-cut) + 3px) 0,
+      100% 50%,
+      calc(100% - var(--plate-cut) + 3px) 100%,
+      calc(var(--plate-cut) - 3px) 100%,
+      0 50%
+    ) !important;
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+  #brandBanner .brand-activate,
+  .brand-banner-final .brand-activate{
+    animation:none !important;
+    background-position:52% 50% !important;
+  }
+}
