@@ -9368,3 +9368,127 @@ body{
     column-gap:.28em !important;
   }
 }
+
+
+/* =========================================================
+   v13.75 — Simplify unified header
+   - remove visual seam between top and second row
+   - top row keeps only the player nameplate (less embellishment)
+   - slightly widen nameplate vs text
+   ========================================================= */
+
+/* Remove any visible dividing seam so the whole header feels continuous */
+.app-header-shell{
+  border-top:1px solid rgba(var(--page-accent-rgb), .28) !important;
+  border-bottom:1px solid rgba(var(--page-accent-rgb), .34) !important;
+}
+.app-header-shell::after{
+  content:"";
+  position:absolute;
+  left:0; right:0;
+  top:calc(var(--brand-row-height, 92px) - 1px);
+  height:3px;
+  background:linear-gradient(
+    180deg,
+    rgba(var(--page-accent-rgb), .08),
+    rgba(var(--page-accent-rgb), 0)
+  );
+  pointer-events:none;
+  z-index:1;
+}
+
+/* Ensure both rows sit on same uninterrupted page-colour field */
+.brand-banner-final,
+.brand-banner-final .brand-wordmark,
+.app-header-shell .page-bar{
+  border-bottom-color: transparent !important;
+}
+.brand-banner-final{
+  box-shadow:none !important;
+}
+.app-header-shell .page-bar{
+  margin-top:0 !important;
+}
+
+/* Strip top-row extras so the nameplate is the hero */
+.brand-banner-final .brand-status,
+.brand-banner-final .brand-indicators,
+.brand-banner-final .brand-signal,
+.brand-banner-final .brand-orbs,
+.brand-banner-final .brand-dot,
+.brand-banner-final .brand-node,
+.brand-banner-final .brand-led,
+.brand-banner-final .brand-pulse,
+.brand-banner-final .brand-corner-deco{
+  display:none !important;
+}
+
+/* Simplify the top strip background */
+.brand-banner-final .brand-wordmark::before,
+.brand-banner-final .brand-wordmark::after{
+  opacity:.18 !important;
+  filter:none !important;
+}
+.brand-banner-final .brand-wordmark{
+  background:
+    radial-gradient(
+      760px 260px at 18% 22%,
+      rgba(var(--page-accent-rgb), .10),
+      transparent 72%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(var(--page-accent-rgb), .04),
+      rgba(var(--page-accent-rgb), .03)
+    ) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.03),
+    inset 0 0 0 1px rgba(var(--page-accent-rgb), .10) !important;
+}
+
+/* Center the single nameplate cleanly */
+.brand-banner-final .brand-wordmark{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+/* Make the nameplate a touch wider than the content */
+.brand-lockup{
+  min-width:min(72vw, 610px) !important;
+  max-width:86vw !important;
+  justify-content:center !important;
+  padding:.38em 1.05em .42em !important;
+  border-radius:18px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 -1px 0 rgba(var(--player-brand-safe-rgb), .18),
+    inset 0 0 18px rgba(var(--player-brand-rgb), .08),
+    0 0 0 1px rgba(255,255,255,.72),
+    0 0 10px rgba(255,255,255,.20),
+    0 0 18px rgba(var(--player-brand-safe-rgb), .20),
+    0 8px 18px rgba(0,0,0,.28) !important;
+}
+.brand-lockup::before{
+  opacity:.72 !important;
+}
+.brand-lockup::after{
+  border-radius:14px !important;
+}
+
+/* Reduce edge-to-edge clutter around top row */
+.brand-banner-final .brand-wordmark > :not(.brand-lockup){
+  display:none !important;
+}
+
+/* Mobile scale */
+@media (max-width: 560px){
+  .brand-lockup{
+    min-width:min(78vw, 540px) !important;
+    padding:.32em .85em .36em !important;
+    border-radius:16px !important;
+  }
+  .brand-lockup::after{
+    border-radius:12px !important;
+  }
+}
