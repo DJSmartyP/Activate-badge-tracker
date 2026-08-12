@@ -6959,3 +6959,74 @@ h3,
   border:1px solid rgba(255,200,74,.35);
   background:rgba(255,200,74,.07)!important;
 }
+
+
+/* =========================================================
+   v13.55 — MODAL / EDITOR ABOVE STICKY PAGE HEADER
+   ========================================================= */
+
+/*
+  The app header is z-index 120. Older modal CSS was z-index 80,
+  allowing the page/title bar to cover the top of edit sheets.
+*/
+.modal{
+  z-index:320 !important;
+}
+
+/*
+  Keep the content editor anchored safely inside the viewport rather
+  than vertically centering a tall sheet where its top can feel clipped
+  on Fold cover screens / short landscape layouts.
+*/
+#contentEditorModal{
+  align-items:flex-start !important;
+  justify-content:center !important;
+  overflow-y:auto !important;
+  padding-top:max(14px,env(safe-area-inset-top)) !important;
+  padding-right:max(14px,env(safe-area-inset-right)) !important;
+  padding-bottom:max(14px,env(safe-area-inset-bottom)) !important;
+  padding-left:max(14px,env(safe-area-inset-left)) !important;
+}
+
+#contentEditorModal .content-editor-sheet{
+  margin:0 auto !important;
+  max-height:calc(
+    100dvh
+    - max(14px,env(safe-area-inset-top))
+    - max(14px,env(safe-area-inset-bottom))
+  ) !important;
+  overflow-y:auto !important;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* The first editor header row always stays visible at the top of the sheet. */
+#contentEditorModal .content-editor-sheet > .row:first-child{
+  position:sticky;
+  top:-1px;
+  z-index:3;
+  margin:-1px -1px 0;
+  padding:1px 1px 10px;
+  background:
+    linear-gradient(180deg,#0e131f 0%,#0e131f 82%,rgba(14,19,31,.96) 100%);
+}
+
+/* Toasts should remain visible above modal actions/validation. */
+.toast{
+  z-index:500 !important;
+}
+
+@media (orientation:landscape) and (max-height:760px){
+  #contentEditorModal{
+    padding-top:max(8px,env(safe-area-inset-top)) !important;
+    padding-bottom:max(8px,env(safe-area-inset-bottom)) !important;
+  }
+
+  #contentEditorModal .content-editor-sheet{
+    max-height:calc(
+      100dvh
+      - max(8px,env(safe-area-inset-top))
+      - max(8px,env(safe-area-inset-bottom))
+    ) !important;
+  }
+}

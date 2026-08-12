@@ -1,0 +1,23 @@
+ACTIVATE TRACKER v13.55 — EDITOR HEADER / MODAL LAYER FIX
+
+FIXED
+- Content Manager edit cards no longer sit behind the sticky page/title bar.
+- Modal layer raised above the app header.
+- Content editor now starts safely at the top of the visible viewport.
+- Safe-area padding added for Fold / notched screens.
+- Tall editors scroll inside the viewport instead of allowing the top to be clipped.
+- Editor title/close row remains visible while scrolling long badge forms.
+- Toast validation messages remain above the editor.
+
+RETAINED
+- v13.54 Add Part fix.
+- 117 verified badges.
+- Any Room / Specific / Multipart rules.
+- Global badge achievements.
+- Requirement-change award snapshots.
+- Separate trophy model.
+- Bronze/Silver/Gold persistent, Platinum dynamic.
+- Self-contained GitHub Pages package.
+
+UPLOAD
+Upload EVERYTHING inside this ZIP to the GitHub repository root and overwrite existing files.
