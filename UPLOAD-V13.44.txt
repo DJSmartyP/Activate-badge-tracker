@@ -1,0 +1,26 @@
+ACTIVATE TRACKER v13.44 — SHARP ICONS + PAGE TITLE HALO
+
+CHANGES
+- Reduced blur on page-header SVG icons.
+- Most page-colour glow now sits in the icon dock instead of on the icon artwork.
+- Icons retain only a tight page-colour halo.
+- Added a neon page-colour halo behind the page name.
+- Reduced large text-shadow radii so the title letters stay crisp.
+- Added a short page-colour light streak beneath the page name.
+- Fold-cover and landscape layouts use tighter glow settings.
+
+PAGE COLOURS RETAINED
+- Home — Electric cyan
+- Badges — Neon pink
+- Levels — Royal blue
+- Competitive — Hot orange-red
+- Locations — Ultraviolet
+- Stats — Emerald green
+- Settings — Amber gold
+
+BASE
+- Built directly from v13.43.
+- Working SVG icon pack retained.
+- No feature removals.
+
+UPLOAD EVERYTHING IN THIS ZIP TO GITHUB ROOT.

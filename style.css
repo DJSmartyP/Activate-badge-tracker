@@ -6100,3 +6100,150 @@ h3,
 }
 
 /* Reduced motion needs no special treatment here: glow is static. */
+
+
+/* =========================================================
+   v13.44 — SHARPER PAGE ICONS + PAGE-COLOUR TITLE HALO
+   ========================================================= */
+
+/* Keep most of the coloured identity in the dock, not on the SVG. */
+.page-icon-dock{
+  border-color:rgba(var(--page-accent-rgb),.52) !important;
+  background:
+    radial-gradient(
+      circle at 50% 48%,
+      rgba(var(--page-accent-rgb),.13) 0%,
+      rgba(var(--page-accent-rgb),.055) 42%,
+      rgba(var(--page-accent-rgb),.012) 70%,
+      transparent 80%
+    ),
+    linear-gradient(145deg,rgba(255,255,255,.032),rgba(0,0,0,.15)) !important;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.02),
+    inset 0 0 14px rgba(var(--page-accent-rgb),.065),
+    0 0 5px rgba(var(--page-accent-rgb),.11),
+    0 0 10px rgba(var(--page-accent-rgb),.055) !important;
+}
+
+/* Crisp icon: only a tight accent halo remains. */
+.page-icon-dock .page-header-icon,
+.page-header-icon{
+  filter:
+    saturate(1.08)
+    contrast(1.08)
+    drop-shadow(0 0 1px rgba(255,255,255,.30))
+    drop-shadow(0 0 3px rgba(var(--page-accent-rgb),.42)) !important;
+}
+
+/* Keep the tiny dock details illuminated but restrained. */
+.page-icon-dock::before,
+.page-icon-dock::after{
+  background:var(--page-accent) !important;
+  box-shadow:
+    0 0 3px rgba(var(--page-accent-rgb),.62),
+    0 0 5px rgba(var(--page-accent-rgb),.30) !important;
+}
+
+/* ---------------------------------------------------------
+   PAGE NAME HALO
+   Separate luminous field behind the text keeps letters crisp.
+   --------------------------------------------------------- */
+.page-bar-copy{
+  position:relative !important;
+  isolation:isolate;
+}
+
+.page-bar-copy::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  left:-14px;
+  top:14px;
+  width:min(92%,360px);
+  height:40px;
+  transform:translateY(-50%);
+  pointer-events:none;
+
+  background:
+    radial-gradient(
+      ellipse at 34% 50%,
+      rgba(var(--page-accent-rgb),.28) 0%,
+      rgba(var(--page-accent-rgb),.14) 32%,
+      rgba(var(--page-accent-rgb),.055) 56%,
+      transparent 76%
+    );
+
+  filter:blur(7px);
+  opacity:.95;
+}
+
+/* Sharper title lettering; the backing halo supplies the larger glow. */
+#pageHeaderTitle{
+  position:relative;
+  z-index:2;
+  text-shadow:
+    0 0 1px rgba(255,255,255,.88),
+    0 0 3px rgba(var(--page-accent-rgb),.64),
+    0 0 6px rgba(var(--page-accent-rgb),.24) !important;
+}
+
+/* Short illuminated accent streak below the page name. */
+#pageHeaderTitle::after{
+  content:"";
+  display:block;
+  width:min(92px,42%);
+  height:2px;
+  margin-top:3px;
+  border-radius:999px;
+  background:linear-gradient(
+    90deg,
+    var(--page-accent),
+    rgba(var(--page-accent-rgb),.35),
+    transparent
+  );
+  box-shadow:
+    0 0 4px rgba(var(--page-accent-rgb),.62),
+    0 0 8px rgba(var(--page-accent-rgb),.22);
+}
+
+/* Fold cover: compact glow and very crisp icon. */
+@media (max-width:430px){
+  .page-icon-dock .page-header-icon,
+  .page-header-icon{
+    filter:
+      saturate(1.06)
+      contrast(1.08)
+      drop-shadow(0 0 2px rgba(var(--page-accent-rgb),.34)) !important;
+  }
+
+  .page-bar-copy::before{
+    left:-9px;
+    top:13px;
+    width:min(96%,250px);
+    height:34px;
+    filter:blur(6px);
+    opacity:.88;
+  }
+
+  #pageHeaderTitle{
+    text-shadow:
+      0 0 1px rgba(255,255,255,.84),
+      0 0 3px rgba(var(--page-accent-rgb),.52) !important;
+  }
+}
+
+/* Compact landscape. */
+@media (orientation:landscape) and (max-height:760px){
+  .page-bar-copy::before{
+    top:11px;
+    height:28px;
+    filter:blur(5px);
+    opacity:.82;
+  }
+
+  #pageHeaderTitle::after{
+    margin-top:1px;
+    height:1.5px;
+  }
+}
