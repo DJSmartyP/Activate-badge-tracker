@@ -11602,3 +11602,93 @@ body{
     transform:rotate(0deg) !important;
   }
 }
+
+
+/* =========================================================
+   v13.89 — FATTER DUAL PULSES + SLOW ACTIVATE PHASE
+   ========================================================= */
+
+/* Much slower colour drift on ACTIVATE. */
+#brandBanner .brand-activate,
+.brand-banner-final .brand-activate{
+  animation-duration:18s !important;
+  animation-timing-function:ease-in-out !important;
+}
+
+/*
+  Keep the permanent plate line thin.
+  Make only the moving energy pulses visually thicker:
+  - broader angular footprint
+  - much larger outer bloom
+  - stronger luminous core
+*/
+#brandBanner .brand-lockup{
+  border-width:1px !important;
+}
+
+/* Broader blue + pink pulses, still opposite each other. */
+#brandBanner .brand-lockup::before{
+  inset:-74% !important;
+
+  background:
+    conic-gradient(
+      from 0deg,
+
+      /* BLUE / CYAN pulse — broader body */
+      transparent 0deg 4deg,
+      rgba(49,87,255,0) 4deg,
+      rgba(49,87,255,.18) 18deg,
+      rgba(49,87,255,.48) 34deg,
+      #3157FF 48deg,
+      #43E7FF 62deg,
+      #C4FCFF 72deg,
+      #43E7FF 82deg,
+      #3157FF 96deg,
+      rgba(49,87,255,.48) 110deg,
+      rgba(49,87,255,.16) 126deg,
+      rgba(49,87,255,0) 140deg,
+
+      /* quiet gap */
+      transparent 140deg 184deg,
+
+      /* PINK pulse — broader body */
+      rgba(255,56,184,0) 184deg,
+      rgba(255,56,184,.18) 198deg,
+      rgba(255,56,184,.50) 214deg,
+      #FF38B8 228deg,
+      #FF4FB3 242deg,
+      #FFD2F1 252deg,
+      #FF4FB3 262deg,
+      #FF38B8 276deg,
+      rgba(255,56,184,.48) 290deg,
+      rgba(255,56,184,.16) 306deg,
+      rgba(255,56,184,0) 320deg,
+
+      /* quiet gap */
+      transparent 320deg 360deg
+    ) !important;
+
+  filter:
+    /* cyan/blue pulse thickness */
+    drop-shadow(0 0 10px rgba(67,231,255,1))
+    drop-shadow(0 0 20px rgba(49,87,255,.98))
+    drop-shadow(0 0 34px rgba(67,231,255,.78))
+    drop-shadow(0 0 48px rgba(49,87,255,.38))
+
+    /* pink pulse thickness */
+    drop-shadow(0 0 10px rgba(255,56,184,1))
+    drop-shadow(0 0 20px rgba(255,79,179,.98))
+    drop-shadow(0 0 34px rgba(255,56,184,.76))
+    drop-shadow(0 0 48px rgba(255,79,179,.36))
+    !important;
+
+  animation-duration:6.8s !important;
+}
+
+/*
+  Preserve the thin edge reveal. The extra apparent thickness is glow,
+  not a fatter permanent border.
+*/
+#brandBanner .brand-lockup::after{
+  inset:2px !important;
+}
