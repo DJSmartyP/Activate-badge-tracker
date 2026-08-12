@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.67.0';
+const VERSION='13.68.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -63,6 +63,59 @@ function hexToRgbTriplet(hex){
   ].join(',');
 }
 
+function hexToRgbArray(hex){
+  const value=validPlayerBrandColor(hex).slice(1);
+  return [
+    parseInt(value.slice(0,2),16),
+    parseInt(value.slice(2,4),16),
+    parseInt(value.slice(4,6),16)
+  ];
+}
+
+function srgbChannelToLinear(v){
+  const c=v/255;
+  return c<=0.04045 ? c/12.92 : Math.pow((c+0.055)/1.055,2.4);
+}
+
+function relativeLuminance(hex){
+  const [r,g,b]=hexToRgbArray(hex).map(srgbChannelToLinear);
+  return 0.2126*r + 0.7152*g + 0.0722*b;
+}
+
+function rgbToHex(r,g,b){
+  return '#'+[r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('').toUpperCase();
+}
+
+function mixHex(a,b,amount){
+  const ar=hexToRgbArray(a), br=hexToRgbArray(b);
+  const t=Math.max(0,Math.min(1,Number(amount)||0));
+  return rgbToHex(
+    ar[0]+(br[0]-ar[0])*t,
+    ar[1]+(br[1]-ar[1])*t,
+    ar[2]+(br[2]-ar[2])*t
+  );
+}
+
+function contrastSafePlayerColor(hex){
+  const raw=validPlayerBrandColor(hex);
+  // Target enough luminance to remain legible/glowy on the dark UI.
+  // Preserve bright colours exactly; progressively lift darker picks
+  // toward white so black/navy/deep purple remain recognisably related
+  // to the chosen colour instead of disappearing.
+  const target=0.34;
+  let safe=raw;
+  if(relativeLuminance(safe)>=target)return safe;
+
+  for(let i=1;i<=20;i++){
+    const candidate=mixHex(raw,'#FFFFFF',i/20);
+    if(relativeLuminance(candidate)>=target){
+      safe=candidate;
+      break;
+    }
+  }
+  return safe;
+}
+
 function playerDisplayName(){
   return normalisePlayerName(state?.playerName)||'Smarty';
 }
@@ -75,6 +128,7 @@ function renderPlayerBrand(){
   const rawName=playerDisplayName();
   const possessive=playerPossessiveName();
   const color=validPlayerBrandColor(state?.playerBrandColor);
+  const safeColor=contrastSafePlayerColor(color);
 
   const nameEl=$('playerBrandName');
   const banner=$('brandBanner');
@@ -83,6 +137,8 @@ function renderPlayerBrand(){
 
   document.documentElement.style.setProperty('--player-brand-color',color);
   document.documentElement.style.setProperty('--player-brand-rgb',hexToRgbTriplet(color));
+  document.documentElement.style.setProperty('--player-brand-safe',safeColor);
+  document.documentElement.style.setProperty('--player-brand-safe-rgb',hexToRgbTriplet(safeColor));
 
   if(nameEl)nameEl.textContent=possessive;
   if(banner)banner.setAttribute('aria-label',`${possessive} Activate Tracker`);
