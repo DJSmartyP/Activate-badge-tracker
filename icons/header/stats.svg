@@ -1,13 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-hidden="true">
   <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M9 20 32 7l23 13v29a6 6 0 0 1-6 6H15a6 6 0 0 1-6-6Z"
-          stroke="#35E690" stroke-width="2.2" opacity=".16"/>
-    
-  <path d="M13 49h38" stroke="#F8FFFB" stroke-width="3.2"/>
-  <path d="M17 49V36h8v13M29 49V28h8v21M41 49V18h8v31"
-        stroke="#F8FFFB" stroke-width="3.2"/>
-  <path d="m15 31 10-6 8 3 14-13" stroke="#35E690" stroke-width="4"/>
-  <circle cx="47" cy="15" r="3.5" fill="#35E690" stroke="none"/>
-
+    <path d="M31 10a21 21 0 1 0 21 21H31Z"
+          stroke="#F8FFFB" stroke-width="3.6"/>
+    <path d="M36 7a21 21 0 0 1 21 21H36Z"
+          stroke="#35E690" stroke-width="3.6"/>
+    <path d="M13 50h9l5-8 6 5 7-12 5 4 7-10"
+          stroke="#35E690" stroke-width="3.5"/>
+    <circle cx="52" cy="29" r="2.6" fill="#35E690" stroke="none"/>
   </g>
 </svg>
