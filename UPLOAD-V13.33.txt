@@ -1,0 +1,41 @@
+ACTIVATE TRACKER v13.33 — LARGER PAGE HEADER ELEMENTS
+
+PAGE HEADER
+- Kept the SAME horizontal column footprint.
+- Menu column remains 54px on normal/landscape layouts and 50px on Fold cover.
+- Gap widths are unchanged.
+- Header grows vertically instead of horizontally.
+
+ENLARGED
+- Bigger hamburger glyph.
+- Taller menu button without making it wider.
+- Bigger page icon artwork inside the same icon-column width.
+- Larger Tilt Neon page title.
+- Larger subtitle.
+- Existing neon glows retained.
+
+RESPONSIVE
+- Fold cover keeps the same 50px horizontal menu/icon footprint.
+- Landscape keeps the same horizontal allocation and gains size mostly through height.
+- Long titles/subtitles ellipsize rather than forcing the header wider.
+
+RETAINED
+- v13.32 landscape trophy layout
+- Crisp app icon set
+- Header HUD/brand lockup
+- Small caps
+- Trophy progress fill
+- Venue high-score filter
+- Context-aware Focus navigation
+- Pin hard fix
+
+UPLOAD TO GITHUB ROOT:
+index.html
+app.js
+style.css
+sw.js
+manifest.webmanifest
+icon-512.png
+icon-192.png
+icon-maskable-512.png
+favicon-64.png
