@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.57.0';
+const VERSION='13.60.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -17,6 +17,8 @@ let contentManagerTab='rooms';
 let contentEditing=null;
 const defaultState=()=>({
   schemaVersion:3,
+  playerName:"Smarty",
+  playerBrandColor:"#FF4FB3",
   content:{rooms:{},games:{},badges:{}},
   badgeAwards:{},
   trophies:{
@@ -39,6 +41,46 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const save=()=>localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
 const toast=msg=>{const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600)};
+function normalisePlayerName(value){
+  let name=String(value??'').trim().replace(/\s+/g,' ').slice(0,32);
+  // v13.58 stored/displayed the old possessive directly. Keep the Settings
+  // field as the raw player name so we never produce "Smarty's's".
+  name=name.replace(/(?:['’]s)$/i,'').trim();
+  return name.slice(0,32);
+}
+
+function validPlayerBrandColor(value){
+  const v=String(value||'').trim();
+  return /^#[0-9a-f]{6}$/i.test(v)?v.toUpperCase():'#FF4FB3';
+}
+
+function playerDisplayName(){
+  return normalisePlayerName(state?.playerName)||'Smarty';
+}
+
+function playerPossessiveName(){
+  return `${playerDisplayName()}’s`;
+}
+
+function renderPlayerBrand(){
+  const rawName=playerDisplayName();
+  const possessive=playerPossessiveName();
+  const color=validPlayerBrandColor(state?.playerBrandColor);
+
+  const nameEl=$('playerBrandName');
+  const banner=$('brandBanner');
+  const input=$('playerDisplayName');
+  const colorInput=$('playerBrandColor');
+
+  document.documentElement.style.setProperty('--player-brand-color',color);
+
+  if(nameEl)nameEl.textContent=possessive;
+  if(banner)banner.setAttribute('aria-label',`${possessive} Activate Tracker`);
+  if(input && document.activeElement!==input)input.value=rawName;
+  if(colorInput && document.activeElement!==colorInput)colorInput.value=color;
+}
+
+
 const activeLocation=()=>state.locations.find(l=>l.id===state.activeLocation)||state.locations[0];
 const earnedCount=()=>activeTrackedBadgeIndices().filter(i=>state.earned[i]).length;
 const roomTypeFromInstance=n=>n==='Entrance'||n==='Exit'?n:n.replace(/\s+\d+$/,'');
@@ -830,6 +872,9 @@ function loadState(){
   state.history=Array.isArray(state.history)?state.history:[];
   state.earned=state.earned||{};
   state.notes=state.notes||{};
+  if(state.playerName===undefined || state.playerName===null)state.playerName='Smarty';
+  state.playerName=normalisePlayerName(state.playerName)||'Smarty';
+  state.playerBrandColor=validPlayerBrandColor(state.playerBrandColor);
   state.locations.forEach(ensureLocationShape);ensureContentState();ensureTrophyState();state.badgeAwards=state.badgeAwards||{};ensureLevelProgressStore();activeLevelProgress();
 }
 
@@ -1632,7 +1677,7 @@ function toggleContentArchived(type,id){
   }
 }
 
-function renderAll(){ensureLevelProgress();renderHome();renderBadges();renderLocations();renderCompetitive();renderLevels();renderStats();renderContentManager();save()}
+function renderAll(){ensureLevelProgress();renderPlayerBrand();renderHome();renderBadges();renderLocations();renderCompetitive();renderLevels();renderStats();renderContentManager();save()}
 
 function toggleEarn(i){
   if(state.earned[i]){
@@ -2126,6 +2171,13 @@ function importScores(t){
   progress.importedAt=importedAt;
   progress.player=player;
   progress.source='Activate-scores.ca';
+
+  if(player){
+    // The player identity embedded in the imported Activate-scores CSV
+    // is authoritative for the personalised header name.
+    state.playerName=normalisePlayerName(player);
+    renderPlayerBrand();
+  }
   progress.lastImportReport=report;
 
   save();
@@ -2699,6 +2751,26 @@ function bindEvents(){
   listen('badgeStatus','change',renderBadges);
   listen('badgeAvailability','change',renderBadges);
   listen('locationName','input',e=>{activeLocation().name=e.target.value;save();renderHome()});
+  listen('playerDisplayName','input',e=>{
+    state.playerName=normalisePlayerName(e.target.value);
+    renderPlayerBrand();
+    save();
+  });
+  listen('playerDisplayName','change',e=>{
+    state.playerName=normalisePlayerName(e.target.value)||'Smarty';
+    renderPlayerBrand();
+    save();
+  });
+  listen('playerBrandColor','input',e=>{
+    state.playerBrandColor=validPlayerBrandColor(e.target.value);
+    renderPlayerBrand();
+    save();
+  });
+  listen('playerBrandColor','change',e=>{
+    state.playerBrandColor=validPlayerBrandColor(e.target.value);
+    renderPlayerBrand();
+    save();
+  });
 
   onClick('addLocation',()=>{const id='loc_'+Date.now();state.locations.push({id,name:'New location',rooms:[],games:[],roomCopies:{},roomInstances:[],venueMap:{Entrance:{front:null,left:null,right:null,back:null},Exit:{front:null,left:null,right:null,back:null}}});state.activeLocation=id;renderAll()});
   onClick('deleteLocation',()=>{if(state.locations.length===1)return toast('Keep at least one location');state.locations=state.locations.filter(l=>l.id!==state.activeLocation);state.activeLocation=state.locations[0].id;renderAll()});
@@ -2805,6 +2877,9 @@ function bindEvents(){
       state.history=Array.isArray(state.history)?state.history:[];
       state.earned=state.earned||{};
       state.notes=state.notes||{};
+      if(state.playerName===undefined || state.playerName===null)state.playerName='Smarty';
+      state.playerName=normalisePlayerName(state.playerName)||'Smarty';
+      state.playerBrandColor=validPlayerBrandColor(state.playerBrandColor);
       ensureContentState();
       ensureTrophyState();
       state.badgeAwards=state.badgeAwards||{};

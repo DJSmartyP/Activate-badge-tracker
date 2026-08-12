@@ -41,7 +41,7 @@
 <header class="app-header-shell">
 
   
-<div class="brand-banner-wrap brand-banner-final" aria-label="Smarty's Activate Tracker">
+<div id="brandBanner" class="brand-banner-wrap brand-banner-final" aria-label="Activate Tracker">
   <div class="brand-wordmark">
     <div class="brand-decor" aria-hidden="true">
       <span class="decor-node decor-node-a"></span>
@@ -56,7 +56,7 @@
       <span class="decor-line decor-line-c"></span>
     </div>
     <div class="brand-lockup">
-      <span class="smarty-tag">Smarty's</span>
+      <span id="playerBrandName" class="player-brand-name">Smarty's</span>
       <strong class="brand-main" aria-label="Activate Tracker">
         <span class="brand-activate">Activate</span>
         <span class="brand-tracker">Tracker</span>
@@ -274,7 +274,19 @@
 
 <div class="card">
         <h2>Settings</h2>
-        <p class="sub">Version <strong>13.57.0</strong> — clean rebuild.</p>
+        <p class="sub">Version <strong>13.60.0</strong> — clean rebuild.</p>
+
+        <div class="player-personalisation top-gap">
+          <div class="player-name-setting">
+            <label class="label" for="playerDisplayName">Player name</label>
+            <input id="playerDisplayName" class="field" type="text" maxlength="32" autocomplete="name" placeholder="Enter player name">
+          </div>
+          <div class="player-colour-setting">
+            <label class="label" for="playerBrandColor">Player colour</label>
+            <input id="playerBrandColor" class="player-colour-picker" type="color" value="#FF4FB3" aria-label="Choose player name colour">
+          </div>
+        </div>
+        <p class="sub">Your name appears to the left of Activate Tracker. The header automatically adds <strong>’s</strong>.</p>
         <div class="row wrap">
           <button class="btn primary icon-label-btn" id="exportBackup"><img src="icons/backup.svg" alt="">Backup app data</button>
           <label class="btn icon-label-btn"><img src="icons/restore.svg" alt="">Restore app data<input id="importBackup" type="file" accept="application/json" hidden></label>
