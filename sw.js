@@ -1,8 +1,8 @@
-const CACHE='activate-tracker-v13-30-0';
+const CACHE='activate-tracker-v13-32-0';
 const ASSETS=[
   './','index.html','style.css','app.js','badges.json','rooms.json','manifest.webmanifest',
-  'icon-192.png?v=108','icon-512.png?v=108','icon-maskable-512.png?v=108',
-  'favicon-64.png?v=108','splash-portrait.png?v=108','splash-landscape.png?v=108'
+  'icon-192.png?v=131','icon-512.png?v=131','icon-maskable-512.png?v=131',
+  'favicon-64.png?v=131','splash-portrait.png?v=108','splash-landscape.png?v=108'
 ];
 
 self.addEventListener('install', event => {

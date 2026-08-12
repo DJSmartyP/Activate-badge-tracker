@@ -1,0 +1,36 @@
+ACTIVATE TRACKER v13.32 — LANDSCAPE TROPHY LAYOUT FIX
+
+HOME TROPHY CARD
+- The live trophy progress visual now sits directly to the RIGHT of the
+  current Bronze / Silver / Gold / Platinum name.
+- This uses the previously empty space inside the main trophy card.
+- The old separate current-target panel is removed.
+- Recent 3 achievements remain in the side area only when there is enough room.
+
+LANDSCAPE FIXES
+- Reduced unnecessary column pressure.
+- Prevented labels and small-caps text from being squeezed into tiny widths.
+- Metrics use minmax(0,1fr) so all three stay balanced.
+- Trophy progress shrinks cleanly in landscape.
+- Recent achievement rows use tighter but readable spacing.
+- On very short landscape screens, the recent-achievements side panel hides
+  rather than crushing the main trophy content.
+
+APP ICON
+- Includes the new crisp v13.31 app icon set:
+  icon-512.png
+  icon-192.png
+  icon-maskable-512.png
+  favicon-64.png
+  manifest.webmanifest
+
+UPLOAD TO GITHUB ROOT:
+index.html
+app.js
+style.css
+sw.js
+manifest.webmanifest
+icon-512.png
+icon-192.png
+icon-maskable-512.png
+favicon-64.png

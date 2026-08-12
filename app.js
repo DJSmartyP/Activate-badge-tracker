@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.30.0';
+const VERSION='13.32.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -193,9 +193,29 @@ function renderHome(){
     <div class="home-trophy-dashboard">
       <div class="home-trophy-main">
         <div class="label">Trophy progress</div>
-        <div class="big trophy-current-name ${tpClass}">${esc(tp.name)}</div>
-        <div class="sub">${tp.remaining?`${tp.current} / ${tp.target} badges • ${tp.remaining} to unlock`:'Unlocked • 100% complete'}</div>
+
+        <div class="home-trophy-title-row">
+          <div class="home-trophy-title-copy">
+            <div class="big trophy-current-name ${tpClass}">${esc(tp.name)}</div>
+            <div class="sub">${tp.remaining?`${tp.current} / ${tp.target} badges • ${tp.remaining} to unlock`:'Unlocked • 100% complete'}</div>
+          </div>
+
+          <div class="home-trophy-live ${tpClass}" aria-label="${milestonePct}% progress toward ${esc(tp.name)} trophy">
+            <div class="trophy-counter-display" style="--trophy-pct:${milestonePct};--milestone-fill:${milestonePct}%">
+              <div class="trophy-counter-inner">
+                <span class="trophy-counter-icon-stack" aria-hidden="true">
+                  <span class="trophy-counter-icon trophy-counter-icon-mono">🏆</span>
+                  <span class="trophy-counter-icon trophy-counter-icon-colour">🏆</span>
+                </span>
+                <strong>${milestonePct}%</strong>
+                <small>To ${esc(tp.name)}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="progress top-gap"><span style="width:${tp.target?Math.min(100,tp.current/tp.target*100):100}%"></span></div>
+
         <div class="metrics">
           <div class="metric"><span class="label">Earned</span><b>${n}</b></div>
           <div class="metric"><span class="label">Overall</span><b>${pct}%</b></div>
@@ -204,24 +224,6 @@ function renderHome(){
       </div>
 
       <aside class="home-trophy-side">
-        <div class="trophy-counter-panel ${tpClass}" aria-label="${milestonePct}% progress toward ${esc(tp.name)} trophy">
-          <div class="trophy-counter-display" style="--trophy-pct:${milestonePct};--milestone-fill:${milestonePct}%">
-            <div class="trophy-counter-inner">
-              <span class="trophy-counter-icon-stack" aria-hidden="true">
-                <span class="trophy-counter-icon trophy-counter-icon-mono">🏆</span>
-                <span class="trophy-counter-icon trophy-counter-icon-colour">🏆</span>
-              </span>
-              <strong>${milestonePct}%</strong>
-              <small>To ${esc(tp.name)}</small>
-            </div>
-          </div>
-          <div class="trophy-counter-copy">
-            <span class="label">Current trophy target</span>
-            <b>${tp.current} / ${tp.target}</b>
-            <span>${tp.remaining?`${tp.remaining} badges to ${esc(tp.name)}`:`${esc(tp.name)} achieved`}</span>
-          </div>
-        </div>
-
         <div class="home-recent-three">
           <div class="home-recent-head">
             <span class="label">Last 3 achievements</span>
