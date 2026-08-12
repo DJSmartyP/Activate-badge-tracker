@@ -9492,4 +9492,309 @@ body{
     border-radius:12px !important;
   }
 }
-\n\n/* =========================================================\n   v13.76 — CLEAN PAGE-COLOUR HEADER\n   Top and lower page row are one continuous colour field.\n   The ONLY top-row object is the personalised nameplate.\n   ========================================================= */\n\n/* One uninterrupted page-colour surface across both tiers. */\n.app-header-shell{\n  background:\n    radial-gradient(\n      900px 360px at 18% 26%,\n      rgba(var(--active-page-accent-rgb),.24) 0%,\n      rgba(var(--active-page-accent-rgb),.12) 38%,\n      transparent 72%\n    ),\n    linear-gradient(\n      180deg,\n      rgba(var(--active-page-accent-rgb),.16) 0%,\n      rgba(var(--active-page-accent-rgb),.15) 48%,\n      rgba(var(--active-page-accent-rgb),.15) 100%\n    ),\n    #08101b !important;\n\n  border-top:1px solid rgba(var(--active-page-accent-rgb),.30) !important;\n  border-bottom:1px solid rgba(var(--active-page-accent-rgb),.38) !important;\n  box-shadow:\n    inset 0 1px 0 rgba(255,255,255,.035),\n    0 10px 26px rgba(0,0,0,.28),\n    0 5px 18px rgba(var(--active-page-accent-rgb),.08) !important;\n}\n\n/* Remove every inherited decorative background/seam from the former top bar. */\n.app-header-shell::before,\n.app-header-shell::after,\n.brand-banner-final .brand-wordmark::before,\n.brand-banner-final .brand-wordmark::after,\n.app-header-shell .page-bar::before,\n.app-header-shell .page-bar::after{\n  content:none !important;\n  display:none !important;\n}\n\n.brand-banner-wrap,\n.brand-banner-final,\n.brand-banner-final .brand-wordmark{\n  background:transparent !important;\n  border:0 !important;\n  border-radius:0 !important;\n  clip-path:none !important;\n  box-shadow:none !important;\n}\n\n/* The top tier is simply empty page-colour space containing the plate. */\n.brand-banner-final .brand-wordmark{\n  min-height:116px !important;\n  display:flex !important;\n  align-items:center !important;\n  justify-content:center !important;\n  padding:14px 20px 10px !important;\n}\n\n/* Lower row sits directly on the SAME colour field. */\n.app-header-shell .page-bar{\n  margin-top:0 !important;\n  border-top:0 !important;\n  border-bottom:0 !important;\n  background:\n    radial-gradient(\n      760px 240px at 20% 18%,\n      rgba(var(--active-page-accent-rgb),.11),\n      transparent 70%\n    ),\n    linear-gradient(\n      180deg,\n      rgba(var(--active-page-accent-rgb),.035),\n      rgba(var(--active-page-accent-rgb),.035)\n    ) !important;\n  box-shadow:none !important;\n}\n\n/* One clean, slightly oversized personalised plate. */\n.brand-lockup{\n  --plate-cut:12px;\n\n  position:relative !important;\n  left:auto !important;\n  top:auto !important;\n  transform:none !important;\n\n  width:auto !important;\n  min-width:min(76vw,760px) !important;\n  max-width:88vw !important;\n  min-height:58px !important;\n\n  display:flex !important;\n  align-items:baseline !important;\n  justify-content:center !important;\n  gap:.34em !important;\n\n  margin:0 auto !important;\n  padding:.38em 1.05em .42em !important;\n\n  background:\n    radial-gradient(\n      520px 120px at 18% 50%,\n      rgba(var(--player-brand-safe-rgb),.28),\n      transparent 74%\n    ),\n    linear-gradient(\n      135deg,\n      rgba(var(--player-brand-safe-rgb),.24),\n      rgba(var(--player-brand-rgb),.12) 55%,\n      rgba(var(--player-brand-safe-rgb),.15)\n    ),\n    rgba(7,10,18,.94) !important;\n\n  border:1px solid rgba(255,255,255,.68) !important;\n  border-radius:0 !important;\n  clip-path:polygon(\n    var(--plate-cut) 0,\n    calc(100% - var(--plate-cut)) 0,\n    100% 50%,\n    calc(100% - var(--plate-cut)) 100%,\n    var(--plate-cut) 100%,\n    0 50%\n  ) !important;\n\n  box-shadow:\n    inset 0 1px 0 rgba(255,255,255,.12),\n    inset 0 -1px 0 rgba(var(--player-brand-safe-rgb),.16),\n    0 0 0 1px rgba(255,255,255,.12),\n    0 0 8px rgba(255,255,255,.20),\n    0 0 18px rgba(var(--player-brand-safe-rgb),.20),\n    0 7px 18px rgba(0,0,0,.26) !important;\n}\n\n/* Remove legacy plate frames / mounting effects. */\n.brand-lockup::before,\n.brand-lockup::after{\n  content:none !important;\n  display:none !important;\n}\n\n.player-brand-name,\n.brand-banner-final .player-brand-name{\n  position:relative !important;\n  left:auto !important;\n  top:auto !important;\n  transform:none !important;\n  margin:0 !important;\n  padding:0 !important;\n  background:none !important;\n  border:0 !important;\n  clip-path:none !important;\n  box-shadow:none !important;\n  max-width:min(38vw,380px) !important;\n}\n\n.brand-banner-final .brand-main{\n  position:relative !important;\n  display:inline-flex !important;\n  align-items:baseline !important;\n  gap:.34em !important;\n  margin:0 !important;\n  padding:0 !important;\n  background:none !important;\n}\n\n/* Make sure nothing from the removed old brand system can reappear. */\n.brand-decor,\n.brand-hud,\n.brand-tagline,\n.brand-kicker,\n.brand-status,\n.brand-indicators,\n.brand-signal,\n.brand-orbs,\n.brand-dot,\n.brand-node,\n.brand-led,\n.brand-pulse,\n.brand-corner-deco{\n  display:none !important;\n}\n\n@media (max-width:820px){\n  .brand-banner-final .brand-wordmark{\n    min-height:104px !important;\n    padding:12px 14px 8px !important;\n  }\n  .brand-lockup{\n    --plate-cut:10px;\n    min-width:min(82vw,680px) !important;\n    max-width:92vw !important;\n    min-height:52px !important;\n    padding:.32em .82em .36em !important;\n    gap:.29em !important;\n  }\n  .brand-banner-final .brand-main{gap:.29em !important;}\n}\n\n@media (max-width:520px){\n  .brand-banner-final .brand-wordmark{\n    min-height:92px !important;\n    padding:10px 10px 7px !important;\n  }\n  .brand-lockup{\n    --plate-cut:8px;\n    min-width:86vw !important;\n    max-width:95vw !important;\n    min-height:46px !important;\n    padding:.28em .62em .31em !important;\n    gap:.25em !important;\n  }\n  .brand-banner-final .brand-main{gap:.25em !important;}\n}\n
+
+
+/* =========================================================
+   v13.77 — TRUE UNIFIED HEADER
+   The app-header-shell is the ONLY header background.
+   Upper and lower tiers are transparent over the same page colour.
+   ========================================================= */
+
+.app-header-shell{
+  --active-page-accent:#43E7FF;
+  --active-page-accent-rgb:67,231,255;
+
+  position:sticky !important;
+  top:0 !important;
+  z-index:120 !important;
+  isolation:isolate !important;
+  overflow:visible !important;
+
+  background:
+    radial-gradient(
+      880px 360px at 18% 28%,
+      rgba(var(--active-page-accent-rgb),.28) 0%,
+      rgba(var(--active-page-accent-rgb),.14) 40%,
+      transparent 74%
+    ),
+    radial-gradient(
+      720px 320px at 92% 82%,
+      rgba(var(--active-page-accent-rgb),.11) 0%,
+      transparent 70%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(var(--active-page-accent-rgb),.18) 0%,
+      rgba(var(--active-page-accent-rgb),.15) 52%,
+      rgba(var(--active-page-accent-rgb),.15) 100%
+    ),
+    #07101a !important;
+
+  border:0 !important;
+  border-bottom:1px solid rgba(var(--active-page-accent-rgb),.42) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.035),
+    0 10px 26px rgba(0,0,0,.28),
+    0 6px 20px rgba(var(--active-page-accent-rgb),.08) !important;
+}
+
+/* Absolutely no shell divider/decorative overlays. */
+.app-header-shell::before,
+.app-header-shell::after{
+  content:none !important;
+  display:none !important;
+}
+
+/* Every legacy top-bar wrapper becomes transparent structure only. */
+.brand-banner-wrap,
+.brand-banner-final,
+.brand-banner-final .brand-wordmark{
+  background:transparent !important;
+  background-image:none !important;
+  border:0 !important;
+  outline:0 !important;
+  border-radius:0 !important;
+  clip-path:none !important;
+  box-shadow:none !important;
+}
+
+.brand-banner-final .brand-wordmark::before,
+.brand-banner-final .brand-wordmark::after{
+  content:none !important;
+  display:none !important;
+}
+
+/* Upper tier: only centered nameplate, nothing else. */
+.brand-banner-wrap{
+  position:relative !important;
+  z-index:2 !important;
+  padding:0 !important;
+  margin:0 !important;
+}
+
+.brand-banner-final .brand-wordmark{
+  min-height:112px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:14px 16px 10px !important;
+}
+
+/* Hide every known legacy decorative brand artifact. */
+.brand-kicker,
+.brand-status,
+.brand-indicators,
+.brand-signal,
+.brand-orbs,
+.brand-dot,
+.brand-node,
+.brand-led,
+.brand-pulse,
+.brand-corner-deco,
+.brand-hud,
+.brand-decor,
+.brand-tagline{
+  display:none !important;
+}
+
+/* Full personalised title plate, deliberately slightly wider than its text. */
+.brand-lockup{
+  --plate-cut:12px;
+
+  position:relative !important;
+  left:auto !important;
+  right:auto !important;
+  top:auto !important;
+  transform:none !important;
+
+  display:flex !important;
+  align-items:baseline !important;
+  justify-content:center !important;
+  gap:.34em !important;
+
+  width:min(82vw,780px) !important;
+  min-width:0 !important;
+  max-width:92vw !important;
+  min-height:58px !important;
+
+  margin:0 auto !important;
+  padding:.40em 1.15em .44em !important;
+
+  background:
+    radial-gradient(
+      520px 120px at 20% 50%,
+      rgba(var(--player-brand-safe-rgb),.28),
+      transparent 76%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(var(--player-brand-safe-rgb),.26),
+      rgba(var(--player-brand-rgb),.13) 55%,
+      rgba(var(--player-brand-safe-rgb),.16)
+    ),
+    rgba(7,10,18,.93) !important;
+
+  border:1px solid rgba(255,255,255,.76) !important;
+  border-radius:0 !important;
+  clip-path:polygon(
+    var(--plate-cut) 0,
+    calc(100% - var(--plate-cut)) 0,
+    100% 50%,
+    calc(100% - var(--plate-cut)) 100%,
+    var(--plate-cut) 100%,
+    0 50%
+  ) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 -1px 0 rgba(var(--player-brand-safe-rgb),.18),
+    0 0 0 1px rgba(255,255,255,.10),
+    0 0 9px rgba(255,255,255,.22),
+    0 0 20px rgba(var(--player-brand-safe-rgb),.20),
+    0 8px 18px rgba(0,0,0,.25) !important;
+}
+
+/* No old nested plate frames/mounting graphics. */
+.brand-lockup::before,
+.brand-lockup::after{
+  content:none !important;
+  display:none !important;
+}
+
+.player-brand-name,
+.brand-banner-final .player-brand-name{
+  position:relative !important;
+  left:auto !important;
+  top:auto !important;
+  transform:none !important;
+  margin:0 !important;
+  padding:0 !important;
+
+  background:none !important;
+  border:0 !important;
+  outline:0 !important;
+  clip-path:none !important;
+  box-shadow:none !important;
+
+  max-width:min(38vw,390px) !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+
+  color:var(--player-brand-safe) !important;
+  text-shadow:
+    0 0 2px rgba(255,255,255,.72),
+    0 0 7px rgba(var(--player-brand-safe-rgb),.58),
+    0 0 14px rgba(var(--player-brand-safe-rgb),.28) !important;
+}
+
+.player-brand-name::before,
+.player-brand-name::after{
+  content:none !important;
+  display:none !important;
+}
+
+.brand-banner-final .brand-main{
+  position:relative !important;
+  display:inline-flex !important;
+  align-items:baseline !important;
+  justify-content:flex-start !important;
+  gap:.34em !important;
+  margin:0 !important;
+  padding:0 !important;
+  background:none !important;
+}
+
+.brand-banner-final .brand-main::before,
+.brand-banner-final .brand-main::after{
+  content:none !important;
+  display:none !important;
+}
+
+/* Lower tier is fully transparent over the EXACT SAME shell background. */
+.app-header-shell .page-bar{
+  position:relative !important;
+  z-index:3 !important;
+
+  margin:0 !important;
+  border:0 !important;
+  outline:0 !important;
+
+  background:transparent !important;
+  background-image:none !important;
+  box-shadow:none !important;
+}
+
+.app-header-shell .page-bar::before,
+.app-header-shell .page-bar::after{
+  content:none !important;
+  display:none !important;
+}
+
+/* Preserve a gentle page-colour focus behind the actual page content
+   without changing the background colour family. */
+.page-bar-title{
+  position:relative !important;
+}
+
+.page-bar-title::before{
+  content:"" !important;
+  position:absolute !important;
+  z-index:-1 !important;
+  inset:-14px -22px !important;
+  border-radius:22px !important;
+  background:radial-gradient(
+    ellipse at 28% 50%,
+    rgba(var(--page-accent-rgb),.10),
+    transparent 72%
+  ) !important;
+  pointer-events:none !important;
+}
+
+/* No line between upper and lower tier. */
+.brand-banner-wrap,
+.brand-banner-final .brand-wordmark,
+.app-header-shell .page-bar{
+  border-bottom:0 !important;
+  border-top:0 !important;
+}
+
+@media (max-width:820px){
+  .brand-banner-final .brand-wordmark{
+    min-height:102px !important;
+    padding:12px 12px 8px !important;
+  }
+
+  .brand-lockup{
+    --plate-cut:10px;
+    width:min(86vw,700px) !important;
+    max-width:94vw !important;
+    min-height:52px !important;
+    padding:.34em .90em .38em !important;
+    gap:.29em !important;
+  }
+
+  .brand-banner-final .brand-main{
+    gap:.29em !important;
+  }
+}
+
+@media (max-width:520px){
+  .brand-banner-final .brand-wordmark{
+    min-height:92px !important;
+    padding:10px 9px 7px !important;
+  }
+
+  .brand-lockup{
+    --plate-cut:8px;
+    width:88vw !important;
+    max-width:96vw !important;
+    min-height:46px !important;
+    padding:.29em .66em .32em !important;
+    gap:.25em !important;
+  }
+
+  .brand-banner-final .brand-main{
+    gap:.25em !important;
+  }
+}
