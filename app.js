@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.75.0';
+const VERSION='13.76.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
