@@ -11133,3 +11133,44 @@ body{
     background-position:52% 50% !important;
   }
 }
+
+
+/* =========================================================
+   v13.85 — UNIFIED NAV ICON SYSTEM + FINAL PAGE PALETTE
+   ========================================================= */
+.page-bar[data-page="home"]{
+  --page-accent:#43E7FF !important;
+  --page-accent-rgb:67,231,255 !important;
+}
+.page-bar[data-page="badges"]{
+  --page-accent:#35E690 !important;
+  --page-accent-rgb:53,230,144 !important;
+}
+.page-bar[data-page="levels"]{
+  --page-accent:#3157FF !important;
+  --page-accent-rgb:49,87,255 !important;
+}
+.page-bar[data-page="competitive"]{
+  --page-accent:#FF5A3D !important;
+  --page-accent-rgb:255,90,61 !important;
+}
+.page-bar[data-page="locations"]{
+  --page-accent:#9B62FF !important;
+  --page-accent-rgb:155,98,255 !important;
+}
+.page-bar[data-page="stats"]{
+  --page-accent:#FF4FB3 !important;
+  --page-accent-rgb:255,79,179 !important;
+}
+.page-bar[data-page="settings"]{
+  --page-accent:#EAF6FF !important;
+  --page-accent-rgb:234,246,255 !important;
+}
+
+/* White Settings is intentionally neutral rather than amber. */
+.page-bar[data-page="settings"] .page-header-icon{
+  filter:
+    contrast(1.04)
+    drop-shadow(0 0 4px rgba(234,246,255,.70))
+    drop-shadow(0 0 10px rgba(234,246,255,.28)) !important;
+}

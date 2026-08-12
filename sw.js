@@ -1,13 +1,13 @@
-const CACHE='activate-tracker-v13-84-0';
+const CACHE='activate-tracker-v13-85-0';
 const ASSETS=[
   './',
   'index.html',
-  'style.css?v=1384',
-  'app.js?v=1384',
+  'style.css?v=1385',
+  'app.js?v=1385',
   'badges.json','rooms.json','manifest.webmanifest',
   'icon-192.png?v=131','icon-512.png?v=131','icon-maskable-512.png?v=131','favicon-64.png?v=131',
-  'icons/home.svg','icons/badges.svg','icons/levels.svg','icons/competitive.svg','icons/locations.svg','icons/stats.svg','icons/settings.svg','icons/menu.svg','icons/more.svg','icons/backup.svg','icons/restore.svg',
-  'icons/header/home.svg','icons/header/badges.svg','icons/header/levels.svg','icons/header/competitive.svg','icons/header/locations.svg','icons/header/stats.svg','icons/header/settings.svg','icons/header/menu.svg'
+  'icons/home.svg?v=1385','icons/badges.svg?v=1385','icons/levels.svg?v=1385','icons/competitive.svg?v=1385','icons/locations.svg?v=1385','icons/stats.svg?v=1385','icons/settings.svg?v=1385','icons/menu.svg','icons/more.svg','icons/backup.svg','icons/restore.svg',
+  'icons/header/home.svg?v=1385','icons/header/badges.svg?v=1385','icons/header/levels.svg?v=1385','icons/header/competitive.svg?v=1385','icons/header/locations.svg?v=1385','icons/header/stats.svg?v=1385','icons/header/settings.svg?v=1385','icons/header/menu.svg'
 ];
 
 self.addEventListener('install', event => {

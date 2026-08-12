@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.84.0';
+const VERSION='13.85.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -2560,7 +2560,7 @@ function updatePageHeader(view){
   const title=$('pageHeaderTitle'),subtitle=$('pageHeaderSubtitle'),icon=$('pageHeaderIcon');
   if(title)title.textContent=meta.title;
   if(subtitle)subtitle.textContent=meta.subtitle;
-  if(icon)icon.src=`icons/header/${meta.icon}.svg`;
+  if(icon)icon.src=`icons/header/${meta.icon}.svg?v=1385`;
 
   const pageBar=document.querySelector('.page-bar');
   const shell=document.querySelector('.app-header-shell');
@@ -2986,6 +2986,6 @@ function bindEvents(){
   onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();ensureContentState();applyContentCatalog();renderAll()}});
 }
 
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1384',{updateViaCache:'none'}).catch(console.error));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1385',{updateViaCache:'none'}).catch(console.error));
 init();
 installBackGuard();
