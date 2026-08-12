@@ -7629,3 +7629,94 @@ h3,
 
   filter:brightness(1.12) saturate(1.08);
 }
+
+
+/* =========================================================
+   v13.65 — PLAYER-COLOUR AMBIENT BACKGROUND
+   The selected player colour now personalises the app backdrop.
+   ========================================================= */
+
+:root{
+  --player-brand-rgb:255,79,179;
+}
+
+/*
+  Keep the original near-black foundation for contrast, then layer
+  restrained player-colour glows over it. This avoids recolouring
+  cards/trophies/page semantics while still making the whole app feel
+  personalised.
+*/
+html,
+body{
+  background-color:#05060d !important;
+  background-image:
+    radial-gradient(
+      1100px 720px at 8% 12%,
+      rgba(var(--player-brand-rgb),.13) 0%,
+      rgba(var(--player-brand-rgb),.055) 31%,
+      transparent 66%
+    ),
+    radial-gradient(
+      900px 680px at 96% 88%,
+      rgba(var(--player-brand-rgb),.085) 0%,
+      rgba(var(--player-brand-rgb),.025) 36%,
+      transparent 68%
+    ),
+    linear-gradient(180deg,#070912 0%,#05060d 56%,#03040a 100%) !important;
+  background-attachment:fixed !important;
+}
+
+/* Existing app shell backgrounds were opaque enough to hide the body tint.
+   Make only the shell backdrop slightly translucent; content cards remain
+   unchanged. */
+.app{
+  background:
+    linear-gradient(
+      180deg,
+      rgba(5,6,13,.90) 0%,
+      rgba(5,6,13,.78) 34%,
+      rgba(5,6,13,.86) 100%
+    ) !important;
+}
+
+/* Add a subtle player-colour aura behind the active content area. */
+.view.active{
+  background-image:
+    radial-gradient(
+      720px 520px at 0% 18%,
+      rgba(var(--player-brand-rgb),.055),
+      transparent 70%
+    ),
+    radial-gradient(
+      620px 460px at 100% 82%,
+      rgba(var(--player-brand-rgb),.035),
+      transparent 72%
+    ) !important;
+}
+
+/* Header keeps its own page-specific fascia, but gets a faint player-colour
+   environmental glow around the brand strip. */
+.brand-banner-wrap{
+  box-shadow:
+    0 12px 34px rgba(var(--player-brand-rgb),.10),
+    inset 0 -1px 0 rgba(var(--player-brand-rgb),.12) !important;
+}
+
+@media (max-width:520px){
+  html,
+  body{
+    background-image:
+      radial-gradient(
+        620px 520px at 5% 10%,
+        rgba(var(--player-brand-rgb),.12) 0%,
+        rgba(var(--player-brand-rgb),.045) 34%,
+        transparent 68%
+      ),
+      radial-gradient(
+        540px 460px at 96% 90%,
+        rgba(var(--player-brand-rgb),.07) 0%,
+        transparent 70%
+      ),
+      linear-gradient(180deg,#070912 0%,#05060d 58%,#03040a 100%) !important;
+  }
+}

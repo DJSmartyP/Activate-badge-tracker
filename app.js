@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.64.0';
+const VERSION='13.65.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -54,6 +54,15 @@ function validPlayerBrandColor(value){
   return /^#[0-9a-f]{6}$/i.test(v)?v.toUpperCase():'#FF4FB3';
 }
 
+function hexToRgbTriplet(hex){
+  const value=validPlayerBrandColor(hex).slice(1);
+  return [
+    parseInt(value.slice(0,2),16),
+    parseInt(value.slice(2,4),16),
+    parseInt(value.slice(4,6),16)
+  ].join(',');
+}
+
 function playerDisplayName(){
   return normalisePlayerName(state?.playerName)||'Smarty';
 }
@@ -73,6 +82,7 @@ function renderPlayerBrand(){
   const colorInput=$('playerBrandColor');
 
   document.documentElement.style.setProperty('--player-brand-color',color);
+  document.documentElement.style.setProperty('--player-brand-rgb',hexToRgbTriplet(color));
 
   if(nameEl)nameEl.textContent=possessive;
   if(banner)banner.setAttribute('aria-label',`${possessive} Activate Tracker`);
