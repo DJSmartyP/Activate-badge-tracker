@@ -3,9 +3,9 @@
     <path d="M31 10a21 21 0 1 0 21 21H31Z"
           stroke="#F8FFFB" stroke-width="3.6"/>
     <path d="M36 7a21 21 0 0 1 21 21H36Z"
-          stroke="#35E690" stroke-width="3.6"/>
+          stroke="#FF4FB3" stroke-width="3.6"/>
     <path d="M13 50h9l5-8 6 5 7-12 5 4 7-10"
-          stroke="#35E690" stroke-width="3.5"/>
-    <circle cx="52" cy="29" r="2.6" fill="#35E690" stroke="none"/>
+          stroke="#FF4FB3" stroke-width="3.5"/>
+    <circle cx="52" cy="29" r="2.6" fill="#FF4FB3" stroke="none"/>
   </g>
 </svg>
