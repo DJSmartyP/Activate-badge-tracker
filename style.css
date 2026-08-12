@@ -8139,3 +8139,115 @@ body{
   outline:1px solid rgba(var(--player-brand-safe-rgb),.40);
   box-shadow:0 0 0 2px rgba(var(--player-brand-safe-rgb),.08);
 }
+
+
+/* =========================================================
+   v13.70 — CENTRED, NATURALLY SPACED BRAND LINE
+   Treat PLAYER'S ACTIVATE TRACKER as one centred phrase.
+   ========================================================= */
+
+.brand-lockup{
+  left:50% !important;
+  right:auto !important;
+  transform:translate(-50%,-50%) !important;
+
+  display:grid !important;
+  grid-template-columns:auto auto !important;
+  grid-template-rows:auto auto !important;
+  justify-content:center !important;
+  justify-items:center !important;
+  align-items:baseline !important;
+
+  /* Normal word-space feel between PLAYER'S and ACTIVATE. */
+  column-gap:.34em !important;
+  row-gap:0 !important;
+
+  width:max-content !important;
+  max-width:94% !important;
+  text-align:center !important;
+}
+
+/* Player name is first word of the phrase. */
+.player-brand-name,
+.brand-banner-final .player-brand-name{
+  grid-column:1 !important;
+  grid-row:1 !important;
+  justify-self:end !important;
+  text-align:right !important;
+
+  margin:0 !important;
+  padding:0 !important;
+
+  /* Natural typography rather than artificially tight display tracking. */
+  letter-spacing:.012em !important;
+  font-kerning:normal !important;
+  font-feature-settings:"kern" 1,"liga" 1 !important;
+}
+
+/* ACTIVATE TRACKER is the second half of the same phrase. */
+.brand-banner-final .brand-main{
+  grid-column:2 !important;
+  grid-row:1 !important;
+
+  display:inline-flex !important;
+  align-items:baseline !important;
+  justify-content:flex-start !important;
+
+  /* A standard visual word space between ACTIVATE and TRACKER. */
+  gap:.34em !important;
+
+  margin:0 !important;
+  padding:0 !important;
+
+  font-kerning:normal !important;
+  font-feature-settings:"kern" 1,"liga" 1 !important;
+}
+
+.brand-activate,
+.brand-tracker{
+  margin:0 !important;
+  padding:0 !important;
+  letter-spacing:.012em !important;
+  font-kerning:normal !important;
+  font-feature-settings:"kern" 1,"liga" 1 !important;
+}
+
+/* Keep the secondary line centred under the whole title lockup. */
+.brand-kicker{
+  grid-column:1 / -1 !important;
+  grid-row:2 !important;
+  justify-self:center !important;
+  text-align:center !important;
+}
+
+@media (max-width:820px){
+  .brand-lockup{
+    column-gap:.30em !important;
+    max-width:96% !important;
+  }
+
+  .brand-banner-final .brand-main{
+    gap:.30em !important;
+  }
+}
+
+@media (max-width:520px){
+  .brand-lockup{
+    column-gap:.27em !important;
+    max-width:98% !important;
+  }
+
+  .brand-banner-final .brand-main{
+    gap:.27em !important;
+  }
+}
+
+@media (orientation:landscape) and (max-height:760px){
+  .brand-lockup{
+    column-gap:.30em !important;
+  }
+
+  .brand-banner-final .brand-main{
+    gap:.30em !important;
+  }
+}
