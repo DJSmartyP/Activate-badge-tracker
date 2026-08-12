@@ -1,0 +1,32 @@
+ACTIVATE TRACKER v13.22 — STRONGER SPECIAL EFFECTS + PINNED SPACING
+
+VISUAL INTENSITY
+- Achieved Focus cards:
+  • brighter emerald/cyan frame
+  • stronger outer glow
+  • brighter animated top-edge sweep
+  • stronger ACHIEVED status pill
+- Venue high-score level tiles:
+  • brighter cyan / violet / neon-pink animated frame
+  • stronger glow around the tile
+  • high-score tag now uses the app's cyan/pink palette more strongly
+  • score text gets a subtle cyan highlight
+
+HOME PINNED BADGES
+- Added more vertical breathing room between the purple Open button/header row
+  and the pinned-badge row underneath.
+
+RETAINED
+- Context-aware Focus Previous/Next
+- Clear MARK BADGE EARNED / ACHIEVED states
+- v13.20 pin control hard fix
+- Tektur titles + Bruno Ace SC body/UI
+- Portrait Focus responsive text fitting
+- Thicker outlines
+- Landscape scrolling fix
+
+UPLOAD TO GITHUB ROOT:
+index.html
+app.js
+style.css
+sw.js

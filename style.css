@@ -2653,3 +2653,134 @@ p,
     width:32%;
   }
 }
+
+/* =========================================================
+   v13.22 — stronger achievement/high-score effects
+   + more breathing room in Home pinned badges
+   ========================================================= */
+
+/* HOME — keep the Open button visually separated from the pinned row below. */
+.home-pins-head{
+  margin-bottom:18px !important;
+}
+.home-pins-open{
+  margin-bottom:2px;
+}
+#homePins{
+  margin-top:0 !important;
+}
+
+/* ACHIEVED FOCUS — brighter, more unmistakable completed state. */
+#focusOverlay .focus-inner.focus-achieved{
+  border-width:2px !important;
+  border-color:rgba(80,255,180,.98) !important;
+  box-shadow:
+    0 0 0 1px rgba(85,255,190,.28),
+    0 0 18px rgba(55,255,170,.42),
+    0 0 38px rgba(0,229,255,.28),
+    0 0 64px rgba(41,255,174,.14),
+    0 24px 70px rgba(0,0,0,.52) !important;
+}
+
+#focusOverlay .focus-inner.focus-achieved::after{
+  height:4px !important;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(80,255,180,.25),
+    #50ffb4,
+    #a6ffe0,
+    #00e5ff,
+    #6ef2ff,
+    transparent
+  ) !important;
+  box-shadow:
+    0 0 10px rgba(80,255,180,1),
+    0 0 20px rgba(0,229,255,.9),
+    0 0 30px rgba(80,255,180,.45) !important;
+}
+
+.focus-achieved-banner{
+  border-color:rgba(80,255,180,.92) !important;
+  background:
+    linear-gradient(90deg,rgba(47,255,164,.24),rgba(0,229,255,.16)) !important;
+  box-shadow:
+    0 0 12px rgba(73,255,172,.32),
+    0 0 22px rgba(0,229,255,.14),
+    inset 0 0 14px rgba(0,229,255,.08) !important;
+  text-shadow:0 0 8px rgba(117,255,204,.28);
+}
+
+.focus-achieved-symbol{
+  text-shadow:
+    0 0 7px rgba(73,255,172,1),
+    0 0 15px rgba(0,229,255,.65) !important;
+}
+
+/* HIGH SCORE — stronger app-colour treatment.
+   Keep the moving pink/cyan line, but make it brighter and easier to spot. */
+.level-chip.high-score-level{
+  border-width:2px !important;
+  border-color:rgba(0,229,255,.98) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,56,189,.26),
+    0 0 12px rgba(0,229,255,.50),
+    0 0 24px rgba(255,56,189,.34),
+    0 0 40px rgba(117,92,255,.18) !important;
+}
+
+.level-chip.high-score-level::before{
+  background:conic-gradient(
+    from 0deg,
+    transparent 0deg 245deg,
+    rgba(0,229,255,0) 245deg,
+    #00e5ff 272deg,
+    #8ff7ff 292deg,
+    #755cff 314deg,
+    #ff38bd 334deg,
+    #ff8bdd 350deg,
+    rgba(255,56,189,0) 360deg
+  ) !important;
+  filter:
+    drop-shadow(0 0 7px rgba(0,229,255,1))
+    drop-shadow(0 0 10px rgba(255,56,189,.95))
+    drop-shadow(0 0 16px rgba(117,92,255,.55)) !important;
+}
+
+.high-score-tag{
+  border-color:rgba(255,64,194,.90) !important;
+  background:
+    linear-gradient(90deg,rgba(0,229,255,.14),rgba(255,56,189,.20)) !important;
+  color:#ffffff !important;
+  box-shadow:
+    0 0 8px rgba(0,229,255,.34),
+    0 0 14px rgba(255,56,189,.30) !important;
+  text-shadow:
+    0 0 6px rgba(0,229,255,.7),
+    0 0 9px rgba(255,56,189,.55);
+}
+
+/* Make the high-score score line itself subtly pop too. */
+.level-chip.high-score-level .level-chip-main > span{
+  color:#e8fbff;
+  text-shadow:0 0 7px rgba(0,229,255,.24);
+}
+
+@keyframes focusAchievedPulse{
+  0%,100%{
+    box-shadow:
+      0 0 0 1px rgba(85,255,190,.22),
+      0 0 16px rgba(55,255,170,.34),
+      0 0 32px rgba(0,229,255,.22),
+      0 0 54px rgba(41,255,174,.10),
+      0 24px 70px rgba(0,0,0,.52);
+  }
+  50%{
+    box-shadow:
+      0 0 0 1px rgba(85,255,190,.36),
+      0 0 25px rgba(55,255,170,.58),
+      0 0 48px rgba(0,229,255,.38),
+      0 0 72px rgba(41,255,174,.20),
+      0 24px 70px rgba(0,0,0,.52);
+  }
+}
