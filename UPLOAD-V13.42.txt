@@ -1,0 +1,29 @@
+ACTIVATE TRACKER v13.42 — UNIQUE SUBTLE PAGE ACCENTS
+
+Unique page accents:
+- Home — Electric cyan
+- Badges — Neon pink
+- Levels — Royal blue
+- Competitive — Hot orange-red
+- Locations — Ultraviolet
+- Stats — Emerald green
+- Settings — Amber gold
+
+Applied subtly to:
+- page title glow
+- page-bar bottom light
+- active module indicator
+- icon dock glow
+- hamburger border/glow
+- selected controls
+- subtle heading aura
+
+Semantic colours are preserved:
+- earned/success green
+- incomplete/error red
+- trophies metallic
+- venue high-score neon treatment
+
+Based on v13.41 regression-recovery build with working SVG icon pack.
+
+UPLOAD EVERYTHING IN THIS ZIP TO GITHUB ROOT.

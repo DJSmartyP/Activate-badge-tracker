@@ -5892,3 +5892,139 @@ h3,
 .page-bar-copy h1{
   letter-spacing: .02em !important;
 }
+
+
+/* =========================================================
+   v13.42 — UNIQUE SUBTLE PAGE ACCENTS
+   Dark UI remains consistent; each section gets one distinct accent.
+   ========================================================= */
+
+.page-bar{
+  --page-accent:#43e7ff;
+  --page-accent-rgb:67,231,255;
+}
+
+/* Deliberately separated hues — no two pages are close. */
+.page-bar[data-page="home"]{
+  --page-accent:#43e7ff;          /* electric cyan */
+  --page-accent-rgb:67,231,255;
+}
+.page-bar[data-page="badges"]{
+  --page-accent:#ff4fb3;          /* neon pink */
+  --page-accent-rgb:255,79,179;
+}
+.page-bar[data-page="levels"]{
+  --page-accent:#4676ff;          /* royal blue */
+  --page-accent-rgb:70,118,255;
+}
+.page-bar[data-page="competitive"]{
+  --page-accent:#ff5a3d;          /* hot orange-red */
+  --page-accent-rgb:255,90,61;
+}
+.page-bar[data-page="locations"]{
+  --page-accent:#9b62ff;          /* ultraviolet */
+  --page-accent-rgb:155,98,255;
+}
+.page-bar[data-page="stats"]{
+  --page-accent:#35e690;          /* emerald green */
+  --page-accent-rgb:53,230,144;
+}
+.page-bar[data-page="settings"]{
+  --page-accent:#ffc84a;          /* amber gold */
+  --page-accent-rgb:255,200,74;
+}
+
+/* Keep the change subtle: accent only the identity/details, not whole surfaces. */
+.page-bar{
+  border-bottom-color:rgba(var(--page-accent-rgb),.38) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.035),
+    0 5px 18px rgba(0,0,0,.26),
+    0 1px 14px rgba(var(--page-accent-rgb),.055) !important;
+}
+
+.page-bar::after{
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(var(--page-accent-rgb),.22) 10%,
+      var(--page-accent) 43%,
+      rgba(255,255,255,.88) 50%,
+      var(--page-accent) 57%,
+      rgba(var(--page-accent-rgb),.22) 90%,
+      transparent 100%
+    ) !important;
+  box-shadow:
+    0 0 5px rgba(var(--page-accent-rgb),.62),
+    0 0 12px rgba(var(--page-accent-rgb),.23) !important;
+}
+
+#pageHeaderTitle{
+  text-shadow:
+    0 0 2px currentColor,
+    0 0 6px rgba(var(--page-accent-rgb),.78),
+    0 0 14px rgba(var(--page-accent-rgb),.34) !important;
+}
+
+.page-header-subtitle,
+.page-header-eyebrow{
+  color:rgba(var(--page-accent-rgb),.92) !important;
+}
+
+.page-live-dot{
+  background:var(--page-accent) !important;
+  box-shadow:
+    0 0 4px var(--page-accent),
+    0 0 9px rgba(var(--page-accent-rgb),.70) !important;
+}
+
+.page-icon-dock,
+.drawer-menu-btn{
+  border-color:rgba(var(--page-accent-rgb),.48) !important;
+  box-shadow:
+    inset 0 0 16px rgba(var(--page-accent-rgb),.055),
+    0 0 10px rgba(var(--page-accent-rgb),.075) !important;
+}
+
+.page-icon-dock::before{
+  background:var(--page-accent) !important;
+  box-shadow:0 0 7px rgba(var(--page-accent-rgb),.75) !important;
+}
+
+.page-header-icon{
+  filter:
+    saturate(1.12)
+    contrast(1.04)
+    drop-shadow(0 0 4px rgba(var(--page-accent-rgb),.42)) !important;
+}
+
+/* Page-level accents: headings and selected controls only.
+   Scoped through the active view IDs/classes where possible. */
+.view.active h2,
+.view.active h3{
+  text-shadow:
+    0 0 2px currentColor,
+    0 0 7px currentColor,
+    0 0 12px rgba(var(--page-accent-rgb),.16) !important;
+}
+
+/* Selected/active controls pick up the current page accent,
+   but retain existing semantic green/red/gold states. */
+.view.active .seg.active,
+.view.active .filter-btn.active,
+.view.active .tab-btn.active,
+.view.active button[aria-pressed="true"]:not(.pin-btn):not([data-pin]):not([data-unpin]){
+  border-color:rgba(var(--page-accent-rgb),.62) !important;
+  box-shadow:
+    inset 0 0 12px rgba(var(--page-accent-rgb),.06),
+    0 0 9px rgba(var(--page-accent-rgb),.10) !important;
+}
+
+/* Decorative meter follows current page accent. */
+.page-bar-status span{
+  background:linear-gradient(180deg,#fff,var(--page-accent)) !important;
+  box-shadow:0 0 5px rgba(var(--page-accent-rgb),.48) !important;
+}
+
+/* Do not override semantic success/warning/trophy/high-score colours. */
