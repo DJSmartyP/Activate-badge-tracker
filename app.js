@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.56.0';
+const VERSION='13.57.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -1885,7 +1885,7 @@ function exportBackup(){
 
 
 function emptyLevelProgress(){
-  return {games:{},competitive:{},importedAt:null,player:null,source:null};
+  return {games:{},competitive:{},importedAt:null,player:null,source:null,lastImportReport:null};
 }
 function ensureLevelProgressStore(){
   if(!state.levelProgressByLocation || typeof state.levelProgressByLocation!=='object'){
@@ -1923,12 +1923,84 @@ function activeLevelProgress(){
   const p=state.levelProgressByLocation[id];
   if(!p.games)p.games={};
   if(!p.competitive)p.competitive={};
+  if(p.lastImportReport===undefined)p.lastImportReport=null;
   return p;
 }
 function ensureLevelProgress(){
   return activeLevelProgress();
 }
 function csvRows(t){let a=[],r=[],f='',q=false;for(let i=0;i<t.length;i++){let c=t[i];if(q){if(c==='"'&&t[i+1]==='"'){f+='"';i++}else if(c==='"')q=false;else f+=c}else if(c==='"')q=true;else if(c===','){r.push(f);f=''}else if(c==='\n'){r.push(f);a.push(r);r=[];f=''}else if(c!=='\r')f+=c}if(f||r.length){r.push(f);a.push(r)}return a}
+function csvChangeLabel(room,game,level=null){
+  return `${room} • ${game}${level?` • Level ${level}`:''}`;
+}
+
+function csvImportReportCount(report){
+  if(!report)return 0;
+  return [
+    report.newLevels,
+    report.newGames,
+    report.newCompetitiveGames,
+    report.highScoresGained,
+    report.highScoresLost,
+    report.scoreImprovements,
+    report.venueHighChanges
+  ].reduce((n,list)=>n+(Array.isArray(list)?list.length:0),0);
+}
+
+function renderCsvImportReport(report=activeLevelProgress()?.lastImportReport){
+  const el=$('csvImportReport');
+  if(!el)return;
+
+  if(!report){
+    el.innerHTML='';
+    el.classList.add('hidden');
+    return;
+  }
+
+  const newGames=[...(report.newGames||[]),...(report.newCompetitiveGames||[])];
+  const chips=[
+    ['New levels',(report.newLevels||[]).length],
+    ['New games',newGames.length],
+    ['Highs gained',(report.highScoresGained||[]).length],
+    ['Highs lost',(report.highScoresLost||[]).length],
+    ['Scores improved',(report.scoreImprovements||[]).length]
+  ];
+
+  const group=(title,items,kind='')=>{
+    if(!items?.length)return '';
+    return `<details class="csv-report-group ${kind}" open>
+      <summary>${esc(title)} <span>${items.length}</span></summary>
+      <div class="csv-report-list">${items.map(x=>`<div class="csv-report-item">${esc(x)}</div>`).join('')}</div>
+    </details>`;
+  };
+
+  const changeCount=csvImportReportCount(report);
+  const when=report.importedAt?new Date(report.importedAt).toLocaleString():'';
+
+  el.classList.remove('hidden');
+  el.innerHTML=`
+    <div class="csv-report-head row between wrap">
+      <div>
+        <div class="label">CSV change report</div>
+        <h4>${changeCount?`${changeCount} recorded change${changeCount===1?'':'s'}`:'No progress changes detected'}</h4>
+      </div>
+      <div class="sub">${esc(report.location||activeLocation().name)}${when?' • '+esc(when):''}</div>
+    </div>
+
+    <div class="csv-report-summary">
+      ${chips.map(([label,count])=>`<span class="csv-report-chip ${count?'has-change':''}"><strong>${count}</strong> ${esc(label)}</span>`).join('')}
+    </div>
+
+    ${group('New levels completed',report.newLevels,'new')}
+    ${group('New games played',newGames,'new')}
+    ${group('Venue high scores gained',report.highScoresGained,'gain')}
+    ${group('Venue high scores lost',report.highScoresLost,'loss')}
+    ${group('Personal scores improved',report.scoreImprovements,'improve')}
+    ${group('Other venue high-score changes',report.venueHighChanges,'venue')}
+    ${!changeCount?'<div class="csv-report-empty sub">This upload matches the progress already stored for this Location.</div>':''}
+  `;
+}
+
 function importScores(t){
   const rows=csvRows(t).filter(r=>r.some(c=>String(c||'').trim()!==''));
   if(!rows.length)throw Error('The selected CSV is empty.');
@@ -1942,8 +2014,22 @@ function importScores(t){
   const progress=activeLevelProgress();
   const playerRow=rows.slice(0,headerIndex).find(r=>String(r[0]||'').toLowerCase().startsWith('activate:'));
   const player=playerRow?String(playerRow[0]).replace(/^Activate:\s*/i,'').trim():null;
+  const importedAt=new Date().toISOString();
 
-  let games=0,newLevels=0,totalCompleted=0,competitivePlayed=0;
+  const report={
+    importedAt,
+    location:activeLocation().name,
+    player,
+    newLevels:[],
+    newGames:[],
+    newCompetitiveGames:[],
+    highScoresGained:[],
+    highScoresLost:[],
+    scoreImprovements:[],
+    venueHighChanges:[]
+  };
+
+  let games=0,totalCompleted=0,competitivePlayed=0;
 
   for(const r of rows.slice(headerIndex+1)){
     const room=String(r[0]||'').trim();
@@ -1956,13 +2042,17 @@ function importScores(t){
 
     // Competitive-only games do not have level progression.
     if(isComp&&!isCoop){
+      const key=room+'||'+game;
+      const wasPlayed=!!progress.competitive[key];
       const played=r.slice(2).some(v=>{
         const n=Number(String(v||'').replace(/,/g,'').trim());
         return Number.isFinite(n)&&n>0;
       });
+
       if(played){
-        progress.competitive[room+'||'+game]=true;
+        progress.competitive[key]=true;
         competitivePlayed++;
+        if(!wasPlayed)report.newCompetitiveGames.push(`${csvChangeLabel(room,game)} • Competitive`);
       }
       games++;
       continue;
@@ -1971,47 +2061,86 @@ function importScores(t){
     // Cooperative (including games that also have a competitive mode): parse configured level count.
     const key=room+'||'+game;
     const prior=progress.games[key]||{room,game,levels:{}};
-    const levels={...(prior.levels||{})};
+    const priorLevels={...(prior.levels||{})};
     (prior.complete||[]).forEach(level=>{
-      levels[level]=levels[level]||{score:0,topScore:0,complete:true};
-      levels[level].complete=true;
+      priorLevels[level]=priorLevels[level]||{score:0,topScore:0,complete:true};
+      priorLevels[level].complete=true;
     });
 
+    const wasGamePlayed=Object.values(priorLevels).some(x=>!!x?.complete);
+    const levels={...priorLevels};
     let foundLevel=false;
+
     for(let i=2;i+2<r.length;i+=3){
       const level=parseInt(String(r[i]||'').trim(),10);
       if(!(level>=1&&level<=levelCountForGame(room,game)))continue;
       foundLevel=true;
 
-      const score=Number(String(r[i+1]||'0').replace(/,/g,'').trim())||0;
-      const topScore=Number(String(r[i+2]||'0').replace(/,/g,'').trim())||0;
-      const old=levels[level]||{score:0,topScore:0,complete:false};
-      const wasComplete=!!old.complete;
-      const complete=score>0||wasComplete;
+      const csvScore=Number(String(r[i+1]||'0').replace(/,/g,'').trim())||0;
+      const csvTopScore=Number(String(r[i+2]||'0').replace(/,/g,'').trim())||0;
 
-      levels[level]={
-        score:Math.max(Number(old.score)||0,score),
-        topScore:topScore||Number(old.topScore)||0,
-        complete
-      };
+      const old=levels[level]||{score:0,topScore:0,complete:false};
+      const oldScore=Number(old.score)||0;
+      const oldTopScore=Number(old.topScore)||0;
+      const wasComplete=!!old.complete;
+      const oldHigh=oldScore>0&&oldTopScore>0&&oldScore===oldTopScore;
+
+      const score=Math.max(oldScore,csvScore);
+      const topScore=csvTopScore||oldTopScore;
+      const complete=csvScore>0||wasComplete;
+      const newHigh=score>0&&topScore>0&&score===topScore;
+      const label=csvChangeLabel(room,game,level);
+
+      levels[level]={score,topScore,complete};
+
       if(complete){
         totalCompleted++;
-        if(!wasComplete)newLevels++;
+        if(!wasComplete)report.newLevels.push(label);
+      }
+
+      if(csvScore>oldScore){
+        report.scoreImprovements.push(`${label} • ${oldScore||0} → ${csvScore}`);
+      }
+
+      if(!oldHigh&&newHigh){
+        report.highScoresGained.push(`${label} • ${score}`);
+      }else if(oldHigh&&!newHigh){
+        report.highScoresLost.push(`${label} • Your ${score} • Venue high ${topScore}`);
+      }else if(oldTopScore>0&&topScore>0&&oldTopScore!==topScore){
+        report.venueHighChanges.push(`${label} • ${oldTopScore} → ${topScore}`);
       }
     }
 
     if(foundLevel){
       progress.games[key]={room,game,levels};
+      const isGamePlayed=Object.values(levels).some(x=>!!x?.complete);
+      if(!wasGamePlayed&&isGamePlayed){
+        report.newGames.push(`${csvChangeLabel(room,game)} • Co-op`);
+      }
       games++;
     }
   }
 
   if(!games)throw Error('No game rows were found in this Activate-scores.ca export.');
-  progress.importedAt=new Date().toISOString();
+
+  progress.importedAt=importedAt;
   progress.player=player;
   progress.source='Activate-scores.ca';
-  save();renderLevels();
-  return {games,newLevels,totalCompleted,competitivePlayed,player};
+  progress.lastImportReport=report;
+
+  save();
+  renderLevels();
+  renderCsvImportReport(report);
+
+  return {
+    games,
+    newLevels:report.newLevels.length,
+    totalCompleted,
+    competitivePlayed,
+    player,
+    report,
+    changeCount:csvImportReportCount(report)
+  };
 }
 function gameModesForRoom(room){
   const c=GAME_CATALOG[room]||{};
@@ -2238,6 +2367,7 @@ function renderLevels(){
     ? `Last import for ${activeLocation().name}: ${new Date(progress.importedAt).toLocaleString()}${progress.player?' • '+progress.player:''}`
     : `No Activate-scores.ca export imported for ${activeLocation().name} yet.`;
 
+  renderCsvImportReport(progress.lastImportReport);
   $('levelsList').innerHTML=roomHtml||'<div class="item sub">Nothing matches this filter.</div>';
 }
 
@@ -2544,7 +2674,9 @@ function bindEvents(){
       const text=await f.text();
       const result=importScores(text);
       if(info)info.textContent=`Imported ${result.games} games • ${result.totalCompleted} co-op levels${result.competitivePlayed?` • ${result.competitivePlayed} competitive played`:''}${result.player?' • '+result.player:''}`;
-      toast(`Import complete • ${result.newLevels} new levels`);
+      toast(result.changeCount
+        ? `Import complete • ${result.changeCount} change${result.changeCount===1?'':'s'}`
+        : 'Import complete • no progress changes');
     }catch(err){
       console.error('Activate-scores.ca import failed',err);
       if(info)info.textContent=`Import failed: ${err?.message||'Unknown error'}`;
@@ -2557,7 +2689,7 @@ function bindEvents(){
   onChange('levelsView',renderLevels);
   onChange('levelsSort',renderLevels);
   onChange('gamesView',renderLevels);
-  onClick('clearLevelProgress',()=>{if(confirm(`Clear imported level progress for ${activeLocation().name}?`)){state.levelProgressByLocation[state.activeLocation]=emptyLevelProgress();save();renderLevels()}});
+  onClick('clearLevelProgress',()=>{if(confirm(`Clear imported level progress for ${activeLocation().name}?`)){state.levelProgressByLocation[state.activeLocation]=emptyLevelProgress();save();renderLevels();renderCsvImportReport(null)}});
 
   listen('badgeSearch','input',renderBadges);
   listen('competitiveSearch','input',renderCompetitive);
