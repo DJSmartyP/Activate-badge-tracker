@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.33.0';
+const VERSION='13.35.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -864,7 +864,9 @@ function renderLevels(){
   if($('levelsImportLocation'))$('levelsImportLocation').textContent=`Progress dataset: ${activeLocation().name}`;
 
   const roomSel=$('levelsRoom');
+  const gameSel=$('levelsGame');
   const currentRoom=roomSel?.value||'';
+  const currentGame=gameSel?.value||'';
   const entries=progressEntries();
   const rooms=[...new Set(entries.map(x=>x.room))].sort();
 
@@ -874,6 +876,23 @@ function renderLevels(){
   }
 
   const selectedRoom=roomSel?.value||'';
+
+  if(gameSel){
+    const games=selectedRoom
+      ? [...new Set(entries.filter(x=>x.room===selectedRoom).map(x=>x.game))].sort((a,b)=>a.localeCompare(b))
+      : [];
+
+    gameSel.disabled=!selectedRoom;
+    gameSel.classList.toggle('disabled-filter',!selectedRoom);
+    gameSel.innerHTML=selectedRoom
+      ? '<option value="">All games</option>'+games.map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join('')
+      : '<option value="">Select a room first</option>';
+
+    if(selectedRoom && games.includes(currentGame))gameSel.value=currentGame;
+    else gameSel.value='';
+  }
+
+  const selectedGame=gameSel?.value||'';
   const levelMode=$('levelsView')?.value||'all';
   const gameMode=$('gamesView')?.value||'all';
 
@@ -887,7 +906,7 @@ function renderLevels(){
   let totalGames=0,playedGames=0,totalLevels=0,completeLevels=0,venueHighScores=0;
 
   const roomHtml=visibleRooms.map(room=>{
-    const roomEntries=entries.filter(x=>x.room===room);
+    const roomEntries=entries.filter(x=>x.room===room && (!selectedGame||x.game===selectedGame));
     const coop=roomEntries.filter(x=>x.mode==='cooperative').sort((a,b)=>a.game.localeCompare(b.game));
     const comp=roomEntries.filter(x=>x.mode==='competitive').sort((a,b)=>a.game.localeCompare(b.game));
 
@@ -1080,7 +1099,7 @@ function updatePageHeader(view){
   const title=$('pageHeaderTitle'),subtitle=$('pageHeaderSubtitle'),icon=$('pageHeaderIcon');
   if(title)title.textContent=meta.title;
   if(subtitle)subtitle.textContent=meta.subtitle;
-  if(icon)icon.src=`icons/${meta.icon}.png`;
+  if(icon)icon.src=`icons/${meta.icon}.svg`;
 }
 
 
@@ -1270,6 +1289,7 @@ function bindEvents(){
   });
 
   onChange('levelsRoom',renderLevels);
+  onChange('levelsGame',renderLevels);
   onChange('levelsView',renderLevels);
   onChange('levelsSort',renderLevels);
   onChange('gamesView',renderLevels);

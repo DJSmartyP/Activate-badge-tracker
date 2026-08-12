@@ -1,0 +1,55 @@
+ACTIVATE TRACKER v13.35 — NEON ICONS + LEVEL/GAME FILTERS
+
+NEON ICONS WIRED INTO THE APP
+- Replaced the old page icons with the new neon SVG set:
+  Home, Badges, Levels, Competitive, Locations, Stats, Settings.
+- Drawer navigation uses the same matching neon icons.
+- Hamburger/menu button now uses the neon menu icon.
+- Settings Backup / Restore also use matching neon icons.
+- SVGs remain sharp on Fold cover, inner screen and landscape.
+- Neon icons are precached for offline/PWA use.
+
+LEVELS — ROOM + GAME FILTER
+- Room dropdown remains first.
+- New Game dropdown sits beside it.
+- Game dropdown is disabled until a specific Room is selected.
+- Once a Room is selected it lists only games in that Room.
+- Includes All games within the selected Room.
+- Works in both Levels and Games display modes.
+
+LEVELS — GAMES MODE STATUS FILTER
+- Games view now has its own visible filter:
+  All games
+  Played
+  Not played
+- Co-op counts as Played if any level is complete.
+- Competitive uses its saved Played / Not played state.
+- The existing Levels filters remain separate:
+  All levels / Incomplete / Complete / Venue high scores.
+
+RESPONSIVE
+- Extra filters wrap into a 2-column control grid on smaller screens.
+- Fold cover drops to a single column so nothing overflows.
+
+UPLOAD TO GITHUB ROOT:
+index.html
+app.js
+style.css
+sw.js
+manifest.webmanifest
+icon-512.png
+icon-192.png
+icon-maskable-512.png
+favicon-64.png
+icons/home.svg
+icons/badges.svg
+icons/levels.svg
+icons/competitive.svg
+icons/locations.svg
+icons/stats.svg
+icons/settings.svg
+icons/menu.svg
+icons/more.svg
+icons/backup.svg
+icons/restore.svg
+icons/highscores.svg

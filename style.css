@@ -5012,3 +5012,100 @@ h3,
     font-size:clamp(13px,1.5vw,17px) !important;
   }
 }
+
+/* =========================================================
+   v13.35 — integrated neon icons + Levels game filters
+   ========================================================= */
+
+/* Page/drawer icons are now crisp transparent SVG neon line art. */
+.drawer-icon-img,
+.page-header-icon,
+.drawer-menu-icon,
+.icon-label-btn img{
+  object-fit:contain;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+
+.drawer-icon-img{
+  width:34px !important;
+  height:34px !important;
+  padding:1px;
+  filter:
+    drop-shadow(0 0 4px rgba(0,229,255,.38))
+    drop-shadow(0 0 7px rgba(255,79,198,.20));
+}
+
+.page-header-icon{
+  filter:
+    drop-shadow(0 0 5px rgba(0,229,255,.44))
+    drop-shadow(0 0 9px rgba(255,79,198,.25));
+}
+
+/* Hamburger keeps exactly the same button footprint from v13.33. */
+.drawer-menu-icon{
+  width:72%;
+  height:72%;
+  display:block;
+  margin:auto;
+  filter:
+    drop-shadow(0 0 5px rgba(0,229,255,.42))
+    drop-shadow(0 0 8px rgba(255,79,198,.24));
+}
+
+.icon-label-btn{
+  display:inline-flex !important;
+  align-items:center;
+  gap:8px;
+}
+
+.icon-label-btn img{
+  width:22px;
+  height:22px;
+  flex:0 0 22px;
+  filter:drop-shadow(0 0 5px rgba(0,229,255,.34));
+}
+
+/* Levels toolbar: Room and Game read as a deliberate filter pair. */
+.levels-filter-row{
+  align-items:center;
+}
+
+#levelsRoom,
+#levelsGame{
+  min-width:150px;
+}
+
+#levelsGame:disabled,
+#levelsGame.disabled-filter{
+  opacity:.48;
+  cursor:not-allowed;
+}
+
+/* Don't let the extra dropdown create horizontal overflow on Fold screens. */
+@media (max-width:700px){
+  .levels-filter-row{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:8px !important;
+  }
+
+  .levels-filter-row > *{
+    width:100% !important;
+    min-width:0 !important;
+  }
+
+  #levelsModeTabs{
+    grid-column:1/-1;
+  }
+}
+
+@media (max-width:430px){
+  .levels-filter-row{
+    grid-template-columns:1fr;
+  }
+
+  #levelsModeTabs{
+    grid-column:auto;
+  }
+}
