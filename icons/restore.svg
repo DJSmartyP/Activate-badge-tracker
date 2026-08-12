@@ -1,50 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
   <defs>
-    <linearGradient id="neonGrad" x1="24" y1="24" x2="232" y2="232" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#ff4fd8"/>
-      <stop offset="48%" stop-color="#9a6dff"/>
-      <stop offset="100%" stop-color="#43d7ff"/>
+    <linearGradient id="g" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5BE6FF"/>
+      <stop offset="0.52" stop-color="#8F8BFF"/>
+      <stop offset="1" stop-color="#FF5CCF"/>
     </linearGradient>
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="4" result="blur1"/>
-      <feColorMatrix in="blur1" type="matrix" values="
-        1 0 0 0 0
-        0 1 0 0 0
-        0 0 1 0 0
-        0 0 0 0.9 0" result="blur2"/>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="1.8" result="b"/>
       <feMerge>
-        <feMergeNode in="blur2"/>
+        <feMergeNode in="b"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-    <style>
-      .st {
-        stroke: url(#neonGrad);
-        stroke-width: 12;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        filter: url(#glow);
-      }
-      .st2 {
-        stroke: #dffbff;
-        stroke-opacity: .38;
-        stroke-width: 4;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
-      .fillg {
-        fill: url(#neonGrad);
-        filter: url(#glow);
-      }
-      .soft {
-        fill: #dffbff;
-        fill-opacity: .15;
-      }
-    </style>
   </defs>
-  
-<path class="st" d="M86 92H42V48"/>
-<path class="st" d="M56 62c18-20 44-32 72-32 53 0 96 43 96 96s-43 96-96 96-96-43-96-96"/>
-<path class="st2" d="M128 84v46l30 18"/>
+  <g stroke="url(#g)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+    
+<path d="M20 46h24"/>
+<path d="M32 18v20"/>
+<path d="m24 30 8 8 8-8"/>
+<path d="M18 40a8 8 0 0 1 0-16 11 11 0 0 1 21-2 7 7 0 1 1 7 12"/>
 
+  </g>
 </svg>

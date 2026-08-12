@@ -1,48 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
   <defs>
-    <linearGradient id="neonGrad" x1="24" y1="24" x2="232" y2="232" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#ff4fd8"/>
-      <stop offset="48%" stop-color="#9a6dff"/>
-      <stop offset="100%" stop-color="#43d7ff"/>
+    <linearGradient id="g" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5BE6FF"/>
+      <stop offset="0.52" stop-color="#8F8BFF"/>
+      <stop offset="1" stop-color="#FF5CCF"/>
     </linearGradient>
-    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
-      <feGaussianBlur stdDeviation="4.2" result="blur"/>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="1.8" result="b"/>
       <feMerge>
-        <feMergeNode in="blur"/>
+        <feMergeNode in="b"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-    <style>
-      .st {
-        stroke:url(#neonGrad);
-        stroke-width:12;
-        stroke-linecap:round;
-        stroke-linejoin:round;
-        filter:url(#glow);
-      }
-      .st2 {
-        stroke:#dffbff;
-        stroke-opacity:.42;
-        stroke-width:4;
-        stroke-linecap:round;
-        stroke-linejoin:round;
-      }
-      .fillg {
-        fill:url(#neonGrad);
-        filter:url(#glow);
-      }
-      .txt {
-        fill:url(#neonGrad);
-        filter:url(#glow);
-        font-family:Arial,Helvetica,sans-serif;
-        font-weight:900;
-      }
-    </style>
   </defs>
-  
-<path class="st2" d="M46 70l-18 18 18 18M210 70l18 18-18 18"/>
-<text x="128" y="150" text-anchor="middle" font-size="92" class="txt">VS</text>
-<path class="st" d="M52 188h54M150 188h54"/>
-<circle class="fillg" cx="128" cy="188" r="8"/>
+  <g stroke="url(#g)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+    
+<path d="M16 44 28 20"/>
+<path d="M36 44 48 20"/>
+<path d="m24 38 8-6 8 6"/>
+<path d="m21 25 7 5"/>
+<path d="m43 25-7 5"/>
+<circle cx="32" cy="49" r="1.8" fill="#C885FF" stroke="none"/>
 
+  </g>
 </svg>

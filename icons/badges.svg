@@ -1,50 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
   <defs>
-    <linearGradient id="neonGrad" x1="24" y1="24" x2="232" y2="232" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#ff4fd8"/>
-      <stop offset="48%" stop-color="#9a6dff"/>
-      <stop offset="100%" stop-color="#43d7ff"/>
+    <linearGradient id="g" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5BE6FF"/>
+      <stop offset="0.52" stop-color="#8F8BFF"/>
+      <stop offset="1" stop-color="#FF5CCF"/>
     </linearGradient>
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="4" result="blur1"/>
-      <feColorMatrix in="blur1" type="matrix" values="
-        1 0 0 0 0
-        0 1 0 0 0
-        0 0 1 0 0
-        0 0 0 0.9 0" result="blur2"/>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="1.8" result="b"/>
       <feMerge>
-        <feMergeNode in="blur2"/>
+        <feMergeNode in="b"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-    <style>
-      .st {
-        stroke: url(#neonGrad);
-        stroke-width: 12;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        filter: url(#glow);
-      }
-      .st2 {
-        stroke: #dffbff;
-        stroke-opacity: .38;
-        stroke-width: 4;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
-      .fillg {
-        fill: url(#neonGrad);
-        filter: url(#glow);
-      }
-      .soft {
-        fill: #dffbff;
-        fill-opacity: .15;
-      }
-    </style>
   </defs>
-  
-<circle class="st" cx="128" cy="92" r="38"/>
-<path class="st2" d="M128 70l7 14 16 2-11 11 3 16-15-8-15 8 3-16-11-11 16-2 7-14z"/>
-<path class="st" d="M98 126l-6 54 36-20 36 20-6-54"/>
+  <g stroke="url(#g)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+    
+<path d="M22 15h20v15a10 10 0 0 1-20 0V15Z"/>
+<path d="m26 46 6-4 6 4"/>
+<path d="m26 42 6-4 6 4"/>
+<path d="m32 21 2.2 4.5 4.8.7-3.5 3.4.8 4.8L32 32l-4.3 2.4.8-4.8-3.5-3.4 4.8-.7L32 21Z"/>
 
+  </g>
 </svg>
