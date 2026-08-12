@@ -7572,3 +7572,60 @@ h3,
     column-gap:.34em !important;
   }
 }
+
+
+/* =========================================================
+   v13.63 — PLAYER COLOUR CARRIES THROUGH TO TRACKER
+   PLAYER'S + TRACKER share the personalised colour.
+   ACTIVATE remains the bright focal word.
+   ========================================================= */
+
+.brand-tracker{
+  color:var(--player-brand-color) !important;
+  text-shadow:
+    0 0 2px rgba(255,255,255,.72),
+    0 0 6px var(--player-brand-color),
+    0 0 13px color-mix(in srgb,var(--player-brand-color) 62%,transparent),
+    0 0 22px color-mix(in srgb,var(--player-brand-color) 28%,transparent) !important;
+}
+
+.brand-activate{
+  color:#f7fdff !important;
+  font-weight:800 !important;
+  letter-spacing:.035em !important;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 7px rgba(67,231,255,.95),
+    0 0 15px rgba(67,231,255,.72),
+    0 0 27px rgba(155,98,255,.38) !important;
+  filter:brightness(1.08);
+}
+
+
+/* =========================================================
+   v13.64 — ACTIVATE PINK / BLUE MIX
+   ========================================================= */
+
+.brand-activate{
+  background:
+    linear-gradient(
+      90deg,
+      #FF4FB3 0%,
+      #FF78C7 24%,
+      #F7FDFF 48%,
+      #66E8FF 70%,
+      #3157FF 100%
+    ) !important;
+  -webkit-background-clip:text !important;
+  background-clip:text !important;
+  -webkit-text-fill-color:transparent !important;
+  color:transparent !important;
+
+  text-shadow:
+    0 0 3px rgba(255,255,255,.88),
+    0 0 8px rgba(255,79,179,.62),
+    0 0 15px rgba(67,231,255,.66),
+    0 0 27px rgba(49,87,255,.38) !important;
+
+  filter:brightness(1.12) saturate(1.08);
+}
