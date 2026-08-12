@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.23.0';
+const VERSION='13.24.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -171,8 +171,9 @@ function trophyProgress(){
 function renderHome(){
   const n=earnedCount(), total=BASE_BADGE_COUNT, pct=total?Math.round(n/total*100):0, l=activeLocation();
   const tp=trophyProgress();
+  const tpClass=`trophy-${String(tp.name).toLowerCase()}`;
   $('homeSummary').innerHTML=`<div class="label">Trophy progress</div>
-    <div class="big">${esc(tp.name)}</div>
+    <div class="big trophy-current-name ${tpClass}">${esc(tp.name)}</div>
     <div class="sub">${tp.remaining?`${tp.current} / ${tp.target} badges • ${tp.remaining} to unlock`:'Unlocked • 100% complete'}</div>
     <div class="progress top-gap"><span style="width:${tp.target?Math.min(100,tp.current/tp.target*100):100}%"></span></div>
     <div class="metrics">
@@ -180,7 +181,20 @@ function renderHome(){
       <div class="metric"><span class="label">Overall</span><b>${pct}%</b></div>
       <div class="metric"><span class="label">Location</span><b style="font-size:15px">${esc(l.name)}</b></div>
     </div>`;
-  $('trophies').innerHTML=[['Bronze',25],['Silver',50],['Gold',75],['Platinum',total]].map(([name,need])=>`<div class="card trophy ${n>=need?'':'locked'}"><div class="row between"><span class="cup">🏆</span><span class="pill">${n>=need?'Unlocked':`${Math.max(0,need-n)} left`}</span></div><h3>${name}</h3><div class="sub">${name==='Platinum'?'100% of tracked badges':`${need} badges`}</div><div class="progress top-gap"><span style="width:${need?Math.min(100,n/need*100):0}%"></span></div></div>`).join('');
+  $('trophies').innerHTML=[['Bronze',25],['Silver',50],['Gold',75],['Platinum',total]].map(([name,need])=>{
+    const metal=`trophy-${name.toLowerCase()}`;
+    const unlocked=n>=need;
+    return `<div class="card trophy ${metal} ${unlocked?'unlocked':'locked'}">
+      <div class="trophy-shimmer" aria-hidden="true"></div>
+      <div class="row between">
+        <span class="cup" aria-hidden="true">🏆</span>
+        <span class="pill">${unlocked?'Unlocked':`${Math.max(0,need-n)} left`}</span>
+      </div>
+      <h3>${name}</h3>
+      <div class="sub">${name==='Platinum'?'100% of tracked badges':`${need} badges`}</div>
+      <div class="progress top-gap"><span style="width:${need?Math.min(100,n/need*100):0}%"></span></div>
+    </div>`;
+  }).join('');
   $('homePins').innerHTML=state.pins.length?state.pins.map((i,idx)=>`<div class="item row between"><div><b>${esc(BADGES[i].name)}</b><div class="sub">${esc(BADGES[i].room||'Any room')}</div></div><button class="mini" data-open-focus="${idx}">Open</button></div>`).join(''):'<div class="item sub">No pinned badges.</div>';
   $('recent').innerHTML=state.history.length?state.history.slice(0,8).map(h=>`<button class="item recent-achievement clickable-badge" data-open-focus-badge="${h.badge}" data-focus-source="recent"><div><b>${esc(BADGES[h.badge]?.name||'Badge')}</b><div class="sub">${esc(h.date||'')}</div></div><span class="recent-open">›</span></button>`).join(''):'<div class="item sub">No achievements recorded yet.</div>';
 }

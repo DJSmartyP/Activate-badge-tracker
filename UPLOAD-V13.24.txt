@@ -1,0 +1,32 @@
+ACTIVATE TRACKER v13.24 — METALLIC TROPHY COLOURS
+
+HOME TROPHY PROGRESS
+- The current award name now uses its actual metal colour:
+  • Bronze = copper/bronze
+  • Silver = cool silver
+  • Gold = rich gold
+  • Platinum = icy platinum with a subtle violet/cyan tint
+- The text has a moving metallic shimmer and matching glow.
+
+TROPHY CARDS
+- Bronze, Silver, Gold and Platinum cards now each use their own metal palette.
+- Trophy name, border, progress bar and trophy area all inherit the award colour.
+- Unlocked trophies get a brighter glow and a metallic light sweep across the card.
+- Locked trophies retain their award colour but are deliberately subdued.
+- Platinum gets a slightly richer iridescent cyan/violet aura.
+- Reduced-motion settings disable the shimmer animation.
+
+RETAINED
+- Tilt Neon page titles + polished title bar
+- Strong achieved/high-score effects
+- Context-aware Focus navigation
+- Pin control hard fix
+- Home pinned spacing
+- Portrait Focus text fitting
+- Landscape scrolling fix
+
+UPLOAD TO GITHUB ROOT:
+index.html
+app.js
+style.css
+sw.js

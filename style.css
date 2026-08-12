@@ -2983,3 +2983,235 @@ p,
     margin-top:2px;
   }
 }
+
+/* =========================================================
+   v13.24 — metallic trophy colours + shimmer/glow
+   ========================================================= */
+
+/* Home current-trophy name: actual award colour, not generic white. */
+.trophy-current-name{
+  position:relative;
+  display:inline-block;
+  width:max-content;
+  max-width:100%;
+  background-size:220% 100%;
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent !important;
+  text-shadow:none !important;
+  animation:trophyTextShimmer 3.2s ease-in-out infinite;
+}
+
+.trophy-current-name.trophy-bronze{
+  background-image:linear-gradient(100deg,#7a3e16 0%,#c77834 28%,#ffd0a1 48%,#b55a22 65%,#6b3213 100%);
+  filter:drop-shadow(0 0 8px rgba(205,111,49,.25));
+}
+.trophy-current-name.trophy-silver{
+  background-image:linear-gradient(100deg,#798493 0%,#d8e0e8 28%,#ffffff 48%,#b8c4d1 67%,#687482 100%);
+  filter:drop-shadow(0 0 8px rgba(210,228,245,.25));
+}
+.trophy-current-name.trophy-gold{
+  background-image:linear-gradient(100deg,#9a6500 0%,#f2bd28 25%,#fff0a2 48%,#ffc92f 68%,#a96c00 100%);
+  filter:drop-shadow(0 0 9px rgba(255,199,43,.32));
+}
+.trophy-current-name.trophy-platinum{
+  background-image:linear-gradient(100deg,#87cde5 0%,#e9fbff 24%,#ffffff 43%,#c6b8ff 62%,#88ecff 80%,#b6c8ff 100%);
+  filter:drop-shadow(0 0 10px rgba(131,225,255,.34));
+}
+
+/* Trophy cards use the same metal identity. */
+.trophy{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  border-width:2px !important;
+  transition:box-shadow .2s ease,transform .2s ease,opacity .2s ease;
+}
+
+.trophy > *:not(.trophy-shimmer){
+  position:relative;
+  z-index:2;
+}
+
+.trophy h3{
+  margin-top:13px;
+  margin-bottom:4px;
+}
+
+.trophy .cup{
+  display:inline-grid;
+  place-items:center;
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  font-size:30px;
+  background:rgba(7,10,18,.56);
+  border:1px solid currentColor;
+}
+
+.trophy .pill{
+  border:1px solid currentColor;
+  background:rgba(8,11,20,.58);
+  color:inherit;
+}
+
+.trophy .progress{
+  background:rgba(255,255,255,.07);
+}
+
+.trophy .progress > span{
+  background:var(--trophy-progress) !important;
+  box-shadow:0 0 10px var(--trophy-glow);
+}
+
+/* Bronze */
+.trophy.trophy-bronze{
+  --trophy-main:#d07b3e;
+  --trophy-light:#ffd1a2;
+  --trophy-glow:rgba(212,112,54,.52);
+  --trophy-progress:linear-gradient(90deg,#7f3f19,#d77b3b,#ffb36e);
+  color:#e69a61;
+  border-color:rgba(211,116,57,.58) !important;
+  background:
+    radial-gradient(circle at 82% 15%,rgba(216,116,58,.13),transparent 34%),
+    linear-gradient(145deg,rgba(80,39,17,.22),rgba(15,17,26,.98) 58%);
+}
+
+/* Silver */
+.trophy.trophy-silver{
+  --trophy-main:#d7e2ec;
+  --trophy-light:#ffffff;
+  --trophy-glow:rgba(213,233,249,.52);
+  --trophy-progress:linear-gradient(90deg,#72808f,#dce6ef,#ffffff);
+  color:#dce6ef;
+  border-color:rgba(207,224,239,.56) !important;
+  background:
+    radial-gradient(circle at 82% 15%,rgba(220,236,250,.12),transparent 34%),
+    linear-gradient(145deg,rgba(91,106,121,.16),rgba(15,17,26,.98) 58%);
+}
+
+/* Gold */
+.trophy.trophy-gold{
+  --trophy-main:#ffd24a;
+  --trophy-light:#fff4a6;
+  --trophy-glow:rgba(255,207,58,.58);
+  --trophy-progress:linear-gradient(90deg,#a66d00,#ffd135,#fff09b);
+  color:#ffd84e;
+  border-color:rgba(255,205,54,.64) !important;
+  background:
+    radial-gradient(circle at 82% 15%,rgba(255,208,54,.15),transparent 34%),
+    linear-gradient(145deg,rgba(99,68,8,.20),rgba(15,17,26,.98) 58%);
+}
+
+/* Platinum */
+.trophy.trophy-platinum{
+  --trophy-main:#c4f4ff;
+  --trophy-light:#ffffff;
+  --trophy-glow:rgba(132,226,255,.62);
+  --trophy-progress:linear-gradient(90deg,#78dff5,#e9fbff,#c7b9ff,#9cefff);
+  color:#d9f9ff;
+  border-color:rgba(165,232,255,.68) !important;
+  background:
+    radial-gradient(circle at 78% 14%,rgba(121,229,255,.14),transparent 30%),
+    radial-gradient(circle at 12% 84%,rgba(180,142,255,.10),transparent 34%),
+    linear-gradient(145deg,rgba(52,83,101,.18),rgba(15,17,26,.98) 58%);
+}
+
+/* Metal-coloured trophy names inside each card. */
+.trophy h3{
+  color:var(--trophy-main) !important;
+  text-shadow:
+    0 0 8px var(--trophy-glow),
+    0 0 16px color-mix(in srgb,var(--trophy-glow) 55%,transparent);
+}
+
+.trophy .cup{
+  color:var(--trophy-main);
+  box-shadow:
+    inset 0 0 12px color-mix(in srgb,var(--trophy-glow) 38%,transparent),
+    0 0 12px color-mix(in srgb,var(--trophy-glow) 45%,transparent);
+}
+
+/* The actual emoji is multicolour on many devices; filters pull it toward
+   the selected award metal while the frame/glow guarantees consistency. */
+.trophy-bronze .cup{filter:sepia(.55) saturate(1.25) hue-rotate(340deg)}
+.trophy-silver .cup{filter:grayscale(.82) brightness(1.28) contrast(.9)}
+.trophy-gold .cup{filter:saturate(1.18) brightness(1.08)}
+.trophy-platinum .cup{filter:grayscale(.5) brightness(1.34) hue-rotate(145deg) saturate(.72)}
+
+/* Unlocked trophies get the full metallic shimmer. */
+.trophy.unlocked{
+  opacity:1 !important;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb,var(--trophy-main) 22%,transparent),
+    0 0 16px color-mix(in srgb,var(--trophy-glow) 58%,transparent),
+    0 0 30px color-mix(in srgb,var(--trophy-glow) 28%,transparent);
+}
+
+.trophy-shimmer{
+  position:absolute;
+  z-index:1;
+  top:-30%;
+  bottom:-30%;
+  left:-55%;
+  width:30%;
+  transform:skewX(-18deg);
+  background:linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb,var(--trophy-light) 10%,transparent),
+    color-mix(in srgb,var(--trophy-light) 68%,transparent),
+    color-mix(in srgb,var(--trophy-light) 10%,transparent),
+    transparent
+  );
+  filter:blur(.4px);
+  opacity:0;
+  pointer-events:none;
+}
+
+.trophy.unlocked .trophy-shimmer{
+  opacity:.75;
+  animation:trophyCardShimmer 3.7s ease-in-out infinite;
+}
+
+/* Locked awards retain their metal identity, just subdued. */
+.trophy.locked{
+  opacity:.64 !important;
+}
+.trophy.locked .trophy-shimmer{
+  display:none;
+}
+
+/* Platinum gets a slightly richer unlocked aura. */
+.trophy.trophy-platinum.unlocked{
+  box-shadow:
+    0 0 0 1px rgba(183,239,255,.32),
+    0 0 18px rgba(125,229,255,.34),
+    0 0 34px rgba(184,145,255,.22),
+    0 0 48px rgba(255,255,255,.08);
+}
+
+@keyframes trophyTextShimmer{
+  0%,100%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+}
+
+@keyframes trophyCardShimmer{
+  0%,38%{left:-55%;opacity:0}
+  47%{opacity:.8}
+  63%{left:125%;opacity:.55}
+  70%,100%{left:125%;opacity:0}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .trophy-current-name,
+  .trophy.unlocked .trophy-shimmer{
+    animation:none !important;
+  }
+  .trophy-current-name{
+    background-position:50% 50%;
+  }
+  .trophy.unlocked .trophy-shimmer{
+    display:none;
+  }
+}
