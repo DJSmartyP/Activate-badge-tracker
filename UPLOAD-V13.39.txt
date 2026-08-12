@@ -1,0 +1,18 @@
+ACTIVATE TRACKER v13.39 — HEADER NEON DETAILS
+
+WHAT CHANGED
+- Added extra neon 'bits and pieces' to the top brand banner.
+- New decorative layer includes:
+  • neon nodes / dots
+  • tiny status chips
+  • signal bars
+  • accent lines
+  • subtle radial lighting and grid rails
+- Keeps the same header height and layout.
+- Decoration simplifies slightly on smaller screens.
+
+UPLOAD THESE FILES ONLY:
+index.html
+style.css
+app.js
+sw.js

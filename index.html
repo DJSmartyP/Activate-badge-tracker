@@ -7,8 +7,8 @@
   <meta name="mobile-web-app-capable" content="yes">
   <title>Activate Tracker</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
-  <link rel="apple-touch-icon" href="icon-192.png?v=108">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png?v=131">
+  <link rel="apple-touch-icon" href="icon-192.png?v=131">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bruno+Ace+SC&amp;family=Tektur:wght@700;800;900&amp;family=Tilt+Neon&amp;display=swap" rel="stylesheet">
@@ -26,13 +26,13 @@
   </div>
 
   <nav class="drawer-nav">
-    <button data-view="home"><img class="drawer-icon-img" src="icons/home.png" alt=""><span>Home</span></button>
-    <button data-view="badges"><img class="drawer-icon-img" src="icons/badges.png" alt=""><span>Badges</span></button>
-    <button data-view="levels"><img class="drawer-icon-img" src="icons/levels.png" alt=""><span>Levels</span></button>
-    <button data-view="competitive"><img class="drawer-icon-img" src="icons/competitive.png" alt=""><span>Competitive</span></button>
-    <button data-view="locations"><img class="drawer-icon-img" src="icons/locations.png" alt=""><span>Locations</span></button>
-    <button data-view="stats"><img class="drawer-icon-img" src="icons/stats.png" alt=""><span>Stats</span></button>
-    <button data-view="settings"><img class="drawer-icon-img" src="icons/settings.png" alt=""><span>Settings</span></button>
+    <button data-view="home"><img class="drawer-icon-img" src="icons/home.svg" alt=""><span>Home</span></button>
+    <button data-view="badges"><img class="drawer-icon-img" src="icons/badges.svg" alt=""><span>Badges</span></button>
+    <button data-view="levels"><img class="drawer-icon-img" src="icons/levels.svg" alt=""><span>Levels</span></button>
+    <button data-view="competitive"><img class="drawer-icon-img" src="icons/competitive.svg" alt=""><span>Competitive</span></button>
+    <button data-view="locations"><img class="drawer-icon-img" src="icons/locations.svg" alt=""><span>Locations</span></button>
+    <button data-view="stats"><img class="drawer-icon-img" src="icons/stats.svg" alt=""><span>Stats</span></button>
+    <button data-view="settings"><img class="drawer-icon-img" src="icons/settings.svg" alt=""><span>Settings</span></button>
   </nav>
 </aside>
 
@@ -45,42 +45,53 @@
   
 <div class="brand-banner-wrap brand-banner-final" aria-label="Smarty's Activate Tracker">
   <div class="brand-wordmark">
-    <span class="brand-circuit brand-circuit-left" aria-hidden="true"></span>
-    <span class="brand-circuit brand-circuit-right" aria-hidden="true"></span>
+    <div class="brand-decor" aria-hidden="true">
+      <span class="decor-node decor-node-a"></span>
+      <span class="decor-node decor-node-b"></span>
+      <span class="decor-node decor-node-c"></span>
+      <span class="decor-signal decor-signal-a"></span>
+      <span class="decor-signal decor-signal-b"></span>
+      <span class="decor-chip decor-chip-a"></span>
+      <span class="decor-chip decor-chip-b"></span>
+      <span class="decor-line decor-line-a"></span>
+      <span class="decor-line decor-line-b"></span>
+      <span class="decor-line decor-line-c"></span>
+    </div>
+    <div class="brand-lockup">
+      <span class="smarty-tag">Smarty's</span>
+      <strong class="brand-main" aria-label="Activate Tracker">
+        <span class="brand-activate">Activate</span>
+        <span class="brand-tracker">Tracker</span>
+      </strong>
+      <span class="brand-kicker" aria-hidden="true">Badge Ops // Field Log</span>
+    </div>
 
-    <span class="smarty-tag">Smarty's</span>
+    <div class="brand-hud brand-hud-left" aria-hidden="true">
+      <span class="hud-node"></span>
+      <span class="hud-line"></span>
+      <span class="hud-copy">Badge Ops</span>
+      <span class="hud-dots">•••</span>
+    </div>
 
-    <span class="brand-title-lockup">
-      <strong class="brand-main">Activate Tracker</strong>
-      <span class="brand-title-echo" aria-hidden="true">Activate Tracker</span>
-    </span>
+    <div class="brand-hud brand-hud-right" aria-hidden="true">
+      <span class="hud-copy">System Online</span>
+      <span class="hud-bars"><i></i><i></i><i></i><i></i></span>
+      <span class="hud-node"></span>
+    </div>
 
-    <span class="brand-tagline">Track • Pin • Conquer</span>
-
-    <span class="brand-status-chip" aria-hidden="true">
-      <i></i><span>System Live</span>
-    </span>
+    <span class="brand-tagline"><i aria-hidden="true"></i>Track • Pin • Conquer</span>
   </div>
 </div>
 
-<div class="page-bar" data-page="home">
-    <button id="drawerMenuBtn" class="drawer-menu-btn" type="button" aria-label="Open navigation" aria-expanded="false">
-      <span class="drawer-menu-glyph" aria-hidden="true">☰</span>
-    </button>
+<div class="page-bar">
+    <button id="drawerMenuBtn" class="drawer-menu-btn" type="button" aria-label="Open navigation" aria-expanded="false"><img class="drawer-menu-icon" src="icons/menu.svg" alt=""></button>
 
     <div class="page-bar-title">
-      <span class="page-icon-dock" aria-hidden="true">
-        <img id="pageHeaderIcon" class="page-header-icon" src="icons/home.png" alt="">
-      </span>
+      <img id="pageHeaderIcon" class="page-header-icon" src="icons/home.svg" alt="">
       <div class="page-bar-copy">
-        <div class="page-header-eyebrow"><span class="page-live-dot"></span>Active module</div>
         <h1 id="pageHeaderTitle">Home</h1>
         <div id="pageHeaderSubtitle" class="page-header-subtitle">Dashboard overview</div>
       </div>
-    </div>
-
-    <div class="page-bar-status" aria-hidden="true">
-      <span></span><span></span><span></span>
     </div>
   </div>
 </header>
@@ -197,21 +208,32 @@
 </section>
 
 
-<section id="levels" class="view"><div class="section-title"><div><div class="label">Game progress</div><h2>Levels</h2></div><span id="levelsSummary" class="sub"></span></div><div class="card top-gap"><div class="row wrap"><select id="levelsRoom" class="select"><option value="">All rooms</option></select>
+<section id="levels" class="view"><div class="section-title"><div><div class="label">Game progress</div><h2>Levels</h2></div><span id="levelsSummary" class="sub"></span></div><div class="card top-gap"><div class="row wrap levels-filter-row">
+      <select id="levelsRoom" class="select" aria-label="Filter by room"><option value="">All rooms</option></select>
+      <select id="levelsGame" class="select levels-game-filter" aria-label="Filter by game" disabled>
+        <option value="">Select a room first</option>
+      </select>
       <select id="levelsSort" class="select" aria-label="Sort levels and games">
         <option value="room-game">Room, then game</option>
         <option value="game-room">Game A–Z</option>
         <option value="status">Status</option>
-      </select><div id="levelsModeTabs" class="segmented levels-mode-tabs" role="group" aria-label="Levels display mode">
-      <button type="button" class="seg-btn active" data-levels-mode="levels">Levels</button>
-      <button type="button" class="seg-btn" data-levels-mode="games">Games</button>
-    </div>
-    <select id="levelsView" class="select">
-      <option value="all">All levels</option>
-      <option value="incomplete">Incomplete</option>
-      <option value="complete">Complete</option>
-      <option value="highscore">Venue high scores</option>
-    </select></div></div><div id="levelsList" class="stack top-gap"></div></section>
+      </select>
+      <div id="levelsModeTabs" class="segmented levels-mode-tabs" role="group" aria-label="Levels display mode">
+        <button type="button" class="seg-btn active" data-levels-mode="levels">Levels</button>
+        <button type="button" class="seg-btn" data-levels-mode="games">Games</button>
+      </div>
+      <select id="levelsView" class="select">
+        <option value="all">All levels</option>
+        <option value="incomplete">Incomplete</option>
+        <option value="complete">Complete</option>
+        <option value="highscore">Venue high scores</option>
+      </select>
+      <select id="gamesView" class="select hidden" aria-label="Filter games by played status">
+        <option value="all">All games</option>
+        <option value="played">Played</option>
+        <option value="unplayed">Not played</option>
+      </select>
+    </div></div><div id="levelsList" class="stack top-gap"></div></section>
 <section id="stats" class="view">
       <div id="statsCards" class="stats-grid"></div>
       <div class="hero top-gap">
@@ -227,10 +249,10 @@
 </div>
 <div class="card">
         <h2>Settings</h2>
-        <p class="sub">Version <strong>13.29.0</strong> — clean rebuild.</p>
+        <p class="sub">Version <strong>13.41.0</strong> — clean rebuild.</p>
         <div class="row wrap">
-          <button class="btn primary" id="exportBackup">Backup app data</button>
-          <label class="btn">Restore app data<input id="importBackup" type="file" accept="application/json" hidden></label>
+          <button class="btn primary icon-label-btn" id="exportBackup"><img src="icons/backup.svg" alt="">Backup app data</button>
+          <label class="btn icon-label-btn"><img src="icons/restore.svg" alt="">Restore app data<input id="importBackup" type="file" accept="application/json" hidden></label>
           <button class="btn danger" id="resetApp">Reset app data</button>
         </div>
       </div>

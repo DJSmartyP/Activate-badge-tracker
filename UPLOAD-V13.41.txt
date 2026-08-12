@@ -1,0 +1,17 @@
+ACTIVATE TRACKER v13.41 — REGRESSION RECOVERY + ICON FIX
+
+IMPORTANT
+- Restored the project to the real v13.40 lineage instead of the accidental v13.29 rollback.
+- Restores the later designed brand header and refinements.
+- Restores the working SVG navigation/page icon pack.
+- Includes the entire icons folder in this ZIP so the assets cannot be omitted during upload.
+- Keeps the all-small-caps treatment already present in the v13.40 lineage.
+
+ICON CHECK
+- All icon references in index.html/app.js were checked against packaged files.
+- No missing icon assets.
+- Page header uses icons/home.svg etc.
+- Drawer menu uses icons/menu.svg.
+
+UPLOAD
+Upload ALL contents of this ZIP to the GitHub repository root, including the icons folder.
