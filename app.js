@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.68.0';
+const VERSION='13.69.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -2786,6 +2786,16 @@ function bindEvents(){
   onChange('importScoresCsv',async e=>{
     const f=e.target.files?.[0];
     if(!f)return;
+
+    const fileName=String(f.name||'').trim();
+    const mime=String(f.type||'').toLowerCase();
+    const looksCsv=/\.csv$/i.test(fileName) || /csv|comma-separated|plain|excel|octet-stream/.test(mime);
+    if(!looksCsv){
+      toast('Please choose a CSV file');
+      e.target.value='';
+      return;
+    }
+
     const info=$('levelsImportInfo');
     if(info)info.textContent=`Reading ${f.name}…`;
     try{
