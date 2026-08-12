@@ -1,0 +1,41 @@
+ACTIVATE TRACKER v13.36 — REFINED NEON ICONS
+
+UPDATED ICONS
+- Levels:
+  Replaced bar-chart-like icon with an ascending stepped progression icon.
+  It now reads clearly as levels/progression rather than statistics.
+
+- Competitive:
+  Replaced crossed swords with a large neon VS icon.
+  It communicates head-to-head/competitive play without implying combat.
+
+- High Scores:
+  Replaced the chart-style icon with a #1 podium + crown icon.
+  It is now clearly distinct from Stats and reads immediately as high score / leader.
+
+UNCHANGED ICONS
+- Home = house
+- Badges = medal/ribbon
+- Locations = map pin
+- Stats = chart
+- Settings = gear
+- Menu = hamburger
+- Backup = cloud/upload
+- Restore = circular arrow
+- More = ellipsis
+
+RETAINED
+- Neon SVG integration in page headers and drawer
+- Levels Room → Game filter
+- Games All / Played / Not played filter
+- Crisp app icon set
+- Larger header elements
+- Landscape trophy layout
+
+UPLOAD TO GITHUB ROOT:
+index.html
+app.js
+sw.js
+icons/levels.svg
+icons/competitive.svg
+icons/highscores.svg
