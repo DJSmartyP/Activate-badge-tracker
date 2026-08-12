@@ -1,9 +1,9 @@
-const CACHE='activate-tracker-v13-81-0';
+const CACHE='activate-tracker-v13-82-0';
 const ASSETS=[
   './',
   'index.html',
-  'style.css?v=1381',
-  'app.js?v=1381',
+  'style.css?v=1382',
+  'app.js?v=1382',
   'badges.json','rooms.json','manifest.webmanifest',
   'icon-192.png?v=131','icon-512.png?v=131','icon-maskable-512.png?v=131','favicon-64.png?v=131',
   'icons/home.svg','icons/badges.svg','icons/levels.svg','icons/competitive.svg','icons/locations.svg','icons/stats.svg','icons/settings.svg','icons/menu.svg','icons/more.svg','icons/backup.svg','icons/restore.svg',

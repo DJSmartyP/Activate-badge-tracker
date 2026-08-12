@@ -10616,3 +10616,44 @@ body{
     animation:none !important;
   }
 }
+
+
+/* =========================================================
+   v13.82 — ACTIVATE: STRONGER PINK / BLUE NEON
+   Less white, more saturated neon identity.
+   ========================================================= */
+
+#brandBanner .brand-activate,
+.brand-banner-final .brand-activate{
+  background:
+    linear-gradient(
+      90deg,
+      #FF38B8 0%,
+      #FF4FC8 20%,
+      #C85BFF 40%,
+      #7D7BFF 55%,
+      #46D9FF 76%,
+      #2F76FF 100%
+    ) !important;
+
+  -webkit-background-clip:text !important;
+  background-clip:text !important;
+  -webkit-text-fill-color:transparent !important;
+  color:transparent !important;
+
+  text-shadow:
+    0 0 3px rgba(255,78,196,.72),
+    0 0 8px rgba(255,56,184,.46),
+    0 0 12px rgba(126,123,255,.42),
+    0 0 17px rgba(70,217,255,.48),
+    0 0 24px rgba(47,118,255,.28) !important;
+
+  filter:
+    brightness(1.10)
+    saturate(1.22) !important;
+}
+
+/* A narrow central sparkle keeps ACTIVATE crisp without making it white. */
+#brandBanner .brand-activate{
+  position:relative !important;
+}
