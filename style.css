@@ -5109,3 +5109,136 @@ h3,
     grid-column:auto;
   }
 }
+
+/* =========================================================
+   v13.37 — floating neon header icons
+   Removes the old boxed/tile appearance from page icons.
+   ========================================================= */
+
+/* PAGE HEADER ICON
+   Keep the same occupied width/height from v13.33,
+   but remove all tile/chip treatment. */
+.page-header-icon{
+  background:transparent !important;
+  border:0 !important;
+  outline:0 !important;
+  box-shadow:none !important;
+  border-radius:0 !important;
+
+  /* More actual artwork, less empty padding. */
+  padding:0 !important;
+  object-fit:contain !important;
+
+  /* Layered glow: tight white/cyan highlight + broader neon halo. */
+  filter:
+    drop-shadow(0 0 2px rgba(255,255,255,.92))
+    drop-shadow(0 0 5px rgba(67,215,255,.92))
+    drop-shadow(0 0 10px rgba(67,215,255,.58))
+    drop-shadow(0 0 16px rgba(154,109,255,.32))
+    drop-shadow(0 0 20px rgba(255,79,216,.18)) !important;
+}
+
+/* Give the artwork a little more visual presence without consuming
+   any additional horizontal space. */
+.page-bar-title{
+  position:relative;
+}
+
+.page-header-icon{
+  transform:scale(1.08);
+  transform-origin:center;
+}
+
+/* Soft aura behind the icon — no visible box, just light. */
+.page-bar-title::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:50%;
+  width:54px;
+  height:54px;
+  transform:translateY(-50%);
+  border-radius:50%;
+  pointer-events:none;
+  z-index:0;
+  background:
+    radial-gradient(circle,
+      rgba(255,255,255,.10) 0%,
+      rgba(67,215,255,.12) 22%,
+      rgba(154,109,255,.08) 44%,
+      rgba(255,79,216,.035) 60%,
+      transparent 76%);
+  filter:blur(5px);
+  opacity:.9;
+}
+
+/* Keep icon above its aura. */
+.page-header-icon,
+.page-bar-copy{
+  position:relative;
+  z-index:1;
+}
+
+/* DRAWER ICONS
+   Remove any residual tile/chip appearance there too. */
+.drawer-icon-img{
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  border-radius:0 !important;
+  padding:0 !important;
+  filter:
+    drop-shadow(0 0 2px rgba(255,255,255,.74))
+    drop-shadow(0 0 5px rgba(67,215,255,.72))
+    drop-shadow(0 0 10px rgba(154,109,255,.34))
+    drop-shadow(0 0 14px rgba(255,79,216,.16)) !important;
+}
+
+/* MENU ICON
+   Same treatment: floating neon mark, no internal tile. */
+.drawer-menu-icon{
+  filter:
+    drop-shadow(0 0 2px rgba(255,255,255,.86))
+    drop-shadow(0 0 5px rgba(67,215,255,.78))
+    drop-shadow(0 0 9px rgba(154,109,255,.34))
+    drop-shadow(0 0 13px rgba(255,79,216,.16)) !important;
+}
+
+/* The outer hamburger BUTTON can keep its own control boundary,
+   but the graphic itself no longer looks like a box inside a box. */
+.drawer-menu-btn img{
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+/* Narrow Fold cover keeps exactly the same width allocation. */
+@media (max-width:430px){
+  .page-header-icon{
+    transform:scale(1.06);
+  }
+
+  .page-bar-title::before{
+    width:50px;
+    height:50px;
+  }
+}
+
+/* Landscape: strong highlight without increasing header width. */
+@media (orientation:landscape) and (max-height:760px){
+  .page-header-icon{
+    transform:scale(1.08);
+  }
+
+  .page-bar-title::before{
+    width:50px;
+    height:50px;
+    opacity:.82;
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .page-header-icon{
+    transition:none !important;
+  }
+}

@@ -1,0 +1,25 @@
+ACTIVATE TRACKER v13.37 — FLOATING NEON HEADER ICONS
+
+FIX
+- Removed the rounded-square/tile look around page icons.
+- SVG icons now float directly on the header background.
+- Removed icon background, border, box-shadow and rounded container styling.
+
+NEW GLOW
+- Tight white highlight.
+- Strong cyan neon glow.
+- Softer violet and pink outer halo.
+- Subtle radial aura behind each page icon.
+- Same treatment applied to drawer icons.
+- Menu icon remains inside the menu button, but no longer looks boxed inside it.
+
+NO LAYOUT CHANGE
+- Header horizontal footprint is unchanged.
+- Icon column width remains exactly the same.
+- Fold and landscape spacing remain intact.
+
+UPDATE ONLY — UPLOAD THESE FILES:
+index.html
+app.js
+style.css
+sw.js
