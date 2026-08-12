@@ -1,0 +1,42 @@
+ACTIVATE TRACKER v13.27 — SMALL CAPS + FINISHED BRAND BANNER
+
+ALL TEXT
+- Global all-small-caps treatment across headings, body text, controls,
+  labels, filters, cards and form fields.
+- Existing forced-uppercase rules are neutralised so the app has one
+  consistent small-caps visual language.
+- Heading tracking is slightly wider for the neon display treatment.
+
+FINAL BRAND BANNER
+- Removed "Logo artwork placeholder" completely.
+- Replaced it with a finished CSS-built Smarty's Activate Tracker banner.
+- Pink neon Smarty's tag/signature.
+- Cyan/white/violet/pink Activate Tracker wordmark.
+- Track • Pin • Conquer tagline.
+- Clipped sci-fi corners.
+- Subtle tech grid.
+- Cyan/pink edge rails.
+- Animated energy sweep.
+- Animated metallic/neon colour flow through the main wordmark.
+- Reduced-motion accessibility supported.
+- Responsive for Fold cover, inner display and landscape.
+
+HEADER SAFETY
+- Preserves the v13.26 single-sticky-shell header architecture.
+- No nested sticky offsets are reintroduced.
+
+RETAINED
+- Venue high-score filter
+- Metallic trophies
+- Neon headings
+- Strong achieved/high-score effects
+- Context-aware Focus navigation
+- Pin hard fix
+- Portrait Focus fit
+- Landscape scrolling
+
+UPLOAD TO GITHUB ROOT:
+index.html
+app.js
+style.css
+sw.js

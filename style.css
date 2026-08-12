@@ -3513,3 +3513,355 @@ dt,
 #levelsView option[value="highscore"]{
   font-weight:700;
 }
+
+/* =========================================================
+   v13.27 — full small-caps UI + finished CSS brand banner
+   ========================================================= */
+
+/* TRUE SMALL-CAPS TREATMENT THROUGHOUT THE APP
+   all-small-caps gives uppercase and lowercase the same small-cap form.
+   Existing forced uppercase rules are neutralised here so the cap treatment
+   is consistent rather than mixing full caps and small caps. */
+html,
+body,
+button,
+input,
+select,
+textarea,
+option,
+label,
+p,
+span,
+div,
+a,
+li,
+dt,
+dd,
+strong,
+b,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6{
+  font-variant-caps:all-small-caps !important;
+  font-feature-settings:"smcp" 1,"c2sc" 1;
+  text-transform:none !important;
+}
+
+/* Slight tracking makes synthesized small caps feel deliberate rather than cramped. */
+body,
+button,
+input,
+select,
+textarea,
+option{
+  letter-spacing:.022em;
+}
+
+/* Titles stay more open and luminous. */
+h1,
+h2,
+h3,
+.page-bar-copy h1,
+#pageHeaderTitle,
+.section-title h2,
+.room-title-row h3,
+.room-game-head strong,
+.side-drawer-head strong,
+#focusOverlayBody .focus-title,
+.trophy h3{
+  letter-spacing:.045em !important;
+}
+
+/* ---------------------------------------------------------
+   FINISHED BRAND BANNER
+   CSS-only so it is sharp on Fold cover + inner displays.
+   --------------------------------------------------------- */
+.brand-banner-final{
+  min-height:0;
+}
+
+.brand-banner-final .brand-wordmark{
+  --brand-cyan:#68e9ff;
+  --brand-blue:#55a8ff;
+  --brand-violet:#8f65ff;
+  --brand-pink:#ff4fc6;
+  --brand-lime:#dfff67;
+
+  position:relative;
+  isolation:isolate;
+  width:min(100%,1180px);
+  height:clamp(58px,6.6vw,72px) !important;
+  min-height:58px !important;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:1px solid rgba(96,210,255,.34);
+  border-radius:16px;
+  clip-path:polygon(
+    0 0,
+    calc(100% - 20px) 0,
+    100% 20px,
+    100% 100%,
+    20px 100%,
+    0 calc(100% - 20px)
+  );
+
+  background:
+    radial-gradient(circle at 18% 18%,rgba(255,79,198,.14),transparent 28%),
+    radial-gradient(circle at 78% 74%,rgba(0,229,255,.12),transparent 30%),
+    linear-gradient(100deg,rgba(5,11,23,.99),rgba(11,20,40,.99) 48%,rgba(6,11,27,.99));
+
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.025),
+    inset 0 0 28px rgba(93,88,255,.08),
+    0 0 15px rgba(0,229,255,.06);
+}
+
+/* Fine tech grid. */
+.brand-banner-final .brand-wordmark::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  opacity:.42;
+  background:
+    linear-gradient(90deg,transparent 49%,rgba(104,233,255,.06) 50%,transparent 51%) 0 0/34px 100%,
+    linear-gradient(0deg,transparent 49%,rgba(255,79,198,.035) 50%,transparent 51%) 0 0/100% 18px;
+  pointer-events:none;
+}
+
+/* Animated energy streak — decorative only. */
+.brand-banner-final .brand-wordmark::after{
+  content:"";
+  position:absolute;
+  z-index:1;
+  top:-25%;
+  bottom:-25%;
+  left:-32%;
+  width:24%;
+  transform:skewX(-18deg);
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(104,233,255,.02),
+    rgba(104,233,255,.26),
+    rgba(255,255,255,.38),
+    rgba(255,79,198,.18),
+    transparent
+  );
+  filter:blur(.4px);
+  opacity:.72;
+  pointer-events:none;
+  animation:brandEnergySweep 5.2s ease-in-out infinite;
+}
+
+.brand-banner-final .brand-main{
+  position:relative;
+  z-index:3;
+  display:inline-block;
+  max-width:72%;
+  margin-top:1px;
+  padding:0 .08em;
+
+  font-family:var(--font-display) !important;
+  font-weight:400 !important;
+  font-size:clamp(25px,4vw,40px) !important;
+  line-height:.95;
+  letter-spacing:.055em !important;
+  white-space:nowrap;
+
+  background:linear-gradient(
+    90deg,
+    #dffbff 0%,
+    var(--brand-cyan) 24%,
+    #f8fdff 49%,
+    #cbbcff 70%,
+    #ff97de 100%
+  );
+  background-size:200% 100%;
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent !important;
+
+  filter:
+    drop-shadow(0 0 2px rgba(213,249,255,.96))
+    drop-shadow(0 0 7px rgba(0,229,255,.54))
+    drop-shadow(0 0 13px rgba(143,101,255,.28));
+  animation:brandTextFlow 5.8s ease-in-out infinite;
+}
+
+.brand-banner-final .smarty-tag{
+  position:absolute;
+  z-index:4;
+  left:clamp(16px,5.6vw,74px);
+  top:clamp(5px,.6vw,8px);
+  transform:rotate(-7deg);
+
+  font-family:var(--font-display) !important;
+  font-size:clamp(13px,1.65vw,19px) !important;
+  line-height:1;
+  letter-spacing:.075em !important;
+  color:#ff84d7 !important;
+
+  text-shadow:
+    0 0 2px #ff84d7,
+    0 0 7px rgba(255,79,198,.88),
+    0 0 14px rgba(255,79,198,.48) !important;
+}
+
+/* Small neon underline gives the tag a 'sticker/signature' feel. */
+.brand-banner-final .smarty-tag::after{
+  content:"";
+  position:absolute;
+  left:7%;
+  right:0;
+  bottom:-5px;
+  height:2px;
+  transform:skewX(-18deg);
+  border-radius:999px;
+  background:linear-gradient(90deg,#ff4fc6,#ff9ee3,transparent);
+  box-shadow:0 0 7px rgba(255,79,198,.72);
+}
+
+.brand-banner-final .brand-tagline{
+  position:absolute;
+  z-index:4;
+  right:clamp(17px,5vw,64px);
+  bottom:clamp(5px,.62vw,8px);
+
+  font-family:var(--font-body) !important;
+  font-size:clamp(8px,1vw,12px) !important;
+  font-weight:700;
+  letter-spacing:.11em !important;
+  color:#dfff78 !important;
+  white-space:nowrap;
+
+  text-shadow:
+    0 0 4px rgba(220,255,104,.52),
+    0 0 9px rgba(220,255,104,.20) !important;
+}
+
+/* Cyan/pink side rails imply an illuminated hardware fascia. */
+.brand-banner-final .brand-wordmark{
+  background-image:
+    linear-gradient(90deg,rgba(0,229,255,.88),rgba(0,229,255,0)) ,
+    linear-gradient(270deg,rgba(255,79,198,.72),rgba(255,79,198,0)),
+    radial-gradient(circle at 18% 18%,rgba(255,79,198,.14),transparent 28%),
+    radial-gradient(circle at 78% 74%,rgba(0,229,255,.12),transparent 30%),
+    linear-gradient(100deg,rgba(5,11,23,.99),rgba(11,20,40,.99) 48%,rgba(6,11,27,.99));
+  background-size:
+    60px 2px,
+    60px 2px,
+    auto,
+    auto,
+    auto;
+  background-position:
+    0 0,
+    100% 100%,
+    center,
+    center,
+    center;
+  background-repeat:no-repeat;
+}
+
+/* Remove all visual remnants of the retired placeholder treatment. */
+.brand-banner-placeholder,
+.brand-placeholder-note{
+  display:none !important;
+}
+
+/* Keep the final single-sticky-header model authoritative. */
+.app-header-shell{
+  position:sticky !important;
+  top:0 !important;
+  z-index:120 !important;
+}
+.app-header-shell .brand-banner-wrap,
+.app-header-shell .page-bar{
+  position:relative !important;
+  top:auto !important;
+}
+
+/* Fold cover screen */
+@media (max-width:430px){
+  .brand-banner-final .brand-wordmark{
+    height:58px !important;
+    min-height:58px !important;
+    border-radius:14px;
+  }
+
+  .brand-banner-final .brand-main{
+    max-width:78%;
+    font-size:clamp(23px,7.1vw,30px) !important;
+    letter-spacing:.032em !important;
+  }
+
+  .brand-banner-final .smarty-tag{
+    left:14px;
+    top:5px;
+    font-size:12px !important;
+  }
+
+  .brand-banner-final .brand-tagline{
+    right:14px;
+    bottom:5px;
+    font-size:8px !important;
+    letter-spacing:.07em !important;
+  }
+}
+
+/* Inner display / larger widths */
+@media (min-width:700px){
+  .brand-banner-final .brand-main{
+    font-size:clamp(32px,3.5vw,42px) !important;
+  }
+}
+
+/* Landscape keeps the header shallow. */
+@media (orientation:landscape) and (max-height:760px){
+  .brand-banner-final .brand-wordmark{
+    height:50px !important;
+    min-height:50px !important;
+  }
+
+  .brand-banner-final .brand-main{
+    font-size:27px !important;
+  }
+
+  .brand-banner-final .smarty-tag{
+    top:3px;
+    font-size:11px !important;
+  }
+
+  .brand-banner-final .brand-tagline{
+    bottom:3px;
+    font-size:8px !important;
+  }
+}
+
+@keyframes brandEnergySweep{
+  0%,26%{left:-32%;opacity:0}
+  34%{opacity:.72}
+  58%{left:112%;opacity:.62}
+  66%,100%{left:112%;opacity:0}
+}
+
+@keyframes brandTextFlow{
+  0%,100%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .brand-banner-final .brand-wordmark::after,
+  .brand-banner-final .brand-main{
+    animation:none !important;
+  }
+  .brand-banner-final .brand-main{
+    background-position:50% 50%;
+  }
+}
