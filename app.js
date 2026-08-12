@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.27.0';
+const VERSION='13.30.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -172,14 +172,64 @@ function renderHome(){
   const n=earnedCount(), total=BASE_BADGE_COUNT, pct=total?Math.round(n/total*100):0, l=activeLocation();
   const tp=trophyProgress();
   const tpClass=`trophy-${String(tp.name).toLowerCase()}`;
-  $('homeSummary').innerHTML=`<div class="label">Trophy progress</div>
-    <div class="big trophy-current-name ${tpClass}">${esc(tp.name)}</div>
-    <div class="sub">${tp.remaining?`${tp.current} / ${tp.target} badges • ${tp.remaining} to unlock`:'Unlocked • 100% complete'}</div>
-    <div class="progress top-gap"><span style="width:${tp.target?Math.min(100,tp.current/tp.target*100):100}%"></span></div>
-    <div class="metrics">
-      <div class="metric"><span class="label">Earned</span><b>${n}</b></div>
-      <div class="metric"><span class="label">Overall</span><b>${pct}%</b></div>
-      <div class="metric"><span class="label">Location</span><b style="font-size:15px">${esc(l.name)}</b></div>
+  const milestonePct=tp.target?Math.max(0,Math.min(100,Math.round(tp.current/tp.target*100))):100;
+  const recentThree=(state.history||[]).slice(0,3).map(h=>({
+    badge:Number(h.badge),
+    date:h.date||'',
+    name:BADGES[Number(h.badge)]?.name||'Badge'
+  }));
+  const recentMarkup=recentThree.length
+    ? recentThree.map((h,idx)=>`<button class="home-achievement-row" data-open-focus-badge="${h.badge}" data-focus-source="recent">
+        <span class="home-achievement-rank">${String(idx+1).padStart(2,'0')}</span>
+        <span class="home-achievement-copy">
+          <b>${esc(h.name)}</b>
+          <small>${esc(h.date)}</small>
+        </span>
+        <span class="home-achievement-open">›</span>
+      </button>`).join('')
+    : '<div class="home-achievement-empty">No achievements logged yet</div>';
+
+  $('homeSummary').innerHTML=`
+    <div class="home-trophy-dashboard">
+      <div class="home-trophy-main">
+        <div class="label">Trophy progress</div>
+        <div class="big trophy-current-name ${tpClass}">${esc(tp.name)}</div>
+        <div class="sub">${tp.remaining?`${tp.current} / ${tp.target} badges • ${tp.remaining} to unlock`:'Unlocked • 100% complete'}</div>
+        <div class="progress top-gap"><span style="width:${tp.target?Math.min(100,tp.current/tp.target*100):100}%"></span></div>
+        <div class="metrics">
+          <div class="metric"><span class="label">Earned</span><b>${n}</b></div>
+          <div class="metric"><span class="label">Overall</span><b>${pct}%</b></div>
+          <div class="metric"><span class="label">Location</span><b style="font-size:15px">${esc(l.name)}</b></div>
+        </div>
+      </div>
+
+      <aside class="home-trophy-side">
+        <div class="trophy-counter-panel ${tpClass}" aria-label="${milestonePct}% progress toward ${esc(tp.name)} trophy">
+          <div class="trophy-counter-display" style="--trophy-pct:${milestonePct};--milestone-fill:${milestonePct}%">
+            <div class="trophy-counter-inner">
+              <span class="trophy-counter-icon-stack" aria-hidden="true">
+                <span class="trophy-counter-icon trophy-counter-icon-mono">🏆</span>
+                <span class="trophy-counter-icon trophy-counter-icon-colour">🏆</span>
+              </span>
+              <strong>${milestonePct}%</strong>
+              <small>To ${esc(tp.name)}</small>
+            </div>
+          </div>
+          <div class="trophy-counter-copy">
+            <span class="label">Current trophy target</span>
+            <b>${tp.current} / ${tp.target}</b>
+            <span>${tp.remaining?`${tp.remaining} badges to ${esc(tp.name)}`:`${esc(tp.name)} achieved`}</span>
+          </div>
+        </div>
+
+        <div class="home-recent-three">
+          <div class="home-recent-head">
+            <span class="label">Last 3 achievements</span>
+            <span class="home-recent-pulse" aria-hidden="true"></span>
+          </div>
+          <div class="home-achievement-list">${recentMarkup}</div>
+        </div>
+      </aside>
     </div>`;
   $('trophies').innerHTML=[['Bronze',25],['Silver',50],['Gold',75],['Platinum',total]].map(([name,need])=>{
     const metal=`trophy-${name.toLowerCase()}`;

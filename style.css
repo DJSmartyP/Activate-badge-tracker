@@ -3865,3 +3865,762 @@ h3,
     background-position:50% 50%;
   }
 }
+
+/* =========================================================
+   v13.28 — attached brand lockup + HUD fill + trophy dashboard
+   ========================================================= */
+
+/* ---------- BRAND: keep Smarty's physically attached ---------- */
+.brand-banner-final .brand-wordmark{
+  min-height:64px !important;
+  height:clamp(64px,7vw,78px) !important;
+  padding-inline:clamp(12px,2vw,24px);
+}
+
+.brand-lockup{
+  position:absolute;
+  z-index:5;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  display:inline-flex;
+  align-items:flex-end;
+  gap:10px;
+  width:max-content;
+  max-width:72%;
+  white-space:nowrap;
+}
+
+/* Smarty's is now part of the same flex lockup, not independently positioned. */
+.brand-banner-final .smarty-tag{
+  position:relative !important;
+  left:auto !important;
+  top:auto !important;
+  right:auto !important;
+  bottom:auto !important;
+  flex:0 0 auto;
+  align-self:flex-start;
+  margin-top:-9px;
+  margin-right:-2px;
+  transform:rotate(-7deg);
+  font-size:clamp(12px,1.35vw,17px) !important;
+}
+
+.brand-banner-final .brand-main{
+  position:relative;
+  max-width:none !important;
+  margin:0 !important;
+  font-size:clamp(25px,3.65vw,40px) !important;
+}
+
+/* ---------- Decorative HUD fill ---------- */
+.brand-hud{
+  position:absolute;
+  z-index:3;
+  top:50%;
+  transform:translateY(-50%);
+  display:flex;
+  align-items:center;
+  gap:7px;
+  pointer-events:none;
+  opacity:.72;
+  font-family:var(--font-body) !important;
+  font-size:9px;
+  letter-spacing:.12em !important;
+  color:#8ddcf1;
+  text-shadow:0 0 7px rgba(0,229,255,.28);
+}
+
+.brand-hud-left{
+  left:clamp(14px,2.2vw,28px);
+}
+
+.brand-hud-right{
+  right:clamp(14px,2.2vw,28px);
+  color:#ff86d7;
+  text-shadow:0 0 7px rgba(255,79,198,.26);
+}
+
+.hud-node{
+  width:6px;
+  height:6px;
+  border:1px solid currentColor;
+  border-radius:50%;
+  box-shadow:0 0 8px currentColor;
+}
+
+.hud-line{
+  width:clamp(22px,3vw,44px);
+  height:1px;
+  background:linear-gradient(90deg,currentColor,transparent);
+  box-shadow:0 0 6px currentColor;
+}
+
+.hud-dots{
+  letter-spacing:.2em !important;
+  opacity:.65;
+}
+
+.hud-bars{
+  display:inline-flex;
+  align-items:flex-end;
+  gap:2px;
+  height:12px;
+}
+
+.hud-bars i{
+  display:block;
+  width:2px;
+  border-radius:2px;
+  background:currentColor;
+  box-shadow:0 0 5px currentColor;
+  animation:hudBars 1.5s ease-in-out infinite alternate;
+}
+.hud-bars i:nth-child(1){height:4px;animation-delay:-.15s}
+.hud-bars i:nth-child(2){height:7px;animation-delay:-.4s}
+.hud-bars i:nth-child(3){height:10px;animation-delay:-.7s}
+.hud-bars i:nth-child(4){height:6px;animation-delay:-.95s}
+
+/* Decorative corner ticks make the banner feel less empty. */
+.brand-banner-final .brand-wordmark{
+  background-image:
+    linear-gradient(90deg,rgba(0,229,255,.9),rgba(0,229,255,0)),
+    linear-gradient(270deg,rgba(255,79,198,.78),rgba(255,79,198,0)),
+    repeating-linear-gradient(90deg,transparent 0 52px,rgba(119,230,255,.025) 52px 53px),
+    radial-gradient(circle at 18% 18%,rgba(255,79,198,.14),transparent 28%),
+    radial-gradient(circle at 78% 74%,rgba(0,229,255,.12),transparent 30%),
+    linear-gradient(100deg,rgba(5,11,23,.99),rgba(11,20,40,.99) 48%,rgba(6,11,27,.99));
+  background-size:
+    74px 2px,
+    74px 2px,
+    auto,
+    auto,
+    auto,
+    auto;
+  background-position:
+    0 0,
+    100% 100%,
+    center,
+    center,
+    center,
+    center;
+}
+
+/* Tagline sits under/right of the ATTACHED lockup, but still belongs visually. */
+.brand-banner-final .brand-tagline{
+  right:clamp(16px,3vw,38px);
+  bottom:6px;
+  font-size:clamp(8px,.95vw,11px) !important;
+}
+
+/* ---------- HOME trophy dashboard ---------- */
+#homeSummary.hero-card{
+  padding:0 !important;
+  overflow:hidden;
+}
+
+.home-trophy-dashboard{
+  display:grid;
+  grid-template-columns:minmax(0,1.7fr) minmax(280px,.85fr);
+  min-height:100%;
+}
+
+.home-trophy-main{
+  min-width:0;
+  padding:22px 22px 20px;
+  border-right:1px solid rgba(105,135,190,.18);
+}
+
+.home-trophy-side{
+  min-width:0;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:12px;
+  padding:18px;
+  background:
+    radial-gradient(circle at 76% 12%,rgba(0,229,255,.07),transparent 36%),
+    linear-gradient(180deg,rgba(11,17,32,.72),rgba(8,12,24,.88));
+}
+
+.trophy-counter-panel{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  align-items:center;
+  gap:14px;
+  padding:12px;
+  border:1px solid rgba(117,92,255,.28);
+  border-radius:18px;
+  background:rgba(12,17,31,.72);
+  box-shadow:
+    inset 0 0 18px rgba(117,92,255,.04),
+    0 0 16px rgba(0,229,255,.035);
+}
+
+.trophy-counter-display{
+  --p:calc(var(--trophy-pct) * 1%);
+  width:92px;
+  aspect-ratio:1;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  position:relative;
+  background:
+    conic-gradient(
+      from -90deg,
+      #ff4fc6 0,
+      #8f65ff calc(var(--p) * .45),
+      #00e5ff var(--p),
+      rgba(255,255,255,.08) var(--p),
+      rgba(255,255,255,.08) 100%
+    );
+  box-shadow:
+    0 0 14px rgba(0,229,255,.16),
+    0 0 18px rgba(255,79,198,.08);
+}
+
+.trophy-counter-display::before{
+  content:"";
+  position:absolute;
+  inset:7px;
+  border-radius:50%;
+  background:#0b1020;
+  border:1px solid rgba(255,255,255,.06);
+  box-shadow:inset 0 0 18px rgba(0,0,0,.42);
+}
+
+.trophy-counter-inner{
+  position:relative;
+  z-index:1;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  line-height:1;
+}
+
+.trophy-counter-icon{
+  font-size:22px;
+  filter:saturate(1.1);
+}
+
+.trophy-counter-inner strong{
+  margin-top:2px;
+  font-family:var(--font-display) !important;
+  font-size:22px;
+  font-weight:400;
+  color:#f5fbff;
+  text-shadow:
+    0 0 2px currentColor,
+    0 0 7px currentColor,
+    0 0 12px rgba(0,229,255,.28);
+}
+
+.trophy-counter-inner small{
+  margin-top:4px;
+  font-size:8px;
+  color:#b7c0d6;
+}
+
+.trophy-counter-copy{
+  display:grid;
+  gap:3px;
+  min-width:0;
+}
+
+.trophy-counter-copy b{
+  font-family:var(--font-display) !important;
+  font-size:20px;
+  font-weight:400;
+  color:#d9f7ff;
+  text-shadow:0 0 8px rgba(0,229,255,.25);
+}
+
+.trophy-counter-copy span:last-child{
+  font-size:10px;
+  color:#9ea9c1;
+}
+
+.home-recent-three{
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  border:1px solid rgba(255,79,198,.18);
+  border-radius:18px;
+  background:rgba(10,14,26,.62);
+  overflow:hidden;
+}
+
+.home-recent-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:10px 12px 8px;
+  border-bottom:1px solid rgba(255,255,255,.055);
+}
+
+.home-recent-pulse{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#50ffb4;
+  box-shadow:
+    0 0 7px rgba(80,255,180,.9),
+    0 0 14px rgba(80,255,180,.42);
+  animation:recentPulse 1.8s ease-in-out infinite;
+}
+
+.home-achievement-list{
+  display:grid;
+  min-height:0;
+}
+
+.home-achievement-row{
+  appearance:none;
+  width:100%;
+  min-width:0;
+  display:grid;
+  grid-template-columns:30px minmax(0,1fr) 18px;
+  align-items:center;
+  gap:8px;
+  padding:9px 11px;
+  border:0;
+  border-bottom:1px solid rgba(255,255,255,.045);
+  background:transparent;
+  color:inherit;
+  text-align:left;
+}
+
+.home-achievement-row:last-child{
+  border-bottom:0;
+}
+
+.home-achievement-rank{
+  font-family:var(--font-display) !important;
+  font-size:12px;
+  color:#ff7fd4;
+  text-shadow:0 0 7px rgba(255,79,198,.42);
+}
+
+.home-achievement-copy{
+  min-width:0;
+  display:grid;
+  gap:2px;
+}
+
+.home-achievement-copy b{
+  min-width:0;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  font-family:var(--font-display) !important;
+  font-weight:400;
+  font-size:13px;
+  color:#eef8ff;
+  text-shadow:0 0 7px rgba(0,229,255,.16);
+}
+
+.home-achievement-copy small{
+  color:#8f9bb3;
+  font-size:9px;
+}
+
+.home-achievement-open{
+  color:#71e7ff;
+  font-size:18px;
+  text-shadow:0 0 7px rgba(0,229,255,.4);
+}
+
+.home-achievement-empty{
+  padding:16px 12px;
+  color:#8894ac;
+  font-size:10px;
+}
+
+/* Wide screens / inner landscape make real use of the spare side space. */
+@media (min-width:980px){
+  .home-trophy-dashboard{
+    grid-template-columns:minmax(0,1.8fr) minmax(330px,.9fr);
+  }
+}
+
+/* Mid-size tablet/fold portrait: stack side panel below the progress block. */
+@media (max-width:820px){
+  .home-trophy-dashboard{
+    grid-template-columns:1fr;
+  }
+
+  .home-trophy-main{
+    border-right:0;
+    border-bottom:1px solid rgba(105,135,190,.18);
+  }
+
+  .home-trophy-side{
+    grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
+    grid-template-rows:1fr;
+  }
+
+  /* Hide side HUD copy before it can collide with the centered lockup. */
+  .brand-hud{
+    display:none;
+  }
+
+  .brand-lockup{
+    max-width:88%;
+  }
+}
+
+/* Fold cover: keep the new dashboard compact rather than overloading it. */
+@media (max-width:520px){
+  .brand-banner-final .brand-wordmark{
+    height:62px !important;
+    min-height:62px !important;
+  }
+
+  .brand-lockup{
+    max-width:92%;
+    gap:7px;
+  }
+
+  .brand-banner-final .smarty-tag{
+    margin-top:-7px;
+    font-size:11px !important;
+  }
+
+  .brand-banner-final .brand-main{
+    font-size:clamp(22px,6.4vw,29px) !important;
+    letter-spacing:.025em !important;
+  }
+
+  .brand-banner-final .brand-tagline{
+    right:12px;
+    bottom:4px;
+    font-size:7px !important;
+  }
+
+  .home-trophy-side{
+    grid-template-columns:1fr;
+    padding:12px;
+  }
+
+  .trophy-counter-panel{
+    grid-template-columns:84px 1fr;
+  }
+
+  .trophy-counter-display{
+    width:78px;
+  }
+}
+
+/* Landscape: Smarty's remains attached because the lockup stays one flex unit. */
+@media (orientation:landscape) and (max-height:760px){
+  .brand-banner-final .brand-wordmark{
+    height:54px !important;
+    min-height:54px !important;
+  }
+
+  .brand-lockup{
+    gap:8px;
+  }
+
+  .brand-banner-final .smarty-tag{
+    margin-top:-6px;
+    font-size:10px !important;
+  }
+
+  .brand-banner-final .brand-main{
+    font-size:25px !important;
+  }
+
+  .brand-banner-final .brand-tagline{
+    bottom:3px;
+  }
+
+  .brand-hud{
+    font-size:8px;
+  }
+}
+
+@keyframes hudBars{
+  from{opacity:.42;transform:scaleY(.72)}
+  to{opacity:1;transform:scaleY(1.06)}
+}
+
+@keyframes recentPulse{
+  0%,100%{opacity:.55;transform:scale(.86)}
+  50%{opacity:1;transform:scale(1.08)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .hud-bars i,
+  .home-recent-pulse{
+    animation:none !important;
+  }
+}
+
+/* =========================================================
+   v13.29 — milestone trophy meter
+   Circular meter now tracks the CURRENT trophy target.
+   The trophy colour fills upward with progress.
+   ========================================================= */
+
+/* Current trophy palette drives both ring and trophy-colour reveal. */
+.trophy-counter-panel.trophy-bronze{
+  --counter-main:#d17a3e;
+  --counter-light:#ffbf82;
+  --counter-glow:rgba(209,122,62,.58);
+}
+.trophy-counter-panel.trophy-silver{
+  --counter-main:#d8e3ed;
+  --counter-light:#ffffff;
+  --counter-glow:rgba(216,227,237,.55);
+}
+.trophy-counter-panel.trophy-gold{
+  --counter-main:#ffd13f;
+  --counter-light:#fff09a;
+  --counter-glow:rgba(255,209,63,.62);
+}
+.trophy-counter-panel.trophy-platinum{
+  --counter-main:#bdeeff;
+  --counter-light:#ffffff;
+  --counter-glow:rgba(136,226,255,.64);
+}
+
+/* Ring follows the current award colour rather than generic overall progress. */
+.trophy-counter-display{
+  --p:calc(var(--trophy-pct) * 1%);
+  background:
+    conic-gradient(
+      from -90deg,
+      var(--counter-main) 0,
+      var(--counter-light) var(--p),
+      rgba(255,255,255,.08) var(--p),
+      rgba(255,255,255,.08) 100%
+    ) !important;
+  box-shadow:
+    0 0 14px color-mix(in srgb,var(--counter-glow) 68%,transparent),
+    0 0 28px color-mix(in srgb,var(--counter-glow) 26%,transparent) !important;
+}
+
+/* Two identical trophies are layered:
+   bottom layer = monochrome
+   top layer = award-coloured, clipped from the bottom upward. */
+.trophy-counter-icon-stack{
+  position:relative;
+  display:block;
+  width:34px;
+  height:30px;
+  margin-bottom:1px;
+}
+
+.trophy-counter-icon{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  font-size:28px !important;
+  line-height:1;
+}
+
+.trophy-counter-icon-mono{
+  filter:grayscale(1) brightness(.72) contrast(1.08) !important;
+  opacity:.88;
+}
+
+.trophy-counter-icon-colour{
+  clip-path:inset(calc(100% - var(--milestone-fill)) 0 0 0);
+  filter:
+    saturate(1.35)
+    brightness(1.12)
+    drop-shadow(0 0 4px var(--counter-glow)) !important;
+  transition:clip-path .45s ease;
+}
+
+/* Tune native emoji toward each target metal. */
+.trophy-counter-panel.trophy-bronze .trophy-counter-icon-colour{
+  filter:
+    sepia(.64)
+    saturate(1.4)
+    hue-rotate(342deg)
+    brightness(.98)
+    drop-shadow(0 0 5px var(--counter-glow)) !important;
+}
+.trophy-counter-panel.trophy-silver .trophy-counter-icon-colour{
+  filter:
+    grayscale(.86)
+    brightness(1.42)
+    contrast(.92)
+    drop-shadow(0 0 5px var(--counter-glow)) !important;
+}
+.trophy-counter-panel.trophy-gold .trophy-counter-icon-colour{
+  filter:
+    saturate(1.35)
+    brightness(1.13)
+    drop-shadow(0 0 6px var(--counter-glow)) !important;
+}
+.trophy-counter-panel.trophy-platinum .trophy-counter-icon-colour{
+  filter:
+    grayscale(.48)
+    brightness(1.45)
+    hue-rotate(145deg)
+    saturate(.78)
+    drop-shadow(0 0 6px var(--counter-glow)) !important;
+}
+
+/* Percentage and target copy use current-trophy colour. */
+.trophy-counter-inner strong{
+  color:var(--counter-light) !important;
+  text-shadow:
+    0 0 2px currentColor,
+    0 0 7px var(--counter-glow),
+    0 0 13px var(--counter-glow) !important;
+}
+
+.trophy-counter-copy b{
+  color:var(--counter-light) !important;
+  text-shadow:0 0 8px var(--counter-glow) !important;
+}
+
+.trophy-counter-panel{
+  border-color:color-mix(in srgb,var(--counter-main) 44%,rgba(117,92,255,.28)) !important;
+  box-shadow:
+    inset 0 0 18px color-mix(in srgb,var(--counter-glow) 12%,transparent),
+    0 0 18px color-mix(in srgb,var(--counter-glow) 13%,transparent) !important;
+}
+
+/* Subtle pulse when extremely close to unlocking the target. */
+.trophy-counter-panel:has(.trophy-counter-display[style*="--trophy-pct:9"]) .trophy-counter-display{
+  animation:nearTrophyPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes nearTrophyPulse{
+  0%,100%{filter:brightness(1)}
+  50%{filter:brightness(1.13)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .trophy-counter-icon-colour{
+    transition:none !important;
+  }
+  .trophy-counter-display{
+    animation:none !important;
+  }
+}
+
+/* =========================================================
+   v13.30 — trophy-only progress visual
+   Circular ring removed; trophy itself carries the progress.
+   ========================================================= */
+
+.trophy-counter-display{
+  width:104px !important;
+  min-width:104px;
+  aspect-ratio:auto !important;
+  min-height:112px;
+  border-radius:0 !important;
+  display:grid !important;
+  place-items:center !important;
+  position:relative;
+  background:none !important;
+  box-shadow:none !important;
+  filter:none !important;
+}
+
+/* Remove the old inner circular plate completely. */
+.trophy-counter-display::before{
+  display:none !important;
+  content:none !important;
+}
+
+.trophy-counter-inner{
+  position:relative;
+  z-index:1;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  line-height:1;
+  gap:2px;
+}
+
+/* Make the trophy itself the hero visual. */
+.trophy-counter-icon-stack{
+  width:72px !important;
+  height:66px !important;
+  margin:0 0 5px !important;
+}
+
+.trophy-counter-icon{
+  font-size:60px !important;
+  line-height:1 !important;
+}
+
+/* Keep the same bottom-up colour reveal. */
+.trophy-counter-icon-mono{
+  opacity:.84;
+  filter:
+    grayscale(1)
+    brightness(.58)
+    contrast(1.12) !important;
+}
+
+.trophy-counter-icon-colour{
+  clip-path:inset(calc(100% - var(--milestone-fill)) 0 0 0);
+}
+
+/* Percentage stays beneath the trophy, not inside a ring. */
+.trophy-counter-inner strong{
+  margin-top:1px;
+  font-size:24px !important;
+  line-height:1 !important;
+}
+
+.trophy-counter-inner small{
+  margin-top:3px;
+  font-size:9px !important;
+}
+
+/* Slight glow underneath the trophy gives progress some presence without a ring. */
+.trophy-counter-display::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:30px;
+  width:62px;
+  height:12px;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:var(--counter-main);
+  opacity:.16;
+  filter:blur(10px);
+  pointer-events:none;
+}
+
+/* Current-target panel remains balanced with the larger trophy. */
+.trophy-counter-panel{
+  grid-template-columns:116px 1fr !important;
+  gap:12px !important;
+}
+
+/* Remove ring-specific near-unlock animation hook. */
+.trophy-counter-panel:has(.trophy-counter-display[style*="--trophy-pct:9"]) .trophy-counter-display{
+  animation:none !important;
+}
+
+@media (max-width:520px){
+  .trophy-counter-panel{
+    grid-template-columns:96px 1fr !important;
+  }
+
+  .trophy-counter-display{
+    width:88px !important;
+    min-width:88px;
+  }
+
+  .trophy-counter-icon-stack{
+    width:62px !important;
+    height:58px !important;
+  }
+
+  .trophy-counter-icon{
+    font-size:52px !important;
+  }
+}

@@ -1,0 +1,27 @@
+ACTIVATE TRACKER v13.30 — TROPHY-ONLY PROGRESS
+
+HOME CURRENT TROPHY TARGET
+- Removed the circular progress ring completely.
+- Kept the trophy progress visual.
+- Trophy is now larger and more prominent.
+- Trophy still fills upward from monochrome to the correct award colour.
+- Percentage and "To Bronze / Silver / Gold / Platinum" remain underneath.
+- Matching glow remains beneath the trophy without using a circle.
+
+RETAINED
+- Attached Smarty's / Activate Tracker lockup
+- Header HUD fill
+- Last 3 achievements
+- Small caps
+- Metallic trophy cards
+- Venue high-score filter
+- Neon headings
+- Context-aware Focus navigation
+- Pin hard fix
+- Responsive Focus / landscape scrolling
+
+UPLOAD TO GITHUB ROOT:
+index.html
+app.js
+style.css
+sw.js
