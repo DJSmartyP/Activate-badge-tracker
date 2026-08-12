@@ -9181,3 +9181,190 @@ body{
     padding:.23em .52em .26em !important;
   }
 }
+
+
+/* =========================================================
+   v13.74 — Unified header cleanup
+   - top + bottom now share same page-colour treatment
+   - stronger white outline/glow on player nameplate
+   - reduce decorative artefacts in top strip
+   ========================================================= */
+
+/* One single colour system across BOTH header rows */
+.app-header-shell{
+  background:
+    radial-gradient(
+      860px 360px at 18% 22%,
+      rgba(var(--page-accent-rgb), .20) 0%,
+      rgba(var(--page-accent-rgb), .10) 36%,
+      transparent 72%
+    ),
+    radial-gradient(
+      640px 260px at 88% 78%,
+      rgba(var(--page-accent-rgb), .10) 0%,
+      transparent 70%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(var(--page-accent-rgb), .16) 0%,
+      rgba(var(--page-accent-rgb), .15) 35%,
+      rgba(var(--page-accent-rgb), .14) 100%
+    ),
+    #080d19 !important;
+  border-top:1px solid rgba(var(--page-accent-rgb), .34) !important;
+  border-bottom:1px solid rgba(var(--page-accent-rgb), .40) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    inset 0 -1px 0 rgba(var(--page-accent-rgb), .14),
+    0 10px 28px rgba(0,0,0,.32),
+    0 6px 20px rgba(var(--page-accent-rgb), .08) !important;
+}
+
+/* Subtle circuit grid only, no loud top artefacts */
+.app-header-shell::before{
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.02),
+      transparent 20%,
+      transparent 80%,
+      rgba(255,255,255,.015)
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 118px,
+      rgba(var(--page-accent-rgb), .028) 118px 119px
+    ) !important;
+  opacity:.9 !important;
+}
+
+/* Top strip should sit on SAME colour base as the lower strip */
+.brand-banner-final .brand-wordmark{
+  background:
+    radial-gradient(
+      680px 220px at 22% 22%,
+      rgba(var(--page-accent-rgb), .14),
+      transparent 70%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(var(--page-accent-rgb), .06),
+      rgba(var(--page-accent-rgb), .04)
+    ) !important;
+  border-top-color: rgba(var(--page-accent-rgb), .24) !important;
+  border-right-color: rgba(var(--page-accent-rgb), .16) !important;
+  border-left-color: rgba(var(--page-accent-rgb), .16) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.035),
+    inset 0 0 18px rgba(var(--page-accent-rgb), .035) !important;
+}
+
+/* Reduce cluttering artefacts */
+.brand-banner-final .brand-wordmark::before{
+  opacity:.42 !important;
+  background:
+    linear-gradient(90deg,rgba(var(--page-accent-rgb),.42),transparent) 0 0/58px 1px no-repeat,
+    linear-gradient(180deg,rgba(var(--page-accent-rgb),.42),transparent) 0 0/1px 18px no-repeat,
+    linear-gradient(270deg,rgba(var(--page-accent-rgb),.35),transparent) 100% 100%/74px 1px no-repeat,
+    linear-gradient(0deg,rgba(var(--page-accent-rgb),.35),transparent) 100% 100%/1px 18px no-repeat,
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 86px,
+      rgba(var(--page-accent-rgb),.022) 86px 87px
+    ) !important;
+}
+.brand-banner-final .brand-wordmark::after{
+  opacity:.35 !important;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--page-accent-rgb),.02),
+    rgba(var(--page-accent-rgb),.08),
+    rgba(255,255,255,.10),
+    rgba(var(--page-accent-rgb),.08),
+    transparent
+  ) !important;
+}
+
+/* Keep lower page bar on same exact family */
+.app-header-shell .page-bar{
+  background:
+    radial-gradient(
+      760px 240px at 20% 20%,
+      rgba(var(--page-accent-rgb), .16),
+      transparent 70%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(var(--page-accent-rgb), .11),
+      rgba(var(--page-accent-rgb), .10)
+    ) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(var(--page-accent-rgb), .10),
+    inset 0 -1px 0 rgba(var(--page-accent-rgb), .20),
+    0 7px 18px rgba(0,0,0,.14) !important;
+}
+
+/* Player plate: stronger white outline/glow so it stands off cleanly */
+.brand-lockup{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.16),
+    inset 0 -1px 0 rgba(var(--player-brand-safe-rgb), .18),
+    inset 0 0 18px rgba(var(--player-brand-rgb), .09),
+    0 0 0 1px rgba(255,255,255,.70),
+    0 0 10px rgba(255,255,255,.24),
+    0 0 18px rgba(var(--player-brand-safe-rgb), .24),
+    0 8px 20px rgba(0,0,0,.30) !important;
+  border:1px solid rgba(255,255,255,.58) !important;
+}
+
+/* cleaner inner frame */
+.brand-lockup::after{
+  border:1px solid rgba(255,255,255,.085) !important;
+  box-shadow:
+    inset 0 0 8px rgba(255,255,255,.04),
+    inset 0 0 10px rgba(var(--player-brand-safe-rgb), .04) !important;
+}
+
+/* So the plate feels mounted into the same page-colour header */
+.brand-lockup::before{
+  background:radial-gradient(
+    ellipse at center,
+    rgba(var(--page-accent-rgb), .26) 0%,
+    rgba(var(--page-accent-rgb), .10) 50%,
+    transparent 76%
+  ) !important;
+  filter:blur(4px) !important;
+}
+
+/* Nudge the plate to read slightly more premium / less cramped */
+.brand-lockup{
+  padding:.34em .80em .38em !important;
+  column-gap:.36em !important;
+}
+
+/* Slightly calm the far-right decorative glyphs */
+.brand-banner-final .brand-status,
+.brand-banner-final .brand-indicators,
+.brand-banner-final .brand-signal,
+.brand-banner-final .brand-orbs{
+  opacity:.74 !important;
+  filter:saturate(.88) brightness(.96) !important;
+}
+
+/* If the build uses specific decor pieces, tone them down too */
+.brand-banner-final .brand-dot,
+.brand-banner-final .brand-node,
+.brand-banner-final .brand-led,
+.brand-banner-final .brand-pulse,
+.brand-banner-final .brand-corner-deco{
+  opacity:.65 !important;
+}
+
+/* Mobile tune */
+@media (max-width: 520px){
+  .brand-lockup{
+    padding:.28em .62em .31em !important;
+    column-gap:.28em !important;
+  }
+}
