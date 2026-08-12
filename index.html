@@ -47,7 +47,11 @@
   <div class="brand-wordmark">
     <div class="brand-lockup">
       <span class="smarty-tag">Smarty's</span>
-      <strong class="brand-main">Activate Tracker</strong>
+      <strong class="brand-main" aria-label="Activate Tracker">
+        <span class="brand-activate">Activate</span>
+        <span class="brand-tracker">Tracker</span>
+      </strong>
+      <span class="brand-kicker" aria-hidden="true">Badge Ops // Field Log</span>
     </div>
 
     <div class="brand-hud brand-hud-left" aria-hidden="true">
@@ -63,7 +67,7 @@
       <span class="hud-node"></span>
     </div>
 
-    <span class="brand-tagline">Track • Pin • Conquer</span>
+    <span class="brand-tagline"><i aria-hidden="true"></i>Track • Pin • Conquer</span>
   </div>
 </div>
 
@@ -233,7 +237,7 @@
 </div>
 <div class="card">
         <h2>Settings</h2>
-        <p class="sub">Version <strong>13.37.0</strong> — clean rebuild.</p>
+        <p class="sub">Version <strong>13.38.0</strong> — clean rebuild.</p>
         <div class="row wrap">
           <button class="btn primary icon-label-btn" id="exportBackup"><img src="icons/backup.svg" alt="">Backup app data</button>
           <label class="btn icon-label-btn"><img src="icons/restore.svg" alt="">Restore app data<input id="importBackup" type="file" accept="application/json" hidden></label>

@@ -1,0 +1,23 @@
+ACTIVATE TRACKER v13.38 — DESIGNED BRAND HEADER
+
+WHAT CHANGED
+- Smarty's is significantly larger and now behaves like a proper neon badge/tag.
+- Smarty's stays physically attached to the main wordmark at every width.
+- ACTIVATE and TRACKER now use different fonts:
+  • ACTIVATE = Tektur 800, sharper/techier
+  • TRACKER = Tilt Neon, softer neon character
+- Added small "Badge Ops // Field Log" kicker under the title.
+- Tagline is now a small illuminated status strip with a lime indicator.
+- Banner background has more deliberate technical framing and lighting.
+- Side HUD elements are quieter so the main identity dominates.
+- Reduced empty-looking space without filling it with random clutter.
+
+RESPONSIVE
+- Fold cover, inner portrait and landscape all keep the lockup attached.
+- Ultra-wide landscape gets slightly larger type without letting Smarty's drift.
+
+UPDATE ONLY — UPLOAD THESE FILES:
+index.html
+app.js
+style.css
+sw.js

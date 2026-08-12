@@ -5242,3 +5242,363 @@ h3,
     transition:none !important;
   }
 }
+
+/* =========================================================
+   v13.38 — designed brand header
+   More intentional lockup, larger Smarty's, mixed typography.
+   ========================================================= */
+
+.brand-banner-final .brand-wordmark{
+  --brand-cyan:#72efff;
+  --brand-blue:#64a8ff;
+  --brand-violet:#9b72ff;
+  --brand-pink:#ff58c9;
+  --brand-lime:#deff69;
+
+  height:clamp(70px,7.2vw,84px) !important;
+  min-height:70px !important;
+
+  /* More authored surface: diagonal lighting + subtle frame tracks. */
+  background:
+    linear-gradient(100deg,rgba(255,88,201,.12),transparent 23%),
+    linear-gradient(260deg,rgba(72,224,255,.10),transparent 28%),
+    repeating-linear-gradient(90deg,transparent 0 66px,rgba(121,218,255,.028) 66px 67px),
+    linear-gradient(180deg,rgba(255,255,255,.025),transparent 38%),
+    linear-gradient(100deg,#070b18 0%,#0b1530 48%,#071022 100%) !important;
+
+  border-color:rgba(92,213,255,.34) !important;
+  box-shadow:
+    inset 0 1px rgba(255,255,255,.04),
+    inset 0 -1px rgba(255,79,198,.10),
+    0 0 16px rgba(0,229,255,.055) !important;
+}
+
+/* A couple of deliberate circuit/registration marks rather than empty void. */
+.brand-banner-final .brand-wordmark::before{
+  content:"";
+  position:absolute;
+  inset:8px 12px;
+  z-index:0;
+  opacity:.72;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg,var(--brand-cyan),transparent) 0 0/74px 1px no-repeat,
+    linear-gradient(180deg,var(--brand-cyan),transparent) 0 0/1px 22px no-repeat,
+    linear-gradient(270deg,var(--brand-pink),transparent) 100% 100%/86px 1px no-repeat,
+    linear-gradient(0deg,var(--brand-pink),transparent) 100% 100%/1px 22px no-repeat;
+}
+
+/* Keep the moving energy sweep, but make it rarer/subtler. */
+.brand-banner-final .brand-wordmark::after{
+  opacity:.48 !important;
+  animation-duration:7.2s !important;
+}
+
+/* ---------------------------------------------------------
+   BRAND LOCKUP
+   Smarty's + Activate Tracker now behave as one composition.
+   --------------------------------------------------------- */
+.brand-lockup{
+  position:absolute !important;
+  z-index:5 !important;
+  left:50% !important;
+  top:50% !important;
+  transform:translate(-50%,-50%) !important;
+
+  display:grid !important;
+  grid-template-columns:auto auto !important;
+  grid-template-rows:auto auto !important;
+  align-items:end !important;
+  column-gap:13px !important;
+  row-gap:0 !important;
+
+  width:max-content !important;
+  max-width:78% !important;
+  white-space:nowrap !important;
+}
+
+/* Larger and more graphic — this is now a proper badge/tag, not tiny metadata. */
+.brand-banner-final .smarty-tag{
+  grid-column:1 !important;
+  grid-row:1 / span 2 !important;
+  align-self:center !important;
+
+  position:relative !important;
+  left:auto !important;
+  top:auto !important;
+  margin:0 1px 0 0 !important;
+  padding:6px 11px 7px !important;
+
+  transform:rotate(-5deg) translateY(-2px) !important;
+
+  font-family:"Tilt Neon",var(--font-display) !important;
+  font-size:clamp(18px,2vw,27px) !important;
+  font-weight:400 !important;
+  line-height:.9 !important;
+  letter-spacing:.065em !important;
+
+  color:#ff8add !important;
+  background:
+    linear-gradient(100deg,rgba(255,79,198,.16),rgba(255,79,198,.045)) !important;
+  border:1px solid rgba(255,111,211,.46) !important;
+  border-radius:9px 13px 8px 12px !important;
+  box-shadow:
+    inset 0 0 12px rgba(255,79,198,.07),
+    0 0 9px rgba(255,79,198,.20) !important;
+
+  text-shadow:
+    0 0 2px #fff,
+    0 0 5px #ff73d1,
+    0 0 11px rgba(255,79,198,.72),
+    0 0 18px rgba(255,79,198,.30) !important;
+}
+
+/* Hand-tag underline: short and deliberately offset. */
+.brand-banner-final .smarty-tag::after{
+  content:"";
+  position:absolute;
+  left:12%;
+  right:7%;
+  bottom:-6px;
+  height:3px;
+  transform:rotate(-2deg) skewX(-20deg);
+  border-radius:999px;
+  background:linear-gradient(90deg,#ff5fca,#ff9ee4 62%,transparent);
+  box-shadow:
+    0 0 4px #ff62cb,
+    0 0 10px rgba(255,79,198,.66);
+}
+
+/* Split wordmark: ACTIVATE is harder/techier, TRACKER softer/neon. */
+.brand-banner-final .brand-main{
+  grid-column:2 !important;
+  grid-row:1 !important;
+
+  display:flex !important;
+  align-items:baseline !important;
+  gap:.22em !important;
+  max-width:none !important;
+  margin:0 !important;
+  padding:0 !important;
+
+  background:none !important;
+  -webkit-background-clip:initial !important;
+  background-clip:initial !important;
+  color:inherit !important;
+  filter:none !important;
+  animation:none !important;
+  white-space:nowrap !important;
+}
+
+.brand-activate{
+  font-family:"Tektur",var(--font-display) !important;
+  font-size:clamp(29px,4vw,46px) !important;
+  font-weight:800 !important;
+  line-height:.88 !important;
+  letter-spacing:.035em !important;
+  color:#dffcff !important;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 6px rgba(95,233,255,.95),
+    0 0 14px rgba(0,229,255,.43),
+    0 0 24px rgba(0,229,255,.18) !important;
+}
+
+.brand-tracker{
+  font-family:"Tilt Neon",var(--font-display) !important;
+  font-size:clamp(30px,4.1vw,47px) !important;
+  font-weight:400 !important;
+  line-height:.88 !important;
+  letter-spacing:.025em !important;
+  color:#f3efff !important;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 6px rgba(202,181,255,.96),
+    0 0 13px rgba(154,109,255,.48),
+    0 0 22px rgba(255,79,198,.15) !important;
+}
+
+/* Tiny line below the main title ties the piece together and fills space with purpose. */
+.brand-kicker{
+  grid-column:2 !important;
+  grid-row:2 !important;
+  justify-self:start !important;
+  margin-top:7px !important;
+  padding-left:1px !important;
+
+  font-family:"Bruno Ace SC",var(--font-body) !important;
+  font-size:clamp(7px,.72vw,10px) !important;
+  letter-spacing:.16em !important;
+  color:rgba(136,206,226,.72) !important;
+  text-shadow:0 0 6px rgba(0,229,255,.18) !important;
+}
+
+/* The side HUDs become subtle framing devices, not competing copy. */
+.brand-hud{
+  opacity:.48 !important;
+  font-size:8px !important;
+  letter-spacing:.14em !important;
+}
+
+.brand-hud-left{
+  left:clamp(14px,2.5vw,32px) !important;
+}
+.brand-hud-right{
+  right:clamp(14px,2.5vw,32px) !important;
+}
+
+/* Tagline becomes a small illuminated status strip. */
+.brand-banner-final .brand-tagline{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:7px !important;
+  right:clamp(15px,2.2vw,28px) !important;
+  bottom:7px !important;
+  padding:3px 6px 2px !important;
+
+  font-family:"Bruno Ace SC",var(--font-body) !important;
+  font-size:clamp(8px,.9vw,11px) !important;
+  letter-spacing:.10em !important;
+  color:var(--brand-lime) !important;
+  background:linear-gradient(90deg,rgba(221,255,105,.04),transparent) !important;
+  text-shadow:
+    0 0 4px rgba(222,255,105,.55),
+    0 0 9px rgba(222,255,105,.18) !important;
+}
+
+.brand-banner-final .brand-tagline i{
+  display:block;
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:var(--brand-lime);
+  box-shadow:
+    0 0 5px var(--brand-lime),
+    0 0 10px rgba(222,255,105,.48);
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+   Preserve the "attached" lockup on Fold cover + landscape.
+   --------------------------------------------------------- */
+@media (max-width:820px){
+  .brand-hud{
+    display:none !important;
+  }
+
+  .brand-lockup{
+    max-width:91% !important;
+    column-gap:9px !important;
+  }
+
+  .brand-banner-final .smarty-tag{
+    font-size:clamp(14px,3.1vw,20px) !important;
+    padding:5px 8px 6px !important;
+  }
+
+  .brand-activate{
+    font-size:clamp(25px,5.4vw,36px) !important;
+  }
+
+  .brand-tracker{
+    font-size:clamp(26px,5.5vw,37px) !important;
+  }
+
+  .brand-kicker{
+    font-size:7px !important;
+    margin-top:5px !important;
+  }
+}
+
+@media (max-width:520px){
+  .brand-banner-final .brand-wordmark{
+    height:68px !important;
+    min-height:68px !important;
+  }
+
+  .brand-lockup{
+    max-width:94% !important;
+    column-gap:7px !important;
+  }
+
+  .brand-banner-final .smarty-tag{
+    font-size:13px !important;
+    padding:4px 7px 5px !important;
+    transform:rotate(-5deg) translateY(-1px) !important;
+  }
+
+  .brand-activate{
+    font-size:clamp(21px,6.4vw,28px) !important;
+    letter-spacing:.018em !important;
+  }
+
+  .brand-tracker{
+    font-size:clamp(22px,6.5vw,29px) !important;
+    letter-spacing:.012em !important;
+  }
+
+  .brand-kicker{
+    display:none !important;
+  }
+
+  .brand-banner-final .brand-tagline{
+    right:10px !important;
+    bottom:4px !important;
+    font-size:7px !important;
+    padding:2px 4px !important;
+  }
+}
+
+@media (orientation:landscape) and (max-height:760px){
+  .brand-banner-final .brand-wordmark{
+    height:58px !important;
+    min-height:58px !important;
+  }
+
+  .brand-lockup{
+    max-width:79% !important;
+    column-gap:8px !important;
+  }
+
+  .brand-banner-final .smarty-tag{
+    font-size:14px !important;
+    padding:4px 7px 5px !important;
+  }
+
+  .brand-activate{
+    font-size:27px !important;
+  }
+
+  .brand-tracker{
+    font-size:28px !important;
+  }
+
+  .brand-kicker{
+    font-size:6.5px !important;
+    margin-top:4px !important;
+  }
+
+  .brand-banner-final .brand-tagline{
+    bottom:3px !important;
+    font-size:7px !important;
+  }
+}
+
+/* Ultra-wide inner-display landscape: let the composition breathe, not drift. */
+@media (min-width:1100px) and (orientation:landscape){
+  .brand-lockup{
+    max-width:68% !important;
+  }
+
+  .brand-banner-final .smarty-tag{
+    font-size:22px !important;
+  }
+
+  .brand-activate{
+    font-size:42px !important;
+  }
+
+  .brand-tracker{
+    font-size:43px !important;
+  }
+}
