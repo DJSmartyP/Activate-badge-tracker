@@ -1,0 +1,13 @@
+ACTIVATE TRACKER v13.47 — DISTINCT LEVELS / STATS ICONS
+
+CHANGED
+- Levels is now a staircase / numbered progression icon with an upward path.
+- Stats is now a circular pie/donut analytics icon with a trend line.
+- They no longer share the same bar-chart silhouette.
+- Drawer and page header versions were both updated.
+- Existing page colours remain:
+  Levels = royal blue
+  Stats = emerald green
+- No other page icons or app features were changed.
+
+UPLOAD EVERYTHING IN THIS ZIP TO THE GITHUB ROOT.

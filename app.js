@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.44.0';
+const VERSION='13.49.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -1099,7 +1099,7 @@ function updatePageHeader(view){
   const title=$('pageHeaderTitle'),subtitle=$('pageHeaderSubtitle'),icon=$('pageHeaderIcon');
   if(title)title.textContent=meta.title;
   if(subtitle)subtitle.textContent=meta.subtitle;
-  if(icon)icon.src=`icons/${meta.icon}.svg`;
+  if(icon)icon.src=`icons/header/${meta.icon}.svg`;
   const pageBar=document.querySelector('.page-bar');
   if(pageBar)pageBar.dataset.page=view;
 }

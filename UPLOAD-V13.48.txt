@@ -1,0 +1,28 @@
+ACTIVATE TRACKER v13.48 — COLOURED PAGE BARS
+
+CHANGE
+Each page bar now uses a dark tinted version of its own unique page colour.
+
+PAGE COLOURS
+- Home — Electric cyan
+- Badges — Neon pink
+- Levels — Royal blue
+- Competitive — Hot orange-red
+- Locations — Ultraviolet
+- Stats — Emerald green
+- Settings — Amber gold
+
+STYLE
+- Dark base retained.
+- Accent colour is strongest on the left/identity side of the page bar.
+- Page title, subtitle, icon housing and bottom separator all reinforce the page colour.
+- Bar remains readable and does not use a full bright fill.
+- Fold-cover and landscape variants are tuned separately.
+
+ALSO RETAINED FROM v13.47
+- Levels = staircase/progression icon.
+- Stats = circular analytics/pie icon.
+- Competitive = VS icon.
+- Crisp semantic SVG icon family.
+
+UPLOAD EVERYTHING IN THIS ZIP TO THE GITHUB ROOT.

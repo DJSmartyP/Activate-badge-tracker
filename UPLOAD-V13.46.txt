@@ -1,0 +1,32 @@
+ACTIVATE TRACKER v13.46 — SEMANTIC SVG ICON FAMILY
+
+NEW CORE ICON SET
+- Home — house + pulse/spark
+- Badges — shield/badge + star
+- Levels — stepped level bars + rising route
+- Competitive — unmistakable VS symbol
+- Locations — location pin + room grid
+- Stats — bar chart + rising trend line
+- Settings — configuration gear + sliders
+
+DESIGN RULES
+- One consistent SVG family.
+- Crisp vectors; no baked Gaussian blur.
+- Header and drawer use the same artwork.
+- Each icon is semantically tied to its page.
+- Existing unique page accent colours are retained.
+- Header glow remains restrained so the icon stays sharp.
+- Page-colour title halo from v13.44/v13.45 remains.
+
+PAGE COLOURS
+- Home — Electric cyan
+- Badges — Neon pink
+- Levels — Royal blue
+- Competitive — Hot orange-red
+- Locations — Ultraviolet
+- Stats — Emerald green
+- Settings — Amber gold
+
+UPLOAD
+Upload EVERYTHING in this ZIP to the GitHub repository root.
+Make sure the icons/ and icons/header/ folders are uploaded too.

@@ -1,0 +1,20 @@
+ACTIVATE TRACKER v13.45 — CRISP HEADER ICON RECOVERY
+
+WHAT WAS FOUND
+- The underlying icon files had not changed since v13.41.
+- Each SVG contained its own Gaussian blur/glow.
+- CSS therefore could not fully sharpen the icon.
+- v13.43/v13.44 also styled a .page-icon-dock wrapper that does not exist
+  in the recovered v13.41 header markup.
+
+FIX
+- Original SVG icon pack is left untouched for the drawer and other UI.
+- Added icons/header/ with dedicated crisp header SVG variants.
+- Removed only the baked Gaussian blur from those header variants.
+- Header page icon and hamburger now use the crisp variants.
+- Applied the page-colour accent directly to the actual header icon element.
+- External glow is now extremely tight.
+- v13.44 page-colour halo behind the page name is retained.
+
+UPLOAD
+Upload everything in this ZIP to the GitHub root, including icons/header/.

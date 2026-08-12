@@ -1,0 +1,27 @@
+ACTIVATE TRACKER v13.49 — DEEP PAGE-COLOUR HEADERS
+
+CHANGE
+- Page header now uses much more of each page's colour.
+- The colour is deliberately darkened into a deep chromatic fascia.
+- Icon and page title remain the brightest elements for readability.
+- Icon housing gets its own darker local pad so SVG strokes stay crisp.
+- Hamburger housing follows the same darker page colour.
+- Existing title halo and bottom accent rail are retained and strengthened slightly.
+
+PAGE COLOURS
+- Home — Electric cyan
+- Badges — Neon pink
+- Levels — Royal blue
+- Competitive — Hot orange-red
+- Locations — Ultraviolet
+- Stats — Emerald green
+- Settings — Amber gold
+
+RETAINED
+- Distinct Levels staircase icon.
+- Distinct Stats circular analytics icon.
+- Competitive VS icon.
+- Semantic SVG family.
+- No baked icon blur.
+
+UPLOAD EVERYTHING IN THIS ZIP TO THE GITHUB ROOT.
