@@ -1,0 +1,35 @@
+ACTIVATE TRACKER v13.23 — NEON PAGE TITLE + POLISHED TITLE BAR
+
+PAGE TITLE
+- Page title now uses Tilt Neon.
+- Kept intentionally clean/simple rather than using the heavier headline font.
+- Subtle cyan/pink glow only; no excessive outline or effects.
+- Tektur remains available for the stronger section/display headings.
+- Bruno Ace SC remains the general UI/body font.
+
+TITLE BAR
+- Richer purple/navy depth gradient.
+- Thin cyan → violet → pink neon edge along the bottom.
+- Very subtle tech/grid texture.
+- Refined page-icon housing with neon frame.
+- Menu button now visually belongs to the same bar.
+- Subtitle stays lime for clear hierarchy.
+- Compact tuning for narrow Fold front screen.
+- Shallower tuning for landscape.
+
+RETAINED
+- Stronger achieved Focus effect
+- Stronger animated venue-high-score effect
+- Home pinned-badges spacing
+- Context-aware Focus navigation
+- Clear MARK BADGE EARNED / ACHIEVED states
+- Pin control hard fix
+- Portrait Focus text fitting
+- Thicker outlines
+- Landscape scrolling fix
+
+UPLOAD TO GITHUB ROOT:
+index.html
+app.js
+style.css
+sw.js
