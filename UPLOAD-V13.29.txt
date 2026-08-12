@@ -1,0 +1,32 @@
+ACTIVATE TRACKER v13.29 — HERO BRAND BAR
+
+THIS UPDATE TARGETS THE TOP "SMARTY'S ACTIVATE TRACKER" BAR.
+
+BRAND BAR
+- Rebuilt as a proper neon sci-fi fascia.
+- Stronger neon main title.
+- Pink Smarty's tag plaque.
+- Holographic offset echo under Activate Tracker.
+- Animated cyan/pink energy sweep.
+- Side circuit rails and live nodes.
+- Fine tech mesh / scan texture.
+- Track • Pin • Conquer becomes an anchored console readout.
+- Added subtle System Live status chip on larger displays.
+- Stronger corner lighting and depth.
+- Fold cover and landscape have dedicated compact layouts.
+- Reduced-motion support included.
+
+ALSO RETAINED
+- v13.28 upgraded page title bar.
+- v13.27 all-small-caps treatment.
+- v13.26 single sticky header architecture.
+- Venue high scores.
+- Metallic trophies.
+- Focus and pin fixes.
+- Responsive scrolling fixes.
+
+UPLOAD TO GITHUB ROOT:
+index.html
+app.js
+style.css
+sw.js
