@@ -1,0 +1,27 @@
+ACTIVATE TRACKER v13.40 — CYBERPUNK TITLE BAR + ICON FIX
+
+FIXES
+- Removes ALL residual square/rounded-tile styling from the page SVG icons.
+- Removes the old aura/blob behind page icons.
+- Icons now float directly on the page bar.
+- Hamburger icon glow removed completely.
+
+PAGE TITLE BAR
+- Stronger cyberpunk treatment:
+  • deeper purple/navy panel
+  • fine grid texture
+  • cyan/violet/pink scanline
+  • luminous title rail
+  • brighter but controlled title/subtitle glow
+
+SIDE DRAWER
+- Larger icons.
+- Larger text.
+- Much less icon glow.
+- Active state is carried by the whole nav row instead of an icon tile.
+
+UPDATE ONLY — UPLOAD:
+index.html
+app.js
+style.css
+sw.js
