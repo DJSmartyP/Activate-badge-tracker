@@ -8543,3 +8543,641 @@ body{
     margin:-.11em -.03em -.14em -.28em !important;
   }
 }
+
+
+/* =========================================================
+   v13.72 — PLAYER-OWNED TOP BAR / PAGE-COLOUR TAG SHELF
+   Upper brand bar follows player colour again.
+   Player tag sits on a page-colour shelf.
+   ========================================================= */
+
+.app-header-shell{
+  box-shadow:
+    0 12px 30px rgba(0,0,0,.30),
+    0 6px 24px rgba(var(--player-brand-safe-rgb),.10) !important;
+}
+
+/* Remove the page-colour wash dominating the full upper shell */
+.app-header-shell::before{
+  background:
+    radial-gradient(
+      700px 240px at 24% 18%,
+      rgba(var(--player-brand-rgb),.15) 0%,
+      rgba(var(--player-brand-rgb),.06) 34%,
+      transparent 68%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.01) 0%,
+      transparent 30%,
+      rgba(var(--active-page-accent-rgb),.04) 100%
+    ) !important;
+}
+
+/* The main brand panel now belongs to the player colour.
+   Keep only a tiny page-colour influence near the lower seam. */
+.brand-banner-final .brand-wordmark{
+  background:
+    radial-gradient(
+      560px 210px at 26% 32%,
+      rgba(var(--player-brand-safe-rgb),.19) 0%,
+      rgba(var(--player-brand-rgb),.10) 34%,
+      transparent 72%
+    ),
+    radial-gradient(
+      360px 130px at 16% 76%,
+      rgba(var(--player-brand-safe-rgb),.10) 0%,
+      transparent 70%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(8,12,25,.985) 0%,
+      rgba(10,14,30,.97) 74%,
+      rgba(var(--active-page-accent-rgb),.06) 100%
+    ) !important;
+
+  border-bottom-color:rgba(var(--player-brand-safe-rgb),.30) !important;
+  box-shadow:
+    inset 0 1px rgba(255,255,255,.05),
+    inset 0 -1px rgba(var(--player-brand-safe-rgb),.18),
+    inset 0 0 30px rgba(var(--player-brand-rgb),.045),
+    0 0 18px rgba(var(--player-brand-safe-rgb),.08) !important;
+}
+
+/* Create a page-colour "shelf" behind the player tag so it reads as
+   a custom badge sitting on top of the active page identity. */
+.brand-banner-final .brand-main{
+  position:relative !important;
+  align-items:center !important;
+}
+
+.brand-banner-final .brand-main::before{
+  content:"";
+  position:absolute;
+  left:-18px;
+  right:calc(100% - min(48vw, 430px));
+  top:50%;
+  transform:translateY(-50%);
+  height:58px;
+  z-index:0;
+  pointer-events:none;
+
+  border-radius:18px;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(var(--page-accent-rgb),.34) 0%,
+      rgba(var(--page-accent-rgb),.22) 55%,
+      rgba(var(--page-accent-rgb),.06) 100%
+    );
+
+  box-shadow:
+    inset 0 1px rgba(255,255,255,.08),
+    inset 0 -1px rgba(var(--page-accent-rgb),.18),
+    0 0 14px rgba(var(--page-accent-rgb),.16);
+  clip-path:polygon(10px 0, 100% 0, calc(100% - 18px) 100%, 0 100%);
+}
+
+/* Move wordmark content above the shelf */
+.brand-lockup{
+  position:relative !important;
+  z-index:2 !important;
+}
+
+/* Player tag: more bespoke shape and slightly cleaner fit */
+.player-brand-name,
+.brand-banner-final .player-brand-name{
+  position:relative !important;
+  z-index:3 !important;
+
+  padding:.17em .50em .20em .48em !important;
+  margin:-.14em -.02em -.18em -.34em !important;
+
+  color:#f7fbff !important;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(var(--player-brand-safe-rgb),.42),
+      rgba(var(--player-brand-rgb),.26)
+    ) !important;
+
+  border:1px solid rgba(var(--player-brand-safe-rgb),.66) !important;
+  border-radius:0 !important;
+  clip-path:polygon(11px 0, 100% 0, calc(100% - 11px) 100%, 0 100%) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.11),
+    inset 0 -1px 0 rgba(var(--player-brand-safe-rgb),.16),
+    0 0 10px rgba(var(--player-brand-safe-rgb),.22),
+    0 0 22px rgba(var(--player-brand-safe-rgb),.12) !important;
+
+  text-shadow:
+    0 0 2px rgba(255,255,255,.92),
+    0 0 7px rgba(var(--player-brand-safe-rgb),.72),
+    0 0 15px rgba(var(--player-brand-safe-rgb),.38) !important;
+}
+
+/* replace the previous underglow with a tighter page-colour seat */
+.player-brand-name::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  left:8px;
+  right:8px;
+  bottom:-8px;
+  height:12px;
+  border-radius:50%;
+  background:radial-gradient(
+    ellipse at center,
+    rgba(var(--page-accent-rgb),.34),
+    rgba(var(--page-accent-rgb),.12) 48%,
+    transparent 78%
+  );
+  filter:blur(4px);
+  pointer-events:none;
+}
+
+/* keep ACTIVATE slightly more prominent, but make the overall line cohesive */
+.brand-lockup{
+  column-gap:.28em !important;
+}
+.brand-banner-final .brand-main{
+  gap:.28em !important;
+}
+
+.brand-banner-final .brand-activate{
+  filter:drop-shadow(0 0 12px rgba(255,255,255,.18))
+         drop-shadow(0 0 18px rgba(255,80,210,.10)) !important;
+}
+
+.brand-banner-final .brand-tracker{
+  color:var(--player-brand-safe) !important;
+  text-shadow:
+    0 0 2px rgba(255,255,255,.88),
+    0 0 8px rgba(var(--player-brand-safe-rgb),.54),
+    0 0 14px rgba(var(--player-brand-safe-rgb),.22) !important;
+}
+
+/* make the upper line feel visually centered as a single unit */
+.brand-banner-final .brand-wordmark-inner{
+  justify-content:center !important;
+}
+
+/* preserve responsiveness */
+@media (max-width:820px){
+  .brand-banner-final .brand-main::before{
+    left:-12px;
+    right:calc(100% - min(58vw, 340px));
+    height:50px;
+    border-radius:15px;
+  }
+
+  .player-brand-name,
+  .brand-banner-final .player-brand-name{
+    padding:.14em .42em .17em .40em !important;
+    margin:-.11em 0 -.15em -.25em !important;
+    clip-path:polygon(9px 0, 100% 0, calc(100% - 9px) 100%, 0 100%) !important;
+  }
+
+  .brand-lockup,
+  .brand-banner-final .brand-main{
+    gap:.24em !important;
+    column-gap:.24em !important;
+  }
+}
+
+@media (max-width:520px){
+  .brand-banner-final .brand-main::before{
+    right:calc(100% - min(64vw, 290px));
+    height:44px;
+  }
+
+  .player-brand-name,
+  .brand-banner-final .player-brand-name{
+    padding:.11em .34em .13em .32em !important;
+    margin:-.08em 0 -.12em -.18em !important;
+    clip-path:polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%) !important;
+  }
+}
+
+
+/* =========================================================
+   v13.73 — POLISHED UNIFIED HEADER
+   ONE page-colour header field.
+   ONE floating player-colour nameplate containing the full
+   PLAYER'S ACTIVATE TRACKER identity line.
+   ========================================================= */
+
+/* ---------- One continuous page-colour field ---------- */
+.app-header-shell{
+  --active-page-accent:#43E7FF;
+  --active-page-accent-rgb:67,231,255;
+
+  isolation:isolate !important;
+  overflow:visible !important;
+
+  background:
+    radial-gradient(
+      880px 360px at 17% 22%,
+      rgba(var(--active-page-accent-rgb),.32) 0%,
+      rgba(var(--active-page-accent-rgb),.15) 35%,
+      transparent 70%
+    ),
+    radial-gradient(
+      720px 300px at 92% 82%,
+      rgba(var(--active-page-accent-rgb),.12) 0%,
+      transparent 68%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(var(--active-page-accent-rgb),.22) 0%,
+      rgba(var(--active-page-accent-rgb),.16) 42%,
+      rgba(var(--active-page-accent-rgb),.13) 100%
+    ),
+    #080d19 !important;
+
+  border-top:1px solid rgba(var(--active-page-accent-rgb),.38) !important;
+  border-bottom:1px solid rgba(var(--active-page-accent-rgb),.48) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    inset 0 -1px 0 rgba(var(--active-page-accent-rgb),.18),
+    0 11px 30px rgba(0,0,0,.34),
+    0 7px 24px rgba(var(--active-page-accent-rgb),.10) !important;
+}
+
+/* Neutralise the old "two different bars" shell overlays. */
+.app-header-shell::before{
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.025),
+      transparent 22%,
+      transparent 76%,
+      rgba(255,255,255,.018)
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 118px,
+      rgba(var(--active-page-accent-rgb),.035) 118px 119px
+    ) !important;
+}
+
+/* Upper area is now simply the TOP of the page-colour header, not its own bar. */
+.app-header-shell .brand-banner-wrap{
+  position:relative !important;
+  z-index:2 !important;
+  padding-bottom:0 !important;
+  margin-bottom:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+.brand-banner-final .brand-wordmark{
+  background:transparent !important;
+  border-top-color:rgba(var(--active-page-accent-rgb),.34) !important;
+  border-right-color:rgba(var(--active-page-accent-rgb),.24) !important;
+  border-bottom-color:transparent !important;
+  border-left-color:rgba(var(--active-page-accent-rgb),.24) !important;
+
+  border-radius:16px 16px 0 0 !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    inset 0 0 32px rgba(var(--active-page-accent-rgb),.055) !important;
+}
+
+/* Keep the brand's decorative circuitry page-coloured rather than player-coloured. */
+.brand-banner-final .brand-wordmark::before{
+  opacity:.68 !important;
+  background:
+    linear-gradient(90deg,rgba(var(--active-page-accent-rgb),.82),transparent) 0 0/74px 1px no-repeat,
+    linear-gradient(180deg,rgba(var(--active-page-accent-rgb),.82),transparent) 0 0/1px 22px no-repeat,
+    linear-gradient(270deg,rgba(var(--active-page-accent-rgb),.72),transparent) 100% 100%/92px 1px no-repeat,
+    linear-gradient(0deg,rgba(var(--active-page-accent-rgb),.72),transparent) 100% 100%/1px 24px no-repeat,
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 74px,
+      rgba(var(--active-page-accent-rgb),.035) 74px 75px
+    ) !important;
+}
+
+.brand-banner-final .brand-wordmark::after{
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--active-page-accent-rgb),.02),
+    rgba(var(--active-page-accent-rgb),.18),
+    rgba(255,255,255,.22),
+    rgba(var(--active-page-accent-rgb),.18),
+    transparent
+  ) !important;
+}
+
+/* ---------- Full personalised identity NAMEPLATE ---------- */
+/*
+  The whole lockup — PLAYER'S ACTIVATE TRACKER — is now the plate.
+  A dark glass foundation guarantees separation from the page colour,
+  while player colour supplies the identity.
+*/
+.brand-lockup{
+  --plate-cut:14px;
+
+  position:absolute !important;
+  z-index:8 !important;
+  left:50% !important;
+  top:50% !important;
+  transform:translate(-50%,-50%) !important;
+
+  display:grid !important;
+  grid-template-columns:auto auto !important;
+  grid-template-rows:auto !important;
+  align-items:baseline !important;
+  justify-content:center !important;
+  justify-items:center !important;
+
+  width:max-content !important;
+  max-width:min(88%,960px) !important;
+  min-height:54px !important;
+
+  column-gap:.33em !important;
+  row-gap:0 !important;
+
+  padding:.32em .72em .36em !important;
+
+  background:
+    radial-gradient(
+      430px 90px at 18% 50%,
+      rgba(var(--player-brand-safe-rgb),.28),
+      transparent 76%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(var(--player-brand-safe-rgb),.25) 0%,
+      rgba(var(--player-brand-rgb),.13) 48%,
+      rgba(var(--player-brand-safe-rgb),.15) 100%
+    ),
+    linear-gradient(180deg,rgba(11,15,28,.94),rgba(5,8,16,.95)) !important;
+
+  border:1px solid rgba(var(--player-brand-safe-rgb),.64) !important;
+  border-radius:0 !important;
+
+  clip-path:polygon(
+    var(--plate-cut) 0,
+    calc(100% - var(--plate-cut)) 0,
+    100% 50%,
+    calc(100% - var(--plate-cut)) 100%,
+    var(--plate-cut) 100%,
+    0 50%
+  ) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    inset 0 -1px 0 rgba(var(--player-brand-safe-rgb),.16),
+    inset 0 0 20px rgba(var(--player-brand-rgb),.09),
+    0 0 11px rgba(var(--player-brand-safe-rgb),.28),
+    0 0 25px rgba(var(--player-brand-safe-rgb),.13),
+    0 8px 20px rgba(0,0,0,.34) !important;
+
+  font-kerning:normal !important;
+  font-feature-settings:"kern" 1,"liga" 1 !important;
+  white-space:nowrap !important;
+}
+
+/* Page-colour mounting shadow: visually seats the player's plate
+   ON the current page-colour surface. */
+.brand-lockup::before{
+  content:"" !important;
+  position:absolute !important;
+  z-index:-2 !important;
+  left:5% !important;
+  right:5% !important;
+  bottom:-12px !important;
+  height:18px !important;
+
+  border-radius:50% !important;
+  background:radial-gradient(
+    ellipse at center,
+    rgba(var(--active-page-accent-rgb),.36) 0%,
+    rgba(var(--active-page-accent-rgb),.13) 48%,
+    transparent 76%
+  ) !important;
+  filter:blur(5px) !important;
+  pointer-events:none !important;
+}
+
+/* Fine internal line gives the plate a manufactured sci-fi finish. */
+.brand-lockup::after{
+  content:"" !important;
+  position:absolute !important;
+  inset:5px 12px !important;
+  z-index:-1 !important;
+  pointer-events:none !important;
+
+  clip-path:polygon(
+    9px 0,
+    calc(100% - 9px) 0,
+    100% 50%,
+    calc(100% - 9px) 100%,
+    9px 100%,
+    0 50%
+  ) !important;
+
+  border:1px solid rgba(255,255,255,.055) !important;
+  box-shadow:inset 0 0 10px rgba(var(--player-brand-safe-rgb),.05) !important;
+}
+
+/* The player's name is text INSIDE the plate now — no separate mini-tag. */
+.player-brand-name,
+.brand-banner-final .player-brand-name{
+  grid-column:1 !important;
+  grid-row:1 !important;
+  position:relative !important;
+  z-index:2 !important;
+
+  align-self:baseline !important;
+  justify-self:end !important;
+
+  margin:0 !important;
+  padding:0 !important;
+  max-width:min(38vw,380px) !important;
+
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+
+  color:var(--player-brand-safe) !important;
+  background:none !important;
+  border:0 !important;
+  border-radius:0 !important;
+  clip-path:none !important;
+  box-shadow:none !important;
+
+  letter-spacing:.010em !important;
+
+  text-shadow:
+    0 0 2px rgba(255,255,255,.76),
+    0 0 6px rgba(var(--player-brand-safe-rgb),.58),
+    0 0 13px rgba(var(--player-brand-safe-rgb),.28) !important;
+}
+
+/* Remove all previous little-tag underlays/separators. */
+.player-brand-name::before,
+.player-brand-name::after,
+.brand-banner-final .player-brand-name::before,
+.brand-banner-final .player-brand-name::after{
+  content:none !important;
+  display:none !important;
+}
+
+/* ACTIVATE TRACKER is simply the second phrase inside the same plate. */
+.brand-banner-final .brand-main{
+  grid-column:2 !important;
+  grid-row:1 !important;
+
+  position:relative !important;
+  z-index:2 !important;
+
+  display:inline-flex !important;
+  align-items:baseline !important;
+  justify-content:flex-start !important;
+
+  margin:0 !important;
+  padding:0 !important;
+  gap:.33em !important;
+
+  background:none !important;
+}
+
+/* Remove the old page-colour shelf behind only one fragment. */
+.brand-banner-final .brand-main::before,
+.brand-banner-final .brand-main::after{
+  content:none !important;
+  display:none !important;
+}
+
+/* Keep ACTIVATE as the deliberate centre highlight. */
+.brand-activate{
+  letter-spacing:.012em !important;
+  font-kerning:normal !important;
+  font-feature-settings:"kern" 1,"liga" 1 !important;
+}
+
+/* TRACKER remains tied to the player's colour. */
+.brand-tracker{
+  color:var(--player-brand-safe) !important;
+  letter-spacing:.010em !important;
+
+  text-shadow:
+    0 0 2px rgba(255,255,255,.70),
+    0 0 6px rgba(var(--player-brand-safe-rgb),.55),
+    0 0 13px rgba(var(--player-brand-safe-rgb),.25) !important;
+}
+
+/* Old second line inside the logo plate is redundant now. */
+.brand-kicker{
+  display:none !important;
+}
+
+/* ---------- Lower page information on SAME background ---------- */
+.app-header-shell .page-bar{
+  position:relative !important;
+  z-index:3 !important;
+
+  margin-top:-1px !important;
+  border-top:0 !important;
+
+  background:
+    radial-gradient(
+      720px 240px at 21% 20%,
+      rgba(var(--page-accent-rgb),.20),
+      transparent 70%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(var(--page-accent-rgb),.09),
+      rgba(8,13,26,.22) 55%,
+      rgba(8,13,26,.08)
+    ) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(var(--page-accent-rgb),.14),
+    inset 0 -1px 0 rgba(var(--page-accent-rgb),.26),
+    0 7px 20px rgba(0,0,0,.18) !important;
+}
+
+/* One very soft join line, not a separate-bar divider. */
+.app-header-shell .page-bar::before{
+  content:"" !important;
+  position:absolute !important;
+  left:5% !important;
+  right:5% !important;
+  top:0 !important;
+  height:1px !important;
+
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--page-accent-rgb),.20) 18%,
+    rgba(255,255,255,.14) 50%,
+    rgba(var(--page-accent-rgb),.20) 82%,
+    transparent
+  ) !important;
+
+  box-shadow:none !important;
+  pointer-events:none !important;
+}
+
+/* ---------- Responsive plate shaping ---------- */
+@media (max-width:820px){
+  .brand-lockup{
+    --plate-cut:11px;
+    max-width:93% !important;
+    min-height:48px !important;
+    padding:.28em .58em .31em !important;
+    column-gap:.28em !important;
+  }
+
+  .brand-banner-final .brand-main{
+    gap:.28em !important;
+  }
+
+  .player-brand-name,
+  .brand-banner-final .player-brand-name{
+    max-width:36vw !important;
+  }
+}
+
+@media (max-width:520px){
+  .brand-lockup{
+    --plate-cut:9px;
+    max-width:96% !important;
+    min-height:42px !important;
+    padding:.24em .47em .27em !important;
+    column-gap:.24em !important;
+  }
+
+  .brand-banner-final .brand-main{
+    gap:.24em !important;
+  }
+
+  .player-brand-name,
+  .brand-banner-final .player-brand-name{
+    max-width:34vw !important;
+  }
+}
+
+@media (orientation:landscape) and (max-height:760px){
+  .brand-lockup{
+    --plate-cut:10px;
+    max-width:88% !important;
+    min-height:42px !important;
+    padding:.23em .52em .26em !important;
+  }
+}
