@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.91.0';
+const VERSION='13.93.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -2271,6 +2271,7 @@ function progressEntries(){
   const progress=activeLevelProgress();
   const entries=[];
   const l=activeLocation();
+  const excluded=new Set(l.excludedGames||[]);
 
   const rooms=[...new Set(Array.isArray(l.rooms)?l.rooms:[])];
 
@@ -2278,6 +2279,10 @@ function progressEntries(){
     const modes=gameModesForRoom(room);
 
     modes.cooperative.forEach(game=>{
+      // Location availability is authoritative for Levels too.
+      // Keep any saved progress, but do not render unavailable games.
+      if(excluded.has(game))return;
+
       const x=progress.games[room+'||'+game]||{};
       const levels={...(x.levels||{})};
       (Array.isArray(x.complete)?x.complete:[]).forEach(n=>{
@@ -2288,6 +2293,10 @@ function progressEntries(){
     });
 
     modes.competitive.forEach(game=>{
+      // Same rule as the Competitive page: unavailable means hidden,
+      // not merely shown as "Not played".
+      if(excluded.has(game))return;
+
       entries.push({
         room,game,mode:'competitive',
         played:!!progress.competitive[room+'||'+game]
@@ -2986,6 +2995,6 @@ function bindEvents(){
   onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();ensureContentState();applyContentCatalog();renderAll()}});
 }
 
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1391',{updateViaCache:'none'}).catch(console.error));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1393',{updateViaCache:'none'}).catch(console.error));
 init();
 installBackGuard();

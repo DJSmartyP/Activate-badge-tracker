@@ -11854,3 +11854,75 @@ input,select,textarea,button{font-size:max(15px,1em);}
     scroll-padding-top:9px !important;
   }
 }
+
+
+/* =========================================================
+   v13.92 — NAMEPLATE OPTICAL CENTRING
+   True vertical centring + slight optical lift
+   ========================================================= */
+
+.brand-panel,
+.brand-row,
+.brand-line,
+.brand-plate,
+.player-nameplate,
+.nameplate{
+  align-items:center;
+}
+
+.brand-plate,
+.player-nameplate,
+.nameplate{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-height:unset !important;
+  padding-top:8px !important;
+  padding-bottom:8px !important;
+  box-sizing:border-box !important;
+}
+
+.brand-plate .brand-line,
+.brand-plate .player-brand-line,
+.player-nameplate .brand-line,
+.player-nameplate .player-brand-line,
+.nameplate .brand-line,
+.nameplate .player-brand-line{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  line-height:1 !important;
+  margin:0 !important;
+  transform:translateY(-2px) !important; /* optical centring */
+  white-space:nowrap !important;
+}
+
+/* If the brand words are split into spans, centre each cleanly */
+.brand-plate .brand-line > span,
+.brand-plate .player-brand-line > span,
+.player-nameplate .brand-line > span,
+.player-nameplate .player-brand-line > span,
+.nameplate .brand-line > span,
+.nameplate .player-brand-line > span{
+  line-height:1 !important;
+  display:inline-block !important;
+  vertical-align:middle !important;
+}
+
+/* Narrow screens: slightly smaller vertical padding but keep the optical lift */
+@media (max-width: 640px){
+  .brand-plate,
+  .player-nameplate,
+  .nameplate{
+    padding-top:7px !important;
+    padding-bottom:7px !important;
+  }
+  .brand-plate .brand-line,
+  .brand-plate .player-brand-line,
+  .player-nameplate .brand-line,
+  .player-nameplate .player-brand-line,
+  .nameplate .brand-line,
+  .nameplate .player-brand-line{
+    transform:translateY(-1.5px) !important;
+  }
+}
