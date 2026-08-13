@@ -11926,3 +11926,11 @@ input,select,textarea,button{font-size:max(15px,1em);}
     transform:translateY(-1.5px) !important;
   }
 }
+
+
+/* =========================================================
+   v13.94 — LOCATION-QUALIFIED PLATINUM
+   Platinum UI percentages/targets now use badges available
+   at the selected Location. Trophy remains permanent once
+   achieved at any Location.
+   ========================================================= */

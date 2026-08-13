@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='13.93.0';
+const VERSION='13.94.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
@@ -279,7 +279,7 @@ const TROPHY_DEFS=[
   {id:'bronze',name:'Bronze',need:25,description:'25 badges'},
   {id:'silver',name:'Silver',need:50,description:'50 badges'},
   {id:'gold',name:'Gold',need:75,description:'75 badges'},
-  {id:'platinum',name:'Platinum',need:'all',description:'100% of current active badges'}
+  {id:'platinum',name:'Platinum',need:'all',description:'100% of badges available at one Location • permanent once earned'}
 ];
 
 const BASE_MULTIPART_RULES={
@@ -293,6 +293,23 @@ function ensureTrophyState(){
   state.trophies=state.trophies&&typeof state.trophies==='object'?state.trophies:{};
   TROPHY_DEFS.forEach(t=>{
     const old=state.trophies[t.id];
+    if(t.id==='platinum'){
+      state.trophies[t.id]=old&&typeof old==='object'
+        ? {
+            earned:!!old.earned,
+            earnedAt:old.earnedAt||null,
+            earnedLocationId:old.earnedLocationId||null,
+            earnedLocationName:old.earnedLocationName||null,
+            earnedCount:Number.isFinite(Number(old.earnedCount))?Number(old.earnedCount):null,
+            availableCountAtAward:Number.isFinite(Number(old.availableCountAtAward))?Number(old.availableCountAtAward):null
+          }
+        : {
+            earned:false,earnedAt:null,
+            earnedLocationId:null,earnedLocationName:null,
+            earnedCount:null,availableCountAtAward:null
+          };
+      return;
+    }
     state.trophies[t.id]=old&&typeof old==='object'
       ? {earned:!!old.earned,earnedAt:old.earnedAt||null}
       : {earned:false,earnedAt:null};
@@ -558,7 +575,6 @@ function partAvailableHere(part,l=activeLocation()){
 function syncTrophies(){
   ensureTrophyState();
   const n=earnedCount();
-  const total=BASE_BADGE_COUNT;
   const today=new Date().toISOString().slice(0,10);
 
   [['bronze',25],['silver',50],['gold',75]].forEach(([id,need])=>{
@@ -569,12 +585,19 @@ function syncTrophies(){
     // Bronze / Silver / Gold are permanent once achieved.
   });
 
-  const platinumNow=total>0&&n>=total;
-  if(platinumNow&&!state.trophies.platinum.earned){
-    state.trophies.platinum.earnedAt=today;
+  // Platinum is LOCATION-QUALIFIED but GLOBAL/PERMANENT once earned:
+  // reach 100% of badges currently available at any one configured Location.
+  if(!state.trophies.platinum.earned){
+    const qualified=bestPlatinumQualification();
+    if(qualified){
+      state.trophies.platinum.earned=true;
+      state.trophies.platinum.earnedAt=today;
+      state.trophies.platinum.earnedLocationId=qualified.locationId;
+      state.trophies.platinum.earnedLocationName=qualified.locationName;
+      state.trophies.platinum.earnedCount=qualified.current;
+      state.trophies.platinum.availableCountAtAward=qualified.target;
+    }
   }
-  state.trophies.platinum.earned=platinumNow;
-  if(!platinumNow)state.trophies.platinum.earnedAt=null;
 
   TROPHIES=TROPHY_DEFS.map(t=>({
     ...t,
@@ -956,19 +979,45 @@ function ensureLocationShape(l){
   l.venueMap.Exit=l.venueMap.Exit||{front:null,left:null,right:null,back:null};
 }
 
-function availableHere(b){
-  if(b?._archived)return false;
+function availableAtLocation(b,l=activeLocation()){
+  if(b?._archived||!l)return false;
   const type=b?.availabilityType||defaultBadgeAvailabilityType(b,b?.room,b?.game);
 
   // Any Room includes venue-relative rules such as Riddle 7.0.
   if(type==='any')return true;
 
-  // Multipart badges are defined relative to the active venue's current
-  // catalogue, so they are valid at any configured Location.
+  // Multipart badges are defined relative to the selected venue's current
+  // catalogue, so each configured Location has its own valid target.
   if(type==='multipart')return true;
 
   const parts=badgeRequirements(b);
-  return parts.length?parts.every(p=>partAvailableHere(p,activeLocation())):true;
+  return parts.length?parts.every(p=>partAvailableHere(p,l)):true;
+}
+
+function availableHere(b){
+  return availableAtLocation(b,activeLocation());
+}
+
+function platinumProgressForLocation(l=activeLocation()){
+  const tracked=activeTrackedBadgeIndices();
+  const available=tracked.filter(i=>availableAtLocation(BADGES[i],l));
+  const earnedAvailable=available.filter(i=>!!state.earned[i]);
+  const target=available.length;
+  const current=earnedAvailable.length;
+  return {
+    locationId:l?.id||null,
+    locationName:l?.name||'Location',
+    current,
+    target,
+    remaining:Math.max(0,target-current),
+    percent:target?Math.max(0,Math.min(100,Math.round(current/target*100))):0,
+    complete:target>0&&current>=target
+  };
+}
+
+function bestPlatinumQualification(){
+  const rows=(state.locations||[]).map(l=>platinumProgressForLocation(l));
+  return rows.find(x=>x.complete)||null;
 }
 
 function currentTrophy(){
@@ -986,24 +1035,40 @@ function nextTrophyText(){
   if(!state.trophies.bronze.earned)return `${Math.max(0,25-n)} to Bronze`;
   if(!state.trophies.silver.earned)return `${Math.max(0,50-n)} to Silver`;
   if(!state.trophies.gold.earned)return `${Math.max(0,75-n)} to Gold`;
-  if(!state.trophies.platinum.earned)return `${Math.max(0,BASE_BADGE_COUNT-n)} to Platinum`;
-  return '100% complete';
+  if(!state.trophies.platinum.earned){
+    const p=platinumProgressForLocation();
+    return `${p.remaining} to Platinum at ${p.locationName}`;
+  }
+  const award=state.trophies.platinum.earnedLocationName;
+  return award?`Platinum earned at ${award}`:'Platinum earned';
 }
 
 function trophyProgress(){
   ensureTrophyState();
   const n=earnedCount();
-  if(!state.trophies.bronze.earned)return {name:'Bronze',current:n,target:25,remaining:Math.max(0,25-n)};
-  if(!state.trophies.silver.earned)return {name:'Silver',current:n,target:50,remaining:Math.max(0,50-n)};
-  if(!state.trophies.gold.earned)return {name:'Gold',current:n,target:75,remaining:Math.max(0,75-n)};
-  return {name:'Platinum',current:n,target:BASE_BADGE_COUNT,remaining:Math.max(0,BASE_BADGE_COUNT-n)};
+  if(!state.trophies.bronze.earned)return {name:'Bronze',current:n,target:25,remaining:Math.max(0,25-n),percent:Math.min(100,Math.round(n/25*100))};
+  if(!state.trophies.silver.earned)return {name:'Silver',current:n,target:50,remaining:Math.max(0,50-n),percent:Math.min(100,Math.round(n/50*100))};
+  if(!state.trophies.gold.earned)return {name:'Gold',current:n,target:75,remaining:Math.max(0,75-n),percent:Math.min(100,Math.round(n/75*100))};
+
+  const p=platinumProgressForLocation();
+  return {
+    name:'Platinum',
+    current:p.current,
+    target:p.target,
+    remaining:p.remaining,
+    percent:p.percent,
+    locationId:p.locationId,
+    locationName:p.locationName,
+    globallyEarned:!!state.trophies.platinum.earned
+  };
 }
 
 function renderHome(){
   const n=earnedCount(), total=BASE_BADGE_COUNT, pct=total?Math.round(n/total*100):0, l=activeLocation();
+  const localPlatinum=platinumProgressForLocation(l);
   const tp=trophyProgress();
   const tpClass=`trophy-${String(tp.name).toLowerCase()}`;
-  const milestonePct=tp.target?Math.max(0,Math.min(100,Math.round(tp.current/tp.target*100))):100;
+  const milestonePct=Number.isFinite(tp.percent)?tp.percent:(tp.target?Math.max(0,Math.min(100,Math.round(tp.current/tp.target*100))):100);
   const recentThree=(state.history||[]).slice(0,3).map(h=>({
     badge:Number(h.badge),
     date:h.date||'',
@@ -1028,7 +1093,11 @@ function renderHome(){
         <div class="home-trophy-title-row">
           <div class="home-trophy-title-copy">
             <div class="big trophy-current-name ${tpClass}" data-text="${esc(tp.name)}">${esc(tp.name)}</div>
-            <div class="sub">${tp.remaining?`${tp.current} / ${tp.target} badges • ${tp.remaining} to unlock`:'Unlocked • 100% complete'}</div>
+            <div class="sub">${tp.name==='Platinum'
+              ? (state.trophies.platinum.earned
+                  ? `Unlocked permanently${state.trophies.platinum.earnedLocationName?` at ${esc(state.trophies.platinum.earnedLocationName)}`:''} • ${localPlatinum.current} / ${localPlatinum.target} available here`
+                  : `${tp.current} / ${tp.target} badges available at ${esc(tp.locationName||l.name)} • ${tp.remaining} to unlock`)
+              : (tp.remaining?`${tp.current} / ${tp.target} badges • ${tp.remaining} to unlock`:'Unlocked • 100% complete')}</div>
           </div>
 
           <div class="home-trophy-live ${tpClass}" aria-label="${milestonePct}% progress toward ${esc(tp.name)} trophy">
@@ -1045,11 +1114,11 @@ function renderHome(){
           </div>
         </div>
 
-        <div class="progress top-gap"><span style="width:${tp.target?Math.min(100,tp.current/tp.target*100):100}%"></span></div>
+        <div class="progress top-gap"><span style="width:${milestonePct}%"></span></div>
 
         <div class="metrics">
-          <div class="metric"><span class="label">Earned</span><b>${n}</b></div>
-          <div class="metric"><span class="label">Overall</span><b>${pct}%</b></div>
+          <div class="metric"><span class="label">Earned global</span><b>${n}</b></div>
+          <div class="metric"><span class="label">Platinum here</span><b>${localPlatinum.percent}%</b></div>
           <div class="metric"><span class="label">Location</span><b style="font-size:15px">${esc(l.name)}</b></div>
         </div>
       </div>
@@ -1065,20 +1134,30 @@ function renderHome(){
       </aside>
     </div>`;
   $('trophies').innerHTML=TROPHIES.map(t=>{
-    const need=t.need==='all'?total:t.need;
+    const isPlatinum=t.id==='platinum';
+    const need=isPlatinum?localPlatinum.target:t.need;
+    const current=isPlatinum?localPlatinum.current:n;
     const metal=`trophy-${t.id}`;
     const unlocked=!!t.earned;
-    const progress=t.id==='platinum'
-      ? (need?Math.min(100,n/need*100):0)
-      : (unlocked?100:(need?Math.min(100,n/need*100):0));
+    const progress=isPlatinum
+      ? localPlatinum.percent
+      : (unlocked?100:(need?Math.min(100,current/need*100):0));
+    const statusText=unlocked
+      ? 'Unlocked'
+      : `${Math.max(0,need-current)} left`;
+    const description=isPlatinum
+      ? (unlocked
+          ? `Permanent • earned${state.trophies.platinum.earnedLocationName?` at ${esc(state.trophies.platinum.earnedLocationName)}`:''} • ${localPlatinum.current} / ${localPlatinum.target} available here`
+          : `${localPlatinum.current} / ${localPlatinum.target} badges available at ${esc(l.name)} • ${localPlatinum.percent}%`)
+      : `${need} badges • permanent once earned`;
     return `<div class="card trophy ${metal} ${unlocked?'unlocked':'locked'}">
       <div class="trophy-shimmer" aria-hidden="true"></div>
       <div class="row between">
         <span class="cup" aria-hidden="true">🏆</span>
-        <span class="pill">${unlocked?'Unlocked':`${Math.max(0,need-n)} left`}</span>
+        <span class="pill">${statusText}</span>
       </div>
       <h3>${esc(t.name)}</h3>
-      <div class="sub">${t.id==='platinum'?'100% of current active badges':`${need} badges • permanent once earned`}</div>
+      <div class="sub">${description}</div>
       <div class="progress top-gap"><span style="width:${progress}%"></span></div>
     </div>`;
   }).join('');
@@ -1280,7 +1359,8 @@ function openCompetitiveGame(room,game){
 function renderStats(){
   const tracked=activeTrackedBadgeIndices();
   const n=earnedCount(), here=tracked.filter(i=>availableHere(BADGES[i])&&!state.earned[i]).length, away=tracked.filter(i=>!availableHere(BADGES[i])&&!state.earned[i]).length;
-  $('statsCards').innerHTML=`<div class="stat"><span class="label">Earned</span><b>${n}</b></div><div class="stat"><span class="label">Available here</span><b>${here}</b></div><div class="stat"><span class="label">Other location</span><b>${away}</b></div><div class="stat"><span class="label">Pinned</span><b>${state.pins.length}</b></div>`;
+  const platinum=platinumProgressForLocation();
+  $('statsCards').innerHTML=`<div class="stat"><span class="label">Earned</span><b>${n}</b></div><div class="stat"><span class="label">Available here</span><b>${here}</b></div><div class="stat"><span class="label">Platinum here</span><b>${platinum.current}/${platinum.target}</b></div><div class="stat"><span class="label">Platinum</span><b>${platinum.percent}%</b></div>`;
   const byRoom={};BADGES.forEach((b,i)=>{if(state.earned[i])badgeSpecificRooms(b).forEach(r=>byRoom[r]=(byRoom[r]||0)+1)});
   $('roomStats').innerHTML=Object.entries(byRoom).sort((a,b)=>b[1]-a[1]).map(([r,c])=>`<div class="item row between"><span>${esc(r)}</span><b>${c}</b></div>`).join('')||'<div class="item sub">No room-specific badges earned yet.</div>';
   $('historyList').innerHTML=state.history.map(h=>`<div class="item"><b>${esc(BADGES[h.badge]?.name||'Badge')}</b><div class="sub">${esc(h.date||'')}</div></div>`).join('')||'<div class="item sub">No history yet.</div>';
@@ -2995,6 +3075,6 @@ function bindEvents(){
   onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();ensureContentState();applyContentCatalog();renderAll()}});
 }
 
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1393',{updateViaCache:'none'}).catch(console.error));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1394',{updateViaCache:'none'}).catch(console.error));
 init();
 installBackGuard();
