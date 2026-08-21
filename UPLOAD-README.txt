@@ -1,22 +1,20 @@
-ACTIVATE TRACKER v14.00 — COLLAPSIBLE LEVELS TEST
+ACTIVATE TRACKER v14.01 — FIT + HIGH-SCORE LIST
 
-Upload these files to the ROOT of the existing GitHub Pages repository, replacing index.html and sw.js:
+Upload ALL files in this ZIP to the ROOT of the GitHub repository.
+Replace index.html and sw.js when prompted.
 
+FILES
 - index.html
 - sw.js
-- typography-v1400.css
-- levels-accordion-v1400.js
+- typography-v1401.css
+- levels-accordion-v1401.js
 
-Do not delete the existing app.js, style.css, JSON files, icons or older typography files.
+CHANGES FROM v14.00
+- Trophy metric labels/values rolled back slightly so labels and venue names fit the cards again.
+- Trophy counter supporting type reduced slightly to avoid unnecessary wrapping.
+- Recent Achievements stays at the improved readable size.
+- Normal Levels view keeps Room > Game > Level accordions.
+- Venue High Scores is now a simple flat list with Room, Game, Level and score. No accordion.
+- Large Fold navigation menu is retained.
 
-What this test changes:
-- Levels: rooms collapse/expand.
-- Levels: co-op games collapse/expand inside each room.
-- Level rows and game/room headings are larger and more touch-friendly.
-- Room headers show a compact progress summary.
-- Open rooms/games stay open while filters/re-renders update the page.
-- Recent Achievements text/rows are larger.
-- Fold portrait menu is much wider and larger.
-- Fold landscape menu uses a wider two-column layout rather than shrinking the labels.
-
-After GitHub Pages deploys, fully close/reopen the installed PWA once if the old service worker is still visible.
+After upload, allow GitHub Pages a short time to deploy. If the installed PWA still shows the previous build, fully close/reopen it or refresh once so the v14.01 service-worker cache takes over.
