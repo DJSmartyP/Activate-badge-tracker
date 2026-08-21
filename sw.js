@@ -1,10 +1,10 @@
-const CACHE='activate-tracker-v14-01-0';
+const CACHE='activate-tracker-v14-03-0';
 const ASSETS=[
   './',
   'index.html',
   'style.css?v=1397',
-  'typography-v1401.css?v=1401',
-  'levels-accordion-v1401.js?v=1401',
+  'typography-v1403.css?v=1403',
+  'levels-accordion-v1403.js?v=1403',
   'app.js?v=1397',
   'badges.json','rooms.json','manifest.webmanifest',
   'icon-192.png?v=131','icon-512.png?v=131','icon-maskable-512.png?v=131','favicon-64.png?v=131',
