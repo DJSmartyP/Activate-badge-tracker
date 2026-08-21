@@ -1,17 +1,16 @@
-ACTIVATE TRACKER v14.06 — GROUPED ANIMATED VENUE HIGH SCORES
+ACTIVATE TRACKER v14.07 — STRONGER LEVEL STATE BACKGROUNDS
 
 Upload ALL files in this package to the ROOT of your GitHub Pages repository, replacing files when prompted:
 
 - index.html
 - sw.js
-- typography-v1406.css
-- levels-accordion-v1406.js
+- typography-v1407.css
+- levels-accordion-v1407.js
 
-Changes in v14.06:
-- Venue High Scores remains a flat, non-accordion list.
-- High scores are grouped by ROOM and then by GAME using clear headers.
-- Each individual level high-score card keeps the same animated neon high-score treatment as its counterpart in the normal Levels list.
-- Expand all / Collapse all remains available for every accordion view and hidden only in Venue High Scores.
-- v14.04 centred tick/cross indicators are retained.
+Changes in v14.07:
+- Completed level entries now have a more pronounced green background tint, border and glow.
+- Incomplete level entries now have a more pronounced red/pink background tint, border and glow.
+- High-score rows keep their separate neon high-score styling.
+- Room/game grouping, accordion behaviour and expanded/collapsed controls are unchanged.
 
-After upload, allow GitHub Pages a short time to deploy. If the installed PWA still shows the previous build, fully close/reopen it or refresh once so the v14.06 service-worker cache takes over.
+After upload, allow GitHub Pages a short time to deploy. If the installed PWA still shows the previous build, fully close/reopen it or refresh once so the v14.07 service-worker cache takes over.
