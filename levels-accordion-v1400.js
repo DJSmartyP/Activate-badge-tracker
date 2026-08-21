@@ -1,0 +1,151 @@
+(() => {
+  'use strict';
+
+  const LEVELS_LIST_ID = 'levelsList';
+  const openRooms = new Set();
+  const openGames = new Set();
+  let enhancing = false;
+
+  function text(el) {
+    return (el?.textContent || '').trim();
+  }
+
+  function roomMeta(roomGames) {
+    const cards = [...roomGames.querySelectorAll(':scope > .room-game-card')];
+    const chips = [...roomGames.querySelectorAll('.level-chip')];
+    const completed = chips.filter(chip => chip.classList.contains('level-chip-done')).length;
+    const played = cards.filter(card => card.classList.contains('played-card')).length;
+
+    if (chips.length) return `${completed}/${chips.length} visible levels complete · ${cards.length} games`;
+    return `${played}/${cards.length} games played`;
+  }
+
+  function gameKey(room, game) {
+    return `${room}||${game}`;
+  }
+
+  function enhanceGameCard(card, room, selectedGame) {
+    const levelGrid = card.querySelector(':scope > .level-grid');
+    const head = card.querySelector(':scope > .room-game-head');
+    if (!levelGrid || !head || card.matches('details')) return card;
+
+    const game = text(head.querySelector('strong')) || 'Game';
+    const details = document.createElement('details');
+    details.className = `${card.className} levels-game-accordion`;
+    details.dataset.levelsAccordion = 'game';
+    details.dataset.room = room;
+    details.dataset.game = game;
+
+    const summary = document.createElement('summary');
+    summary.className = 'levels-game-summary';
+    summary.appendChild(head);
+    details.append(summary, levelGrid);
+
+    if (openGames.has(gameKey(room, game)) || (selectedGame && selectedGame === game)) {
+      details.open = true;
+    }
+
+    card.replaceWith(details);
+    return details;
+  }
+
+  function enhanceRoomSection(section, selectedRoom, selectedGame) {
+    const title = section.querySelector(':scope > .room-title-row h3');
+    const roomGames = section.querySelector(':scope > .room-games');
+    if (!title || !roomGames) return;
+
+    const room = text(title) || 'Room';
+    const details = document.createElement('details');
+    details.className = `${section.className} levels-room-accordion`;
+    details.dataset.levelsAccordion = 'room';
+    details.dataset.room = room;
+
+    const summary = document.createElement('summary');
+    summary.className = 'levels-room-summary';
+
+    const copy = document.createElement('span');
+    copy.className = 'levels-room-copy';
+
+    const kicker = document.createElement('span');
+    kicker.className = 'levels-room-kicker';
+    kicker.textContent = 'Room';
+
+    const name = document.createElement('strong');
+    name.className = 'levels-room-name';
+    name.textContent = room;
+
+    const meta = document.createElement('span');
+    meta.className = 'levels-room-meta';
+    meta.textContent = roomMeta(roomGames);
+
+    copy.append(kicker, name);
+    summary.append(copy, meta);
+    details.append(summary, roomGames);
+
+    if (openRooms.has(room) || (selectedRoom && selectedRoom === room)) {
+      details.open = true;
+    }
+
+    section.replaceWith(details);
+
+    [...roomGames.querySelectorAll(':scope > .room-game-card.coop-game')]
+      .forEach(card => enhanceGameCard(card, room, selectedGame));
+  }
+
+  function enhanceLevels() {
+    const list = document.getElementById(LEVELS_LIST_ID);
+    if (!list || enhancing) return;
+
+    const sections = [...list.querySelectorAll(':scope > .room-section:not([data-levels-accordion])')];
+    if (!sections.length) return;
+
+    enhancing = true;
+    try {
+      const selectedRoom = document.getElementById('levelsRoom')?.value || '';
+      const selectedGame = document.getElementById('levelsGame')?.value || '';
+      sections.forEach(section => enhanceRoomSection(section, selectedRoom, selectedGame));
+    } finally {
+      enhancing = false;
+    }
+  }
+
+  function rememberToggle(event) {
+    const details = event.target;
+    if (!(details instanceof HTMLDetailsElement)) return;
+    if (details.dataset.levelsAccordion === 'room') {
+      const room = details.dataset.room || '';
+      if (!room) return;
+      if (details.open) openRooms.add(room);
+      else openRooms.delete(room);
+      return;
+    }
+    if (details.dataset.levelsAccordion === 'game') {
+      const room = details.dataset.room || '';
+      const game = details.dataset.game || '';
+      const key = gameKey(room, game);
+      if (!room || !game) return;
+      if (details.open) openGames.add(key);
+      else openGames.delete(key);
+    }
+  }
+
+  function start() {
+    const list = document.getElementById(LEVELS_LIST_ID);
+    if (!list) return;
+
+    document.addEventListener('toggle', rememberToggle, true);
+
+    const observer = new MutationObserver(() => {
+      if (!enhancing) queueMicrotask(enhanceLevels);
+    });
+    observer.observe(list, { childList: true, subtree: false });
+
+    enhanceLevels();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start, { once: true });
+  } else {
+    start();
+  }
+})();
