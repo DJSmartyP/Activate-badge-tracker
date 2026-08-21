@@ -1,16 +1,17 @@
-ACTIVATE TRACKER v14.09 — GREEN HIGH-SCORE TILES EVERYWHERE
+ACTIVATE TRACKER v14.11 — GAME DROPDOWN MODE SEPARATORS
 
 Upload ALL files in this package to the ROOT of your GitHub Pages repository, replacing files when prompted:
 
 - index.html
 - sw.js
-- typography-v1409.css
-- levels-accordion-v1409.js
+- typography-v1411.css
+- levels-accordion-v1411.js
+- levels-game-dropdown-v1411.js
 
-Changes in v14.09:
-- High-score level tiles in the normal Levels list now have the same green body tint as Venue High Scores.
-- The animated cyan/pink high-score frame remains intact.
-- Completed levels remain green and incomplete levels remain red/pink.
-- Accordion, grouping and bulk expand/collapse behaviour are unchanged.
+Changes in v14.11:
+- In Levels, once a room is selected, the Game dropdown is no longer one flat alphabetical list.
+- It now shows a disabled separator line "-- CO-OP --" followed by co-op games.
+- Then it shows a disabled separator line "-- COMPETITIVE --" followed by competitive games.
+- Current high-score tinting, accordion behaviour and other recent UI changes are unchanged.
 
-After upload, allow GitHub Pages a short time to deploy. If the installed PWA still shows the previous build, fully close/reopen it or refresh once so the v14.09 service-worker cache takes over.
+After upload, allow GitHub Pages a short time to deploy. If the installed PWA still shows the previous build, fully close/reopen it or refresh once so the v14.11 service-worker cache takes over.
