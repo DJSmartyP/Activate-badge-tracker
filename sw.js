@@ -1,8 +1,9 @@
-const CACHE='activate-tracker-v13-97-0';
+const CACHE='activate-tracker-v13-98-0';
 const ASSETS=[
   './',
   'index.html',
   'style.css?v=1397',
+  'typography-v1398.css?v=1398',
   'app.js?v=1397',
   'badges.json','rooms.json','manifest.webmanifest',
   'icon-192.png?v=131','icon-512.png?v=131','icon-maskable-512.png?v=131','favicon-64.png?v=131',
@@ -28,7 +29,6 @@ self.addEventListener('fetch', event => {
   const isArtwork = /\.(png|jpg|jpeg|webp)$/i.test(url.pathname);
 
   if (isArtwork) {
-    // Network-first so replacing an image in GitHub is visible immediately.
     event.respondWith((async () => {
       try {
         const fresh = await fetch(event.request,{cache:'no-store'});
@@ -42,7 +42,6 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // App shell: network first, cached fallback.
   event.respondWith((async () => {
     try {
       const fresh = await fetch(event.request,{cache:'no-store'});

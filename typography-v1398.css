@@ -1,0 +1,740 @@
+/* =========================================================
+   ACTIVATE TRACKER v13.98 — PHONE / FOLD TYPOGRAPHY
+   Actual font-size changes only: no page zoom/transform scaling.
+   Landscape is deliberately at least as readable as portrait.
+   ========================================================= */
+
+html,
+body{
+  -webkit-text-size-adjust:100% !important;
+  text-size-adjust:100% !important;
+}
+
+/* =========================================================
+   PORTRAIT PHONE / FOLD
+   ========================================================= */
+@media (orientation:portrait) and (max-width:900px){
+
+  html,
+  body{
+    font-size:20px !important;
+  }
+
+  /* Global supporting copy */
+  .sub,
+  .label{
+    font-size:18.5px !important;
+    line-height:1.16 !important;
+  }
+
+  .mini{
+    font-size:17px !important;
+    line-height:1.14 !important;
+  }
+
+  .detail{
+    font-size:19px !important;
+    line-height:1.20 !important;
+  }
+
+  .detail strong{
+    font-size:17px !important;
+  }
+
+  .checkline{
+    font-size:18px !important;
+  }
+
+  .section-title h2,
+  .card > h2,
+  .card > .row h2{
+    font-size:24px !important;
+    line-height:1.04 !important;
+  }
+
+  .card h3{
+    font-size:23px !important;
+    line-height:1.06 !important;
+  }
+
+  /* Page header */
+  .page-header-title,
+  .page-bar h1,
+  #pageHeaderTitle{
+    font-size:41px !important;
+    line-height:.92 !important;
+  }
+
+  .page-header-subtitle,
+  #pageHeaderSubtitle{
+    font-size:19px !important;
+    line-height:1 !important;
+  }
+
+  /* Controls */
+  .btn,
+  .seg-btn,
+  .icon-label-btn,
+  .pin-button,
+  .toggle,
+  .content-row-actions button,
+  input,
+  select,
+  textarea,
+  button{
+    font-size:20px !important;
+  }
+
+  .field > label,
+  .field .label{
+    font-size:18px !important;
+  }
+
+  /* Chips / tags */
+  .pill,
+  .tag,
+  .selected-pill,
+  .mode-pill,
+  .mode-tag,
+  .status-tag,
+  .play-state-pill,
+  .competitive-pill,
+  .coop-tag,
+  .award-legacy-tag,
+  .availability-tag,
+  .content-archived-pill{
+    font-size:16px !important;
+    line-height:1 !important;
+  }
+
+  .high-score-tag,
+  .target-card.pinned-target::after{
+    font-size:14.5px !important;
+  }
+
+  /* Home trophy dashboard */
+  .home-trophy-title-copy .label{
+    font-size:19px !important;
+  }
+
+  .home-trophy-title-copy .sub{
+    font-size:18px !important;
+    line-height:1.08 !important;
+  }
+
+  .trophy-current-name{
+    font-size:clamp(72px,17vw,96px) !important;
+    line-height:.80 !important;
+  }
+
+  .trophy-counter-inner strong{
+    font-size:31px !important;
+  }
+
+  .trophy-counter-inner small,
+  .home-trophy-live .trophy-counter-inner small{
+    font-size:16px !important;
+  }
+
+  .trophy-counter-copy span:last-child{
+    font-size:17px !important;
+  }
+
+  .metric .label{
+    font-size:17px !important;
+    line-height:1.04 !important;
+  }
+
+  .metric b{
+    font-size:31px !important;
+    line-height:1 !important;
+  }
+
+  /* Recent achievements */
+  .home-achievement-copy b{
+    font-size:20px !important;
+    line-height:1.04 !important;
+  }
+
+  .home-achievement-copy small{
+    font-size:16px !important;
+    line-height:1 !important;
+  }
+
+  .home-achievement-rank{
+    font-size:17px !important;
+  }
+
+  .home-achievement-empty{
+    font-size:17px !important;
+  }
+
+  /* Badges / pinned targets */
+  .badge h3,
+  .target-card h3,
+  .badge.target-card h3{
+    font-size:24px !important;
+    line-height:1.04 !important;
+  }
+
+  .badge p,
+  .target-card p,
+  .badge.target-card p{
+    font-size:19px !important;
+    line-height:1.16 !important;
+  }
+
+  .target-card .sub,
+  .badge.target-card .sub{
+    font-size:18.5px !important;
+    line-height:1.08 !important;
+  }
+
+  .target-card .tag,
+  .badge.target-card .tag{
+    font-size:16px !important;
+  }
+
+  /* Levels / games */
+  .level-room-heading strong{
+    font-size:23px !important;
+  }
+
+  .level-room-heading span{
+    font-size:18px !important;
+  }
+
+  .room-title-row .room-label{
+    font-size:17px !important;
+  }
+
+  .room-title-row h3{
+    font-size:28px !important;
+  }
+
+  .room-game-head strong{
+    font-size:23px !important;
+  }
+
+  .game-kind{
+    font-size:17px !important;
+  }
+
+  .game-card-room{
+    font-size:20px !important;
+  }
+
+  .game-how strong{
+    font-size:18px !important;
+  }
+
+  .level-number{
+    font-size:17px !important;
+  }
+
+  .level-chip-main strong{
+    font-size:21px !important;
+  }
+
+  .level-chip-main span{
+    font-size:17px !important;
+  }
+
+  .your-score{
+    font-size:23px !important;
+  }
+
+  .top-score{
+    font-size:17px !important;
+  }
+
+  /* Locations / stats / content manager */
+  .selected-venue-banner strong{
+    font-size:25px !important;
+  }
+
+  .competitive-check-box{
+    font-size:26px !important;
+  }
+
+  .stat .label{
+    font-size:17px !important;
+  }
+
+  .stat b{
+    font-size:35px !important;
+  }
+
+  .csv-report-head h4{
+    font-size:24px !important;
+  }
+
+  .csv-report-chip{
+    font-size:16px !important;
+  }
+
+  .csv-report-item,
+  .csv-report-summary,
+  .csv-report-empty,
+  .content-manager-row,
+  .content-badge-part,
+  .content-check-row{
+    font-size:17px !important;
+  }
+
+  .content-main-button strong{
+    font-size:22px !important;
+  }
+
+  .content-main-button span{
+    font-size:17px !important;
+  }
+
+  /* Side menu — deliberately larger than v13.97 */
+  .side-drawer{
+    width:min(390px,88vw) !important;
+  }
+
+  .side-drawer-head .label{
+    font-size:17px !important;
+  }
+
+  .side-drawer-head strong{
+    font-size:26px !important;
+  }
+
+  .drawer-close{
+    width:48px !important;
+    height:48px !important;
+    font-size:24px !important;
+  }
+
+  .drawer-nav{
+    gap:10px !important;
+  }
+
+  .drawer-nav button,
+  .side-drawer .drawer-nav button{
+    min-height:72px !important;
+    padding:13px 16px !important;
+    gap:16px !important;
+    font-size:25px !important;
+    line-height:1 !important;
+  }
+
+  .drawer-icon-img,
+  .side-drawer .drawer-icon-img,
+  .side-drawer .drawer-nav button.active .drawer-icon-img,
+  .side-drawer .drawer-nav button[aria-current="page"] .drawer-icon-img{
+    width:44px !important;
+    height:44px !important;
+    flex-basis:44px !important;
+  }
+
+  /* Hamburger button */
+  .app-header-shell .page-bar .drawer-menu-btn,
+  .page-bar .drawer-menu-btn{
+    width:62px !important;
+    min-width:62px !important;
+    height:62px !important;
+    min-height:62px !important;
+  }
+
+  .drawer-menu-icon{
+    width:36px !important;
+    height:36px !important;
+  }
+
+  /* Focus mode */
+  #focusOverlayBody .focus-meta{
+    font-size:20px !important;
+  }
+
+  #focusOverlayBody .detail{
+    font-size:20px !important;
+  }
+
+  #focusOverlayBody .detail strong{
+    font-size:18px !important;
+  }
+
+  #focusOverlay .focus-actions .btn{
+    font-size:20px !important;
+  }
+
+  #focusOverlay #focusPosition{
+    font-size:18px !important;
+  }
+}
+
+/* =========================================================
+   LANDSCAPE PHONE / OPEN FOLD
+   IMPORTANT: does NOT depend on max-width:640px.
+   This fixes the previous Fold landscape regression.
+   ========================================================= */
+@media (orientation:landscape) and (max-width:1180px) and (max-height:900px){
+
+  html,
+  body{
+    font-size:22px !important;
+  }
+
+  /* Global supporting copy */
+  .sub,
+  .label{
+    font-size:20px !important;
+    line-height:1.14 !important;
+  }
+
+  .mini{
+    font-size:18.5px !important;
+    line-height:1.12 !important;
+  }
+
+  .detail{
+    font-size:21px !important;
+    line-height:1.18 !important;
+  }
+
+  .detail strong{
+    font-size:18.5px !important;
+  }
+
+  .checkline{
+    font-size:20px !important;
+  }
+
+  .section-title h2,
+  .card > h2,
+  .card > .row h2{
+    font-size:27px !important;
+    line-height:1.02 !important;
+  }
+
+  .card h3{
+    font-size:26px !important;
+    line-height:1.04 !important;
+  }
+
+  /* Page header */
+  .page-header-title,
+  .page-bar h1,
+  #pageHeaderTitle{
+    font-size:42px !important;
+    line-height:.92 !important;
+  }
+
+  .page-header-subtitle,
+  #pageHeaderSubtitle{
+    font-size:20px !important;
+    line-height:1 !important;
+  }
+
+  /* Controls */
+  .btn,
+  .seg-btn,
+  .icon-label-btn,
+  .pin-button,
+  .toggle,
+  .content-row-actions button,
+  input,
+  select,
+  textarea,
+  button{
+    font-size:22px !important;
+  }
+
+  .field > label,
+  .field .label{
+    font-size:20px !important;
+  }
+
+  /* Chips / tags */
+  .pill,
+  .tag,
+  .selected-pill,
+  .mode-pill,
+  .mode-tag,
+  .status-tag,
+  .play-state-pill,
+  .competitive-pill,
+  .coop-tag,
+  .award-legacy-tag,
+  .availability-tag,
+  .content-archived-pill{
+    font-size:18px !important;
+    line-height:1 !important;
+  }
+
+  .high-score-tag,
+  .target-card.pinned-target::after{
+    font-size:16px !important;
+  }
+
+  /* Home trophy dashboard */
+  .home-trophy-title-copy .label{
+    font-size:21px !important;
+  }
+
+  .home-trophy-title-copy .sub{
+    font-size:20px !important;
+    line-height:1.06 !important;
+  }
+
+  .trophy-current-name{
+    font-size:clamp(74px,9vw,104px) !important;
+    line-height:.78 !important;
+  }
+
+  .trophy-counter-inner strong{
+    font-size:34px !important;
+  }
+
+  .trophy-counter-inner small,
+  .home-trophy-live .trophy-counter-inner small{
+    font-size:18px !important;
+  }
+
+  .trophy-counter-copy span:last-child{
+    font-size:19px !important;
+  }
+
+  .metric .label{
+    font-size:19px !important;
+    line-height:1.03 !important;
+  }
+
+  .metric b{
+    font-size:34px !important;
+    line-height:1 !important;
+  }
+
+  /* Recent achievements */
+  .home-achievement-copy b{
+    font-size:22px !important;
+    line-height:1.02 !important;
+  }
+
+  .home-achievement-copy small{
+    font-size:18px !important;
+    line-height:1 !important;
+  }
+
+  .home-achievement-rank{
+    font-size:19px !important;
+  }
+
+  .home-achievement-empty{
+    font-size:19px !important;
+  }
+
+  /* Badges / pinned targets */
+  .badge h3,
+  .target-card h3,
+  .badge.target-card h3{
+    font-size:27px !important;
+    line-height:1.02 !important;
+  }
+
+  .badge p,
+  .target-card p,
+  .badge.target-card p{
+    font-size:21px !important;
+    line-height:1.14 !important;
+  }
+
+  .target-card .sub,
+  .badge.target-card .sub{
+    font-size:20.5px !important;
+    line-height:1.06 !important;
+  }
+
+  .target-card .tag,
+  .badge.target-card .tag{
+    font-size:18px !important;
+  }
+
+  /* Levels / games */
+  .level-room-heading strong{
+    font-size:26px !important;
+  }
+
+  .level-room-heading span{
+    font-size:20px !important;
+  }
+
+  .room-title-row .room-label{
+    font-size:19px !important;
+  }
+
+  .room-title-row h3{
+    font-size:31px !important;
+  }
+
+  .room-game-head strong{
+    font-size:26px !important;
+  }
+
+  .game-kind{
+    font-size:19px !important;
+  }
+
+  .game-card-room{
+    font-size:22px !important;
+  }
+
+  .game-how strong{
+    font-size:20px !important;
+  }
+
+  .level-number{
+    font-size:19px !important;
+  }
+
+  .level-chip-main strong{
+    font-size:23px !important;
+  }
+
+  .level-chip-main span{
+    font-size:19px !important;
+  }
+
+  .your-score{
+    font-size:25px !important;
+  }
+
+  .top-score{
+    font-size:19px !important;
+  }
+
+  /* Locations / stats / content manager */
+  .selected-venue-banner strong{
+    font-size:28px !important;
+  }
+
+  .competitive-check-box{
+    font-size:29px !important;
+  }
+
+  .stat .label{
+    font-size:19px !important;
+  }
+
+  .stat b{
+    font-size:38px !important;
+  }
+
+  .csv-report-head h4{
+    font-size:27px !important;
+  }
+
+  .csv-report-chip{
+    font-size:18px !important;
+  }
+
+  .csv-report-item,
+  .csv-report-summary,
+  .csv-report-empty,
+  .content-manager-row,
+  .content-badge-part,
+  .content-check-row{
+    font-size:19px !important;
+  }
+
+  .content-main-button strong{
+    font-size:25px !important;
+  }
+
+  .content-main-button span{
+    font-size:19px !important;
+  }
+
+  /* Side menu */
+  .side-drawer{
+    width:min(430px,48vw) !important;
+  }
+
+  .side-drawer-head .label{
+    font-size:19px !important;
+  }
+
+  .side-drawer-head strong{
+    font-size:29px !important;
+  }
+
+  .drawer-close{
+    width:52px !important;
+    height:52px !important;
+    font-size:26px !important;
+  }
+
+  .drawer-nav{
+    gap:10px !important;
+  }
+
+  .drawer-nav button,
+  .side-drawer .drawer-nav button{
+    min-height:76px !important;
+    padding:14px 18px !important;
+    gap:18px !important;
+    font-size:27px !important;
+    line-height:1 !important;
+  }
+
+  .drawer-icon-img,
+  .side-drawer .drawer-icon-img,
+  .side-drawer .drawer-nav button.active .drawer-icon-img,
+  .side-drawer .drawer-nav button[aria-current="page"] .drawer-icon-img{
+    width:48px !important;
+    height:48px !important;
+    flex-basis:48px !important;
+  }
+
+  /* Hamburger button */
+  .app-header-shell .page-bar .drawer-menu-btn,
+  .page-bar .drawer-menu-btn{
+    width:64px !important;
+    min-width:64px !important;
+    height:64px !important;
+    min-height:64px !important;
+  }
+
+  .drawer-menu-icon{
+    width:38px !important;
+    height:38px !important;
+  }
+
+  /* Focus mode */
+  #focusOverlayBody .focus-meta{
+    font-size:22px !important;
+  }
+
+  #focusOverlayBody .detail{
+    font-size:22px !important;
+  }
+
+  #focusOverlayBody .detail strong{
+    font-size:20px !important;
+  }
+
+  #focusOverlay .focus-actions .btn{
+    font-size:22px !important;
+  }
+
+  #focusOverlay #focusPosition{
+    font-size:20px !important;
+  }
+}
+
+/* Very short landscape: keep the larger type and allow scrolling.
+   Do not re-introduce the old compact-font behaviour. */
+@media (orientation:landscape) and (max-width:1180px) and (max-height:560px){
+  .view.active{
+    overflow-y:auto !important;
+  }
+
+  .drawer-nav button,
+  .side-drawer .drawer-nav button{
+    min-height:70px !important;
+  }
+}
