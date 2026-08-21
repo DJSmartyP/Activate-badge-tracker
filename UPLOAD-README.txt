@@ -1,16 +1,16 @@
-ACTIVATE TRACKER v14.08 — GREEN-TINTED VENUE HIGH SCORES
+ACTIVATE TRACKER v14.09 — GREEN HIGH-SCORE TILES EVERYWHERE
 
 Upload ALL files in this package to the ROOT of your GitHub Pages repository, replacing files when prompted:
 
 - index.html
 - sw.js
-- typography-v1408.css
-- levels-accordion-v1408.js
+- typography-v1409.css
+- levels-accordion-v1409.js
 
-Changes in v14.08:
-- Venue High Score level cards now have a clear green-tinted background.
-- The existing animated cyan/pink high-score border remains intact.
-- v14.07 stronger green completed and red incomplete level backgrounds are retained.
-- Room/game grouping and all accordion controls are unchanged.
+Changes in v14.09:
+- High-score level tiles in the normal Levels list now have the same green body tint as Venue High Scores.
+- The animated cyan/pink high-score frame remains intact.
+- Completed levels remain green and incomplete levels remain red/pink.
+- Accordion, grouping and bulk expand/collapse behaviour are unchanged.
 
-After upload, allow GitHub Pages a short time to deploy. If the installed PWA still shows the previous build, fully close/reopen it or refresh once so the v14.08 service-worker cache takes over.
+After upload, allow GitHub Pages a short time to deploy. If the installed PWA still shows the previous build, fully close/reopen it or refresh once so the v14.09 service-worker cache takes over.
