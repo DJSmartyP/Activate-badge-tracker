@@ -1,12 +1,11 @@
-const CACHE='activate-tracker-v14-11-0';
+const CACHE='activate-tracker-v14-12-0';
 const ASSETS=[
   './',
   'index.html',
   'style.css?v=1397',
-  'typography-v1411.css?v=1411',
-  'levels-accordion-v1411.js?v=1411',
+  'typography-v1412.css?v=1412',
+  'levels-accordion-v1412.js?v=1412',
   'app.js?v=1397',
-  'levels-game-dropdown-v1411.js?v=1411',
   'badges.json','rooms.json','manifest.webmanifest',
   'icon-192.png?v=131','icon-512.png?v=131','icon-maskable-512.png?v=131','favicon-64.png?v=131',
   'icons/home.svg?v=1386','icons/badges.svg?v=1386','icons/levels.svg?v=1386','icons/competitive.svg?v=1386','icons/locations.svg?v=1386','icons/stats.svg?v=1386','icons/settings.svg?v=1386','icons/menu.svg','icons/more.svg','icons/backup.svg','icons/restore.svg',
