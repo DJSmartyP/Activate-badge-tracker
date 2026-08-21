@@ -12209,3 +12209,293 @@ button{
     font-size:19px !important;
   }
 }
+
+
+/* =========================================================
+   v13.96 — MAXIMUM MOBILE TYPE DENSITY
+   Deliberately aggressive type enlargement using the live
+   selectors. No widths/heights/padding/grid geometry changed.
+   ========================================================= */
+
+@media (max-width: 640px){
+
+  html, body{
+    font-size:18px !important;
+    -webkit-text-size-adjust:100% !important;
+    text-size-adjust:100% !important;
+  }
+
+  /* Global secondary copy */
+  .sub,
+  .label{
+    font-size:17px !important;
+    line-height:1.18 !important;
+  }
+
+  .mini{
+    font-size:16px !important;
+  }
+
+  .section-title h2{
+    font-size:22px !important;
+    line-height:1.08 !important;
+  }
+
+  /* Header */
+  .page-header-title{
+    font-size:36px !important;
+    line-height:.96 !important;
+  }
+
+  .page-header-subtitle{
+    font-size:17px !important;
+    line-height:1 !important;
+  }
+
+  /* Home trophy panel */
+  .home-trophy-title-copy .label{
+    font-size:17px !important;
+  }
+
+  .home-trophy-title-copy .sub{
+    font-size:16px !important;
+    line-height:1.12 !important;
+  }
+
+  .trophy-current-name{
+    font-size:clamp(64px,15.5vw,84px) !important;
+    line-height:.82 !important;
+  }
+
+  .trophy-counter-inner strong{
+    font-size:27px !important;
+    line-height:1 !important;
+  }
+
+  .trophy-counter-inner small,
+  .home-trophy-live .trophy-counter-inner small{
+    font-size:14px !important;
+    line-height:1 !important;
+  }
+
+  .trophy-counter-copy span:last-child{
+    font-size:15px !important;
+  }
+
+  /* Dashboard metric boxes */
+  .metric .label{
+    font-size:15px !important;
+    line-height:1.05 !important;
+  }
+
+  .metric b{
+    font-size:27px !important;
+    line-height:1 !important;
+  }
+
+  /* Last achievements */
+  .home-achievement-copy b{
+    font-size:17px !important;
+    line-height:1.05 !important;
+  }
+
+  .home-achievement-copy small{
+    font-size:14px !important;
+    line-height:1 !important;
+  }
+
+  .home-achievement-rank{
+    font-size:15px !important;
+  }
+
+  .home-achievement-empty{
+    font-size:15px !important;
+  }
+
+  /* Pinned badges / badge cards */
+  .badge h3,
+  .target-card h3,
+  .badge.target-card h3{
+    font-size:21px !important;
+    line-height:1.06 !important;
+  }
+
+  .badge p,
+  .target-card p,
+  .badge.target-card p{
+    font-size:17px !important;
+    line-height:1.16 !important;
+  }
+
+  .target-card .sub,
+  .badge.target-card .sub{
+    font-size:17px !important;
+    line-height:1.08 !important;
+  }
+
+  .pill,
+  .tag,
+  .selected-pill,
+  .mode-pill,
+  .mode-tag,
+  .status-tag,
+  .play-state-pill,
+  .competitive-pill,
+  .coop-tag,
+  .award-legacy-tag,
+  .availability-tag,
+  .content-archived-pill{
+    font-size:14.5px !important;
+    line-height:1 !important;
+  }
+
+  /* Buttons */
+  .btn,
+  .seg-btn,
+  .icon-label-btn,
+  .checkbtn,
+  .pin-button,
+  .toggle,
+  .content-row-actions button{
+    font-size:18px !important;
+    line-height:1 !important;
+  }
+
+  /* Levels */
+  .level-room-heading strong{
+    font-size:21px !important;
+  }
+
+  .level-room-heading span{
+    font-size:16px !important;
+  }
+
+  .room-title-row .room-label{
+    font-size:15px !important;
+  }
+
+  .room-title-row h3{
+    font-size:25px !important;
+  }
+
+  .room-game-head strong{
+    font-size:21px !important;
+  }
+
+  .game-kind{
+    font-size:15px !important;
+  }
+
+  .game-card-room{
+    font-size:18px !important;
+  }
+
+  .game-how strong{
+    font-size:16px !important;
+  }
+
+  .level-number{
+    font-size:15px !important;
+  }
+
+  .level-chip-main strong{
+    font-size:19px !important;
+  }
+
+  .level-chip-main span{
+    font-size:15px !important;
+  }
+
+  .your-score{
+    font-size:21px !important;
+  }
+
+  .top-score{
+    font-size:15px !important;
+  }
+
+  /* Locations / Competitive / Stats */
+  .selected-venue-banner strong{
+    font-size:23px !important;
+  }
+
+  .competitive-check-box{
+    font-size:24px !important;
+  }
+
+  .stat .label{
+    font-size:15px !important;
+  }
+
+  .stat b{
+    font-size:32px !important;
+  }
+
+  /* Forms */
+  input,
+  select,
+  textarea,
+  button{
+    font-size:18px !important;
+  }
+
+  .field > label,
+  .field .label{
+    font-size:16px !important;
+  }
+
+  /* Drawer */
+  .drawer-nav button{
+    font-size:21px !important;
+  }
+
+  /* Focus mode */
+  #focusOverlayBody .focus-meta{
+    font-size:18px !important;
+  }
+
+  #focusOverlayBody .detail{
+    font-size:18px !important;
+  }
+
+  #focusOverlayBody .detail strong{
+    font-size:16px !important;
+  }
+
+  #focusOverlay .focus-actions .btn{
+    font-size:18px !important;
+  }
+
+  #focusOverlay #focusPosition{
+    font-size:16px !important;
+  }
+}
+
+/* Very narrow cover-screen layouts: still keep text deliberately large. */
+@media (max-width: 390px){
+  html, body{
+    font-size:17px !important;
+  }
+
+  .page-header-title{
+    font-size:33px !important;
+  }
+
+  .page-header-subtitle{
+    font-size:16px !important;
+  }
+
+  .trophy-current-name{
+    font-size:clamp(60px,16vw,78px) !important;
+  }
+
+  .metric b{
+    font-size:25px !important;
+  }
+
+  .badge h3,
+  .target-card h3,
+  .badge.target-card h3{
+    font-size:20px !important;
+  }
+}
