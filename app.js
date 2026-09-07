@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='14.13.1';
+const VERSION='14.14.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 const ACTIVATE_SCORES_UPSTREAM='https://activate-scores-be.herokuapp.com';
@@ -20,7 +20,7 @@ let levelsDisplayMode='levels';
 let contentManagerTab='rooms';
 let contentEditing=null;
 const defaultState=()=>({
-  schemaVersion:3,
+  schemaVersion:4,
   playerName:"",
   playerBrandColor:"#FF4FB3",
   playerProfile:null,
@@ -36,6 +36,7 @@ const defaultState=()=>({
     platinum:{earned:false,earnedAt:null}
   },
   earned:{},
+  badgeProgress:{},
   pins:[],
   notes:{},
   history:[],
@@ -48,7 +49,7 @@ const defaultState=()=>({
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function playerKey(value){return normalisePlayerName(value).toLowerCase()}
-const PLAYER_STATE_FIELDS=['playerName','playerBrandColor','playerProfile','locations','activeLocation','earned','badgeAwards','history','trophies','pins','notes','levelProgressByLocation'];
+const PLAYER_STATE_FIELDS=['playerName','playerBrandColor','playerProfile','locations','activeLocation','earned','badgeProgress','badgeAwards','history','trophies','pins','notes','levelProgressByLocation'];
 function profileSnapshot(){
   const snapshot={};
   PLAYER_STATE_FIELDS.forEach(field=>snapshot[field]=structuredClone(state[field]));
@@ -69,8 +70,9 @@ function loadPlayerProfile(key){
   if(!profile)return false;
   persistActivePlayer();
   suspendPlayerCapture=true;
+  const defaults=defaultState();
   PLAYER_STATE_FIELDS.forEach(field=>{
-    if(profile[field]!==undefined)state[field]=structuredClone(profile[field]);
+    state[field]=structuredClone(profile[field]!==undefined?profile[field]:defaults[field]);
   });
   state.activePlayerKey=key;
   state.playerProfile={...(state.playerProfile||{}),name:profile.name||state.playerName,syncedAt:profile.syncedAt||state.playerProfile?.syncedAt||null};
@@ -1002,6 +1004,7 @@ function loadState(){
   state.pins=Array.isArray(state.pins)?[...new Set(state.pins.map(Number).filter(Number.isInteger))].slice(0,MAX_PINS):[];
   state.history=Array.isArray(state.history)?state.history:[];
   state.earned=state.earned||{};
+  state.badgeProgress=state.badgeProgress||{};
   state.notes=state.notes||{};
   if(state.playerName===undefined || state.playerName===null)state.playerName='';
   state.playerName=normalisePlayerName(state.playerName);
@@ -1285,6 +1288,22 @@ function recentBadgeIndices(){
   }).slice(0,8);
 }
 
+function badgeProgressMarkup(index,{detail=false}={}){
+  const remote=state.badgeProgress?.[index];
+  if(!remote)return '';
+  const progress=Math.max(0,Number(remote.progress)||0);
+  const total=Math.max(0,Number(remote.totalProgress)||0);
+  const complete=!!remote.status||!!state.earned[index];
+  const stars=Math.max(0,Number(remote.stars)||0);
+  if(!complete && !progress && !total)return '';
+  const percent=complete?100:(total?Math.min(100,Math.round(progress/total*100)):0);
+  const value=total?`${progress} / ${total}`:`${progress} recorded`;
+  return `<div class="badge-sync-progress ${detail?'badge-sync-progress-detail':''}">
+    <div class="badge-sync-progress-label"><span>${complete?'Complete':'Activate progress'}</span><strong>${esc(value)}${stars?` • ★ ${stars}`:''}</strong></div>
+    ${total||complete?`<div class="badge-sync-progress-track" role="progressbar" aria-label="${esc(BADGES[index]?.name||'Badge')} progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent}"><span style="width:${percent}%"></span></div>`:''}
+  </div>`;
+}
+
 function renderBadges(){
   syncTrophies();
   const rooms=availableFocusRooms();
@@ -1304,7 +1323,7 @@ function renderBadges(){
   $('badgeCount').textContent=`${rows.length} shown`;
   $('badgeList').innerHTML=rows.length?rows.map(([b,i])=>`<article class="badge target-card clickable-badge ${availableHere(b)?'available-here':'other-location'} ${state.earned[i]?'done completed-target':''} ${state.pins.includes(i)?'pinned-target':''}" data-open-focus-badge="${i}" data-focus-source="badges">
     <button class="checkbtn" data-toggle-earned="${i}">${state.earned[i]?'✓':''}</button>
-    <div><h3>${esc(b.name)}</h3><p>${esc(b.how)}</p><div class="tags">
+    <div><h3>${esc(b.name)}</h3><p>${esc(b.how)}</p>${badgeProgressMarkup(i)}<div class="tags">
       <span class="tag">${isEasterEggBadge(b)?'Badge • Easter Egg':isRiddleBadge(b)?'Badge • Riddle':'Badge'}</span>
       <span class="tag">${esc(badgeScopeLabel(b))}</span>
       ${awardTermsChanged(i)?'<span class="tag award-legacy-tag">Earned under earlier terms</span>':''}
@@ -1906,6 +1925,7 @@ function openBadge(i){
   const award=state.badgeAwards?.[badgeIdAt(i)];
   $('modalBody').innerHTML=`
     <div class="detail"><strong>How to earn</strong>${esc(b.how)}</div>
+    ${badgeProgressMarkup(i,{detail:true})}
     ${badgeRequirementMarkup(b)}
     ${state.earned[i]&&awardTermsChanged(i)?`<div class="detail award-legacy-detail"><strong>Earned under earlier terms</strong>This badge remains earned. Award recorded ${esc(award?.earnedAt||'previously')}.</div>`:''}
     ${b.tip?`<div class="detail"><strong>Tip / watch out</strong>${esc(b.tip)}</div>`:''}
@@ -2065,6 +2085,7 @@ function openBadgeFocus(i,opts={}){
     <h2 class="focus-title">${esc(b.name)}</h2>
     ${achieved?'<div class="focus-achieved-banner"><span class="focus-achieved-symbol">★</span><span>ACHIEVED</span></div>':''}
     <p class="focus-requirement">${esc(b.how)}</p>
+    ${badgeProgressMarkup(badgeIndex,{detail:true})}
   </section>
   <section>
     ${b.tip?`<div class="detail"><strong>Tip / watch out</strong>${esc(b.tip)}</div>`:''}
@@ -2216,14 +2237,31 @@ function importOnlineProgress(locationRecord,playerData,playerName){
   return completed;
 }
 
+function onlineBadgeIndex(remote){
+  const name=String(remote?.name||'').trim().toLowerCase();
+  const exact=BADGES.findIndex(b=>String(b?.name||'').trim().toLowerCase()===name);
+  if(exact>=0)return exact;
+  const description=String(remote?.description||'').toLowerCase();
+  const prefixed=BADGES.map((badge,index)=>({badge,index})).filter(x=>String(x.badge?.name||'').trim().toLowerCase().startsWith(name+' '));
+  const byGame=prefixed.find(x=>x.badge?.game&&description.includes(String(x.badge.game).toLowerCase()));
+  return byGame?.index??-1;
+}
+
 function importOnlineBadges(remoteBadges){
   const today=new Date().toISOString().slice(0,10);
   let imported=0,unmatched=0;
+  const progress={};
   for(const remote of remoteBadges||[]){
-    if(!remote?.status)continue;
-    const name=String(remote.name||'').trim().toLowerCase();
-    const index=BADGES.findIndex(b=>String(b?.name||'').trim().toLowerCase()===name);
+    const index=onlineBadgeIndex(remote);
     if(index<0){unmatched++;continue}
+    progress[index]={
+      remoteId:remote.id??null,
+      progress:Math.max(0,Number(remote.progress)||0),
+      totalProgress:Math.max(0,Number(remote.totalProgress)||0),
+      stars:Math.max(0,Number(remote.stars)||0),
+      status:!!remote.status
+    };
+    if(!remote?.status)continue;
     if(!state.earned[index]){
       state.earned[index]=true;
       recordBadgeAward(index);
@@ -2231,8 +2269,9 @@ function importOnlineBadges(remoteBadges){
       imported++;
     }
   }
+  state.badgeProgress=progress;
   syncTrophies();
-  return {imported,unmatched};
+  return {imported,unmatched,progressMatched:Object.keys(progress).length};
 }
 
 async function syncActivatePlayer(rawName,{preferredLocationId=null}={}){
@@ -2304,7 +2343,7 @@ function renderPlayerSetup(mode=playerSetupMode,{message='',showOffline=false}={
     title.textContent='Who is playing?';
     lead.textContent=message||'Choose a previously loaded player.';
     players.classList.remove('hidden');
-    players.innerHTML=profiles.map(([key,p])=>`<button class="item player-launch-choice" type="button" data-setup-player="${esc(key)}"><strong>${esc(p.name||key)}</strong><span class="sub">${p.locations?.length||0} location profile${p.locations?.length===1?'':'s'}${p.syncedAt?` • Last synced ${esc(new Date(p.syncedAt).toLocaleString())}`:''}</span></button>`).join('');
+    players.innerHTML=profiles.map(([key,p])=>`<div class="player-choice-row"><button class="item player-launch-choice" type="button" data-setup-player="${esc(key)}"><strong>${esc(p.name||key)}</strong><span class="sub">${p.locations?.length||0} location profile${p.locations?.length===1?'':'s'}${p.syncedAt?` • Last synced ${esc(new Date(p.syncedAt).toLocaleString())}`:''}</span></button><button class="mini player-remove-choice" type="button" data-remove-player="${esc(key)}" aria-label="Remove ${esc(p.name||key)} from this browser">Remove</button></div>`).join('');
     footer.classList.remove('hidden');
     add.classList.remove('hidden');
   }else if(mode==='locations'){
@@ -3209,6 +3248,28 @@ function bindEvents(){
     }finally{submit.disabled=false}
   });
   listen('playerSetupModal','click',async e=>{
+    const removeButton=e.target.closest('[data-remove-player]');
+    if(removeButton){
+      const key=removeButton.dataset.removePlayer;
+      const profile=state.playerProfiles?.[key];
+      if(!profile)return;
+      const name=profile.name||key;
+      if(!confirm(`Remove ${name} from this browser? This deletes their locally saved badges, notes, locations and progress. It does not affect their Activate account.`))return;
+      const wasActive=state.activePlayerKey===key;
+      delete state.playerProfiles[key];
+      const remaining=Object.keys(state.playerProfiles);
+      if(wasActive && remaining.length){
+        loadPlayerProfile(remaining[0]);
+      }else if(wasActive){
+        const content=structuredClone(state.content||{});
+        state=defaultState();
+        state.content=content;
+      }
+      renderAll();
+      renderPlayerSetup(remaining.length?'players':'first',{message:`${name} was removed from this browser.`});
+      toast(`${name} removed`);
+      return;
+    }
     const playerButton=e.target.closest('[data-setup-player]');
     if(playerButton){
       const key=playerButton.dataset.setupPlayer;
@@ -3411,6 +3472,6 @@ function bindEvents(){
   onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();ensureContentState();applyContentCatalog();renderAll();setPlayerSetupOpen(true)}});
 }
 
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1401',{updateViaCache:'none'}).catch(console.error));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1410',{updateViaCache:'none'}).catch(console.error));
 init();
 installBackGuard();

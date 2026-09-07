@@ -1187,6 +1187,15 @@ html,body{overscroll-behavior-x:none}
 .player-choice-list{margin-top:18px}
 .player-launch-choice{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;color:var(--text);text-align:left;cursor:pointer}
 .player-launch-choice:hover{border-color:var(--cyan);background:rgba(26,217,255,.07)}
+.player-choice-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:stretch}
+.player-remove-choice{color:#ff9eb2;border-color:rgba(255,106,138,.4);align-self:stretch}
+.badge-sync-progress{margin-top:9px;display:grid;gap:5px}
+.badge-sync-progress-label{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:11px}
+.badge-sync-progress-label strong{color:var(--text);font-size:11px;text-align:right}
+.badge-sync-progress-track{height:7px;border-radius:999px;background:#252c40;overflow:hidden}
+.badge-sync-progress-track span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--purple),var(--cyan))}
+.badge.done .badge-sync-progress-track span{background:linear-gradient(90deg,#14b96a,var(--green))}
+.badge-sync-progress-detail{padding:12px;border-radius:14px;background:#151b29;margin-top:10px}
 .player-setup-loading{min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center}
 .player-setup-spinner{width:54px;height:54px;border:5px solid rgba(255,255,255,.14);border-top-color:var(--cyan);border-right-color:var(--purple);border-radius:50%;animation:player-setup-spin .8s linear infinite;box-shadow:0 0 24px rgba(26,217,255,.22)}
 @keyframes player-setup-spin{to{transform:rotate(360deg)}}
