@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bruno+Ace+SC&amp;family=Tektur:wght@700;800;900&amp;family=Tilt+Neon&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=1397">
+  <link rel="stylesheet" href="style.css?v=1400">
   <link rel="stylesheet" href="typography-v1412.css?v=1412">
 </head>
 <body>
@@ -217,7 +217,7 @@
     <section id="settings" class="view">
 
 <div class="settings-import-block">
-<div class="card"><h3>Import game progress</h3><p class="sub">Import a CSV export from <strong>Activate-scores.ca</strong>. The file is processed locally on this device and updates co-op levels, scores and competitive Played / Not played status.</p><div class="row wrap"><label class="btn primary">Import Activate-scores.ca CSV<input id="importScoresCsv" type="file" hidden></label><button id="clearLevelProgress" class="btn danger">Clear imported progress</button></div><div id="levelsImportInfo" class="sub top-gap"></div><div id="csvImportReport" class="csv-import-report hidden" aria-live="polite"></div></div>
+<div class="card"><h3>Sync Activate Scores</h3><p class="sub">Enter your Activate player name once. Each venue becomes a separate location profile with its own rooms, levels and scores. Earned badges carry across that player’s locations; badge availability follows the selected location.</p><div class="row wrap"><button id="syncActivatePlayer" class="btn primary" type="button">Connect or refresh player</button><label class="btn">CSV fallback<input id="importScoresCsv" type="file" hidden></label><button id="clearLevelProgress" class="btn danger">Clear imported progress</button></div><div id="playerSyncInfo" class="sub top-gap"></div><div id="levelsImportInfo" class="sub top-gap"></div><div id="csvImportReport" class="csv-import-report hidden" aria-live="polite"></div></div>
 </div>
 
 <div class="card top-gap content-manager-card">
@@ -247,7 +247,7 @@
 
 <div class="card">
         <h2>Settings</h2>
-        <p class="sub">Version <strong>14.12.0</strong> — safe co-op/competitive dropdown separators.</p>
+        <p class="sub">Version <strong>14.13.0</strong> — automatic Activate Scores player setup.</p>
 
         <div class="player-personalisation top-gap">
           <div class="player-name-setting">
@@ -272,6 +272,33 @@
       </div>
     </section>
   </main>
+
+<div id="playerSetupModal" class="modal player-setup-modal" aria-hidden="true">
+  <div class="sheet player-setup-sheet" role="dialog" aria-modal="true" aria-labelledby="playerSetupTitle">
+    <div class="label">Welcome to Activate Tracker</div>
+    <h2 id="playerSetupTitle">Connect your player</h2>
+    <p id="playerSetupLead" class="sub">Please enter your Activate username to configure your tracker.</p>
+    <div id="savedPlayerChoices" class="player-choice-list stack hidden"></div>
+    <div id="savedLocationChoices" class="player-choice-list stack hidden"></div>
+    <form id="playerSetupForm" class="player-setup-form">
+      <label class="label" for="activatePlayerName">Activate player name</label>
+      <input id="activatePlayerName" class="field" type="text" maxlength="64" autocomplete="off" placeholder="e.g. DJ Smarty" required>
+      <div id="playerSetupStatus" class="player-setup-status sub" aria-live="polite"></div>
+      <div class="row wrap top-gap">
+        <button id="playerSetupSubmit" class="btn primary" type="submit">Find my player</button>
+        <button id="playerSetupManual" class="btn ghost" type="button">Set up manually instead</button>
+      </div>
+    </form>
+    <div id="playerSetupLoading" class="player-setup-loading hidden" role="status" aria-live="polite">
+      <span class="player-setup-spinner" aria-hidden="true"></span>
+      <strong id="playerSetupLoadingText">Refreshing your tracker…</strong>
+    </div>
+    <div id="playerSetupFooter" class="row wrap top-gap hidden">
+      <button id="playerSetupAdd" class="btn ghost" type="button">Add another player</button>
+      <button id="playerSetupOffline" class="btn ghost hidden" type="button">Open saved data</button>
+    </div>
+  </div>
+</div>
 
 <div id="contentEditorModal" class="modal" aria-hidden="true">
   <div class="sheet content-editor-sheet">
@@ -336,7 +363,8 @@
     </div>
   </div>
 
-  <script src="app.js?v=1397" defer></script>
+  <script src="config.js?v=1400"></script>
+  <script src="app.js?v=1400" defer></script>
   <script src="levels-accordion-v1412.js?v=1412" defer></script>
 </body>
 </html>

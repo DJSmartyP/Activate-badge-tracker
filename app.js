@@ -1,8 +1,9 @@
 'use strict';
 
-const VERSION='13.97.0';
+const VERSION='14.13.0';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
+const ACTIVATE_SCORES_UPSTREAM='https://activate-scores-be.herokuapp.com';
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
 let TROPHIES=[];
 let BASE_BADGES=[], BASE_ROOMS=[], BASE_GAMES=[], BASE_GAME_CATALOG={}, BASE_COMPETITIVE_INFO={}, BASE_GAME_ENTITIES=[], BADGE_ENTITIES=[];
@@ -11,14 +12,21 @@ let modalBadgeIndex=null;
 let focusIndex=0;
 let focusBadgeIndex=null;
 let focusContext={source:'single',indices:[]};
+let showPlayerSetupAfterLoad=false;
+let playerSetupMode='first';
+let suspendPlayerCapture=false;
 
 let levelsDisplayMode='levels';
 let contentManagerTab='rooms';
 let contentEditing=null;
 const defaultState=()=>({
   schemaVersion:3,
-  playerName:"Smarty",
+  playerName:"",
   playerBrandColor:"#FF4FB3",
+  playerProfile:null,
+  playerProfiles:{},
+  activePlayerKey:null,
+  setupMode:null,
   content:{rooms:{},games:{},badges:{}},
   badgeAwards:{},
   trophies:{
@@ -39,7 +47,41 @@ const defaultState=()=>({
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const save=()=>localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+function playerKey(value){return normalisePlayerName(value).toLowerCase()}
+const PLAYER_STATE_FIELDS=['playerName','playerBrandColor','playerProfile','locations','activeLocation','earned','badgeAwards','history','trophies','pins','notes','levelProgressByLocation'];
+function profileSnapshot(){
+  const snapshot={};
+  PLAYER_STATE_FIELDS.forEach(field=>snapshot[field]=structuredClone(state[field]));
+  snapshot.name=normalisePlayerName(state.playerProfile?.name||state.playerName);
+  snapshot.syncedAt=state.playerProfile?.syncedAt||null;
+  return snapshot;
+}
+function persistActivePlayer(){
+  if(suspendPlayerCapture||!state?.activePlayerKey||!state.playerProfiles?.[state.activePlayerKey])return;
+  state.playerProfiles[state.activePlayerKey]=profileSnapshot();
+}
+function save(){
+  persistActivePlayer();
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+}
+function loadPlayerProfile(key){
+  const profile=state.playerProfiles?.[key];
+  if(!profile)return false;
+  persistActivePlayer();
+  suspendPlayerCapture=true;
+  PLAYER_STATE_FIELDS.forEach(field=>{
+    if(profile[field]!==undefined)state[field]=structuredClone(profile[field]);
+  });
+  state.activePlayerKey=key;
+  state.playerProfile={...(state.playerProfile||{}),name:profile.name||state.playerName,syncedAt:profile.syncedAt||state.playerProfile?.syncedAt||null};
+  state.locations.forEach(ensureLocationShape);
+  ensureLevelProgressStore();
+  activeLevelProgress();
+  syncTrophies();
+  suspendPlayerCapture=false;
+  save();
+  return true;
+}
 const toast=msg=>{const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600)};
 function normalisePlayerName(value){
   let name=String(value??'').trim().replace(/\s+/g,' ').slice(0,32);
@@ -117,7 +159,7 @@ function contrastSafePlayerColor(hex){
 }
 
 function playerDisplayName(){
-  return normalisePlayerName(state?.playerName)||'Smarty';
+  return normalisePlayerName(state?.playerName)||'Player';
 }
 
 function playerPossessiveName(){
@@ -961,10 +1003,27 @@ function loadState(){
   state.history=Array.isArray(state.history)?state.history:[];
   state.earned=state.earned||{};
   state.notes=state.notes||{};
-  if(state.playerName===undefined || state.playerName===null)state.playerName='Smarty';
-  state.playerName=normalisePlayerName(state.playerName)||'Smarty';
+  if(state.playerName===undefined || state.playerName===null)state.playerName='';
+  state.playerName=normalisePlayerName(state.playerName);
   state.playerBrandColor=validPlayerBrandColor(state.playerBrandColor);
   state.locations.forEach(ensureLocationShape);ensureContentState();ensureTrophyState();state.badgeAwards=state.badgeAwards||{};ensureLevelProgressStore();activeLevelProgress();
+  const importedPlayer=Object.values(state.levelProgressByLocation||{}).find(p=>normalisePlayerName(p?.player))?.player;
+  if(!state.playerProfile && importedPlayer){
+    state.playerProfile={name:normalisePlayerName(importedPlayer),source:'CSV import',syncedAt:null};
+  }
+  if(!state.playerProfiles || typeof state.playerProfiles!=='object')state.playerProfiles={};
+  const inferredName=normalisePlayerName(state.playerProfile?.name||state.playerName);
+  const canMigrateLegacy=!!inferredName && inferredName.toLowerCase()!=='smarty';
+  if(!Object.keys(state.playerProfiles).length && canMigrateLegacy){
+    const key=playerKey(inferredName);
+    state.activePlayerKey=key;
+    state.playerProfiles[key]=profileSnapshot();
+  }
+  if(!state.activePlayerKey || !state.playerProfiles[state.activePlayerKey]){
+    state.activePlayerKey=Object.keys(state.playerProfiles)[0]||null;
+  }
+  showPlayerSetupAfterLoad=true;
+  playerSetupMode=Object.keys(state.playerProfiles).length?'players':'first';
 }
 
 function ensureLocationShape(l){
@@ -1823,7 +1882,7 @@ function toggleContentArchived(type,id){
   }
 }
 
-function renderAll(){ensureLevelProgress();renderPlayerBrand();renderHome();renderBadges();renderLocations();renderCompetitive();renderLevels();renderStats();renderContentManager();save()}
+function renderAll(){ensureLevelProgress();renderPlayerBrand();renderHome();renderBadges();renderLocations();renderCompetitive();renderLevels();renderStats();renderContentManager();renderPlayerSyncInfo();save()}
 
 function toggleEarn(i){
   if(state.earned[i]){
@@ -2077,6 +2136,216 @@ function exportBackup(){
 
 function emptyLevelProgress(){
   return {games:{},competitive:{},importedAt:null,player:null,source:null,lastImportReport:null};
+}
+
+function activateScoresApiBase(){
+  const configured=String(globalThis.ACTIVATE_TRACKER_CONFIG?.activateScoresApiBase||'').trim().replace(/\/$/,'');
+  return configured||ACTIVATE_SCORES_UPSTREAM;
+}
+
+async function fetchActivateScores(path){
+  const configured=!!String(globalThis.ACTIVATE_TRACKER_CONFIG?.activateScoresApiBase||'').trim();
+  try{
+    const response=await fetch(activateScoresApiBase()+path,{headers:{Accept:'application/json'},cache:'no-store'});
+    if(!response.ok){
+      let detail='';
+      try{detail=(await response.json())?.message||''}catch{}
+      throw new Error(detail||`Activate Scores returned ${response.status}`);
+    }
+    const type=response.headers.get('content-type')||'';
+    if(!/json/i.test(type))throw new Error('Activate Scores returned an unexpected response');
+    return response.json();
+  }catch(err){
+    if(!configured && location.hostname.endsWith('github.io')){
+      throw new Error('Online sync needs the included Activate Scores proxy to be deployed and added to config.js. CSV import is still available.');
+    }
+    throw err;
+  }
+}
+
+function onlineLocationId(remoteId){return `activate-${remoteId}`}
+
+function mergeOnlineLocation(remoteLocation,playerData){
+  const id=onlineLocationId(remoteLocation.id);
+  const existing=state.locations.find(l=>l.id===id);
+  const roomNames=[...new Set((playerData.scores||[]).map(x=>String(x.roomName||'').trim()).filter(r=>ROOMS.includes(r)))];
+  const imported={
+    ...(existing||{}),
+    id,
+    activateLocationId:Number(remoteLocation.id),
+    name:String(remoteLocation.name||`Activate ${remoteLocation.id}`).trim(),
+    rooms:roomNames,
+    games:Array.isArray(existing?.games)?existing.games:[],
+    excludedGames:Array.isArray(existing?.excludedGames)?existing.excludedGames:[],
+    roomCopies:existing?.roomCopies||{},
+    roomInstances:Array.isArray(existing?.roomInstances)?existing.roomInstances:[],
+    venueMap:existing?.venueMap||{Entrance:{front:null,left:null,right:null,back:null},Exit:{front:null,left:null,right:null,back:null}},
+    catalogReview:Array.isArray(existing?.catalogReview)?existing.catalogReview:[]
+  };
+  ensureLocationShape(imported);
+  return imported;
+}
+
+function importOnlineProgress(locationRecord,playerData,playerName){
+  const prior=state.levelProgressByLocation[locationRecord.id]||emptyLevelProgress();
+  const progress={...prior,games:{...(prior.games||{})},competitive:{...(prior.competitive||{})}};
+  let completed=0;
+  for(const score of playerData.scores||[]){
+    const room=String(score.roomName||'').trim();
+    const game=String(score.gameName||'').trim();
+    const level=Number(score.levelId)+1;
+    if(!room||!game||!Number.isInteger(level)||level<1)continue;
+    const key=`${room}||${game}`;
+    const gameProgress=progress.games[key]||{room,game,levels:{}};
+    const old=gameProgress.levels?.[level]||{};
+    const remoteScore=Math.max(0,Number(score.highScore)||0);
+    const topScore=Math.max(0,Number(score.topScore)||0);
+    gameProgress.levels={...(gameProgress.levels||{}),[level]:{
+      score:Math.max(Number(old.score)||0,remoteScore),
+      topScore:topScore||Number(old.topScore)||0,
+      complete:remoteScore>0||!!old.complete
+    }};
+    progress.games[key]=gameProgress;
+    if(gameProgress.levels[level].complete)completed++;
+  }
+  progress.importedAt=new Date().toISOString();
+  progress.player=playerName;
+  progress.source='Activate-scores.ca live sync';
+  progress.lastImportReport=null;
+  state.levelProgressByLocation[locationRecord.id]=progress;
+  return completed;
+}
+
+function importOnlineBadges(remoteBadges){
+  const today=new Date().toISOString().slice(0,10);
+  let imported=0,unmatched=0;
+  for(const remote of remoteBadges||[]){
+    if(!remote?.status)continue;
+    const name=String(remote.name||'').trim().toLowerCase();
+    const index=BADGES.findIndex(b=>String(b?.name||'').trim().toLowerCase()===name);
+    if(index<0){unmatched++;continue}
+    if(!state.earned[index]){
+      state.earned[index]=true;
+      recordBadgeAward(index);
+      state.history.unshift({badge:index,date:today});
+      imported++;
+    }
+  }
+  syncTrophies();
+  return {imported,unmatched};
+}
+
+async function syncActivatePlayer(rawName,{preferredLocationId=null}={}){
+  const playerName=normalisePlayerName(rawName);
+  if(!playerName)throw new Error('Enter your Activate player name.');
+  persistActivePlayer();
+  const encoded=encodeURIComponent(playerName);
+  const remoteLocations=await fetchActivateScores(`/api/activate/playerlocations/${encoded}`);
+  if(!Array.isArray(remoteLocations)||!remoteLocations.length)throw new Error('No Activate player was found with that name.');
+
+  const [playerResults,remoteBadges]=await Promise.all([
+    Promise.all(remoteLocations.map(async remote=>({
+      remote,
+      data:await fetchActivateScores(`/api/activate/players/player/${encoded}/location/${encodeURIComponent(remote.id)}`)
+    }))),
+    fetchActivateScores(`/api/activate/badges/${encoded}`).catch(()=>[])
+  ]);
+
+  const key=playerKey(playerName);
+  if(state.playerProfiles[key] && state.activePlayerKey!==key){
+    loadPlayerProfile(key);
+  }else if(!state.playerProfiles[key]){
+    const fresh=defaultState();
+    suspendPlayerCapture=true;
+    PLAYER_STATE_FIELDS.forEach(field=>state[field]=structuredClone(fresh[field]));
+    state.playerName=playerName;
+    state.playerProfile={name:playerName,source:'Activate-scores.ca',syncedAt:null};
+    state.activePlayerKey=key;
+    suspendPlayerCapture=false;
+  }
+
+  const onlineIds=new Set(remoteLocations.map(x=>onlineLocationId(x.id)));
+  const manualLocations=state.locations.filter(l=>!l.activateLocationId && !onlineIds.has(l.id));
+  const isEmptyStarter=manualLocations.length===1
+    && manualLocations[0].id==='home'
+    && manualLocations[0].name==='My Activate'
+    && !manualLocations[0].rooms.length;
+  const onlineLocations=playerResults.map(x=>mergeOnlineLocation(x.remote,x.data));
+  state.locations=[...onlineLocations,...(isEmptyStarter?[]:manualLocations)];
+
+  let completedLevels=0;
+  playerResults.forEach((x,index)=>{completedLevels+=importOnlineProgress(onlineLocations[index],x.data,playerName)});
+  const preferred=playerResults.reduce((best,x)=>!best||Number(x.data.totalScore)>Number(best.data.totalScore)?x:best,null);
+  const preferredId=remoteLocations.some(x=>String(x.id)===String(preferredLocationId))
+    ? preferredLocationId
+    : (preferred?.remote?.id||remoteLocations[0].id);
+  state.activeLocation=onlineLocationId(preferredId);
+  state.playerName=playerName;
+  state.playerProfile={name:playerName,source:'Activate-scores.ca',syncedAt:new Date().toISOString()};
+  state.setupMode='online';
+  const badges=importOnlineBadges(remoteBadges);
+  state.activePlayerKey=key;
+  state.playerProfiles[key]=state.playerProfiles[key]||{};
+  save();
+  renderAll();
+  return {playerName,locations:onlineLocations.length,completedLevels,badgesImported:badges.imported,badgesUnmatched:badges.unmatched};
+}
+
+function renderPlayerSetup(mode=playerSetupMode,{message='',showOffline=false}={}){
+  playerSetupMode=mode;
+  const profiles=Object.entries(state.playerProfiles||{});
+  const title=$('playerSetupTitle'),lead=$('playerSetupLead'),players=$('savedPlayerChoices');
+  const locations=$('savedLocationChoices'),form=$('playerSetupForm'),loading=$('playerSetupLoading');
+  const footer=$('playerSetupFooter'),add=$('playerSetupAdd'),offline=$('playerSetupOffline');
+  [players,locations,form,loading,footer].forEach(el=>el?.classList.add('hidden'));
+  offline?.classList.add('hidden');
+
+  if(mode==='players'){
+    title.textContent='Who is playing?';
+    lead.textContent=message||'Choose a previously loaded player.';
+    players.classList.remove('hidden');
+    players.innerHTML=profiles.map(([key,p])=>`<button class="item player-launch-choice" type="button" data-setup-player="${esc(key)}"><strong>${esc(p.name||key)}</strong><span class="sub">${p.locations?.length||0} location profile${p.locations?.length===1?'':'s'}${p.syncedAt?` • Last synced ${esc(new Date(p.syncedAt).toLocaleString())}`:''}</span></button>`).join('');
+    footer.classList.remove('hidden');
+    add.classList.remove('hidden');
+  }else if(mode==='locations'){
+    title.textContent=`Choose ${playerDisplayName()}’s location`;
+    lead.textContent=message||'Your tracker will refresh before it opens.';
+    locations.classList.remove('hidden');
+    locations.innerHTML=state.locations.map(l=>`<button class="item player-launch-choice" type="button" data-setup-location="${esc(l.id)}"><strong>${esc(l.name)}</strong><span class="sub">Location profile • ${l.rooms.length} rooms</span></button>`).join('');
+    footer.classList.remove('hidden');
+    if(showOffline)offline.classList.remove('hidden');
+  }else if(mode==='loading'){
+    title.textContent='Configuring your tracker';
+    lead.textContent='Loading your latest Activate data.';
+    loading.classList.remove('hidden');
+    $('playerSetupLoadingText').textContent=message||'Refreshing your tracker…';
+  }else{
+    title.textContent=mode==='add'?'Add another player':'Connect your player';
+    lead.textContent=message||'Please enter your Activate username to configure your tracker.';
+    form.classList.remove('hidden');
+    $('playerSetupStatus').textContent='';
+    $('playerSetupManual').classList.toggle('hidden',mode==='add');
+    const input=$('activatePlayerName');
+    input.value=mode==='add'?'':normalisePlayerName(state?.playerProfile?.name||state?.playerName);
+    setTimeout(()=>input.focus(),0);
+  }
+}
+
+function setPlayerSetupOpen(open,mode=playerSetupMode){
+  const modal=$('playerSetupModal');
+  if(!modal)return;
+  modal.classList.toggle('open',!!open);
+  modal.setAttribute('aria-hidden',open?'false':'true');
+  if(open)renderPlayerSetup(mode);
+}
+
+function renderPlayerSyncInfo(){
+  const el=$('playerSyncInfo');
+  if(!el)return;
+  const profile=state.playerProfile;
+  el.textContent=profile?.name
+    ? `Connected as ${profile.name}${profile.syncedAt?` • Last synced ${new Date(profile.syncedAt).toLocaleString()}`:''}`
+    : 'No Activate player connected.';
 }
 function ensureLevelProgressStore(){
   if(!state.levelProgressByLocation || typeof state.levelProgressByLocation!=='object'){
@@ -2593,6 +2862,7 @@ async function init(){
     applyContentCatalog();
     bindEvents();
     renderAll();
+    if(showPlayerSetupAfterLoad)setPlayerSetupOpen(true,playerSetupMode);
 }catch(err){
     console.error(err);
     
@@ -2916,6 +3186,72 @@ function bindEvents(){
     }finally{e.target.value=''}
   });
 
+  onClick('syncActivatePlayer',()=>setPlayerSetupOpen(true,Object.keys(state.playerProfiles||{}).length?'players':'first'));
+  listen('playerSetupForm','submit',async e=>{
+    e.preventDefault();
+    const input=$('activatePlayerName'),submit=$('playerSetupSubmit');
+    const name=input?.value||'';
+    const wasFirst=!Object.keys(state.playerProfiles||{}).length;
+    submit.disabled=true;
+    renderPlayerSetup('loading',{message:'Finding your player and importing locations…'});
+    try{
+      const result=await syncActivatePlayer(name);
+      toast(`Connected as ${result.playerName}`);
+      if(wasFirst){
+        $('playerSetupLoadingText').textContent=`Ready — ${result.locations} location${result.locations===1?'':'s'}, ${result.completedLevels} completed levels and ${result.badgesImported} badges loaded.`;
+        setTimeout(()=>setPlayerSetupOpen(false),900);
+      }else{
+        renderPlayerSetup('locations',{message:'Player added. Choose a location to open.'});
+      }
+    }catch(err){
+      console.error('Activate Scores sync failed',err);
+      renderPlayerSetup(wasFirst?'first':'add',{message:err?.message||'Could not connect to Activate Scores.'});
+    }finally{submit.disabled=false}
+  });
+  listen('playerSetupModal','click',async e=>{
+    const playerButton=e.target.closest('[data-setup-player]');
+    if(playerButton){
+      const key=playerButton.dataset.setupPlayer;
+      if(loadPlayerProfile(key)){
+        renderAll();
+        renderPlayerSetup('locations');
+      }
+      return;
+    }
+    const locationButton=e.target.closest('[data-setup-location]');
+    if(locationButton){
+      const locationRecord=state.locations.find(l=>l.id===locationButton.dataset.setupLocation);
+      if(!locationRecord)return;
+      state.activeLocation=locationRecord.id;
+      save();
+      renderPlayerSetup('loading',{message:`Refreshing ${playerDisplayName()} at ${locationRecord.name}…`});
+      try{
+        await syncActivatePlayer(state.playerProfile?.name||state.playerName,{preferredLocationId:locationRecord.activateLocationId});
+        setPlayerSetupOpen(false);
+        toast('Tracker refreshed');
+      }catch(err){
+        console.error('Launch refresh failed',err);
+        renderAll();
+        renderPlayerSetup('locations',{message:`Could not refresh: ${err?.message||'Unknown error'}`,showOffline:true});
+      }
+    }
+  });
+  onClick('playerSetupAdd',()=>renderPlayerSetup('add'));
+  onClick('playerSetupOffline',()=>{renderAll();setPlayerSetupOpen(false);toast('Opened saved data')});
+  onClick('playerSetupManual',()=>{
+    const name=normalisePlayerName($('activatePlayerName')?.value)||'Player';
+    state.playerName=name;
+    state.playerProfile={name,source:'Manual setup',syncedAt:null};
+    state.setupMode='manual';
+    const key=playerKey(name);
+    state.activePlayerKey=key;
+    state.playerProfiles[key]=state.playerProfiles[key]||{};
+    save();
+    setPlayerSetupOpen(false);
+    showView('locations');
+    toast('Manual setup is ready');
+  });
+
   onChange('levelsRoom',renderLevels);
   onChange('levelsGame',renderLevels);
   onChange('levelsView',renderLevels);
@@ -2937,7 +3273,7 @@ function bindEvents(){
     save();
   });
   listen('playerDisplayName','change',e=>{
-    state.playerName=normalisePlayerName(e.target.value)||'Smarty';
+    state.playerName=normalisePlayerName(e.target.value)||'Player';
     renderPlayerBrand();
     save();
   });
@@ -3057,8 +3393,8 @@ function bindEvents(){
       state.history=Array.isArray(state.history)?state.history:[];
       state.earned=state.earned||{};
       state.notes=state.notes||{};
-      if(state.playerName===undefined || state.playerName===null)state.playerName='Smarty';
-      state.playerName=normalisePlayerName(state.playerName)||'Smarty';
+      if(state.playerName===undefined || state.playerName===null)state.playerName='';
+      state.playerName=normalisePlayerName(state.playerName);
       state.playerBrandColor=validPlayerBrandColor(state.playerBrandColor);
       ensureContentState();
       ensureTrophyState();
@@ -3072,9 +3408,9 @@ function bindEvents(){
       toast('Backup restored')}catch{toast('Could not read backup')}};
     r.readAsText(f)
   });
-  onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();ensureContentState();applyContentCatalog();renderAll()}});
+  onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();ensureContentState();applyContentCatalog();renderAll();setPlayerSetupOpen(true)}});
 }
 
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1397',{updateViaCache:'none'}).catch(console.error));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1400',{updateViaCache:'none'}).catch(console.error));
 init();
 installBackGuard();

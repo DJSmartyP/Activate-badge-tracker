@@ -1176,6 +1176,21 @@ html,body{overscroll-behavior-x:none}
   background:linear-gradient(135deg,rgba(115,63,255,.95),rgba(72,76,255,.95));
 }
 .hidden{display:none !important}
+
+/* v14.13 — first-run Activate Scores player setup */
+.player-setup-modal{z-index:210;background:radial-gradient(circle at 50% 0,rgba(117,69,255,.28),transparent 34rem),rgba(2,4,9,.92)}
+.player-setup-sheet{width:min(560px,100%);padding:24px}
+.player-setup-sheet h2{font-size:clamp(26px,6vw,40px);margin:.35rem 0 .65rem}
+.player-setup-form{display:grid;gap:10px;margin-top:20px}
+.player-setup-status{min-height:1.5em;line-height:1.45}
+.player-setup-form .btn:disabled{opacity:.55;cursor:wait}
+.player-choice-list{margin-top:18px}
+.player-launch-choice{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;color:var(--text);text-align:left;cursor:pointer}
+.player-launch-choice:hover{border-color:var(--cyan);background:rgba(26,217,255,.07)}
+.player-setup-loading{min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center}
+.player-setup-spinner{width:54px;height:54px;border:5px solid rgba(255,255,255,.14);border-top-color:var(--cyan);border-right-color:var(--purple);border-radius:50%;animation:player-setup-spin .8s linear infinite;box-shadow:0 0 24px rgba(26,217,255,.22)}
+@keyframes player-setup-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.player-setup-spinner{animation-duration:1.8s}}
 .game-play-row{
   display:flex;
   align-items:center;
