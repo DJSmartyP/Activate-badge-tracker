@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='14.14.1';
+const VERSION='14.14.2';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 const ACTIVATE_SCORES_UPSTREAM='https://activate-scores-be.herokuapp.com';
@@ -3472,6 +3472,6 @@ function bindEvents(){
   onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();ensureContentState();applyContentCatalog();renderAll();setPlayerSetupOpen(true)}});
 }
 
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1411',{updateViaCache:'none'}).catch(console.error));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1412',{updateViaCache:'none'}).catch(console.error));
 init();
 installBackGuard();
