@@ -1,9 +1,9 @@
 'use strict';
 
-const VERSION='14.14.3';
+const VERSION='14.14.5';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
-const ACTIVATE_SCORES_UPSTREAM='https://activate-scores-be.herokuapp.com';
+const ACTIVATE_SCORES_SYNC_ENABLED=true;
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
 let TROPHIES=[];
 let BASE_BADGES=[], BASE_ROOMS=[], BASE_GAMES=[], BASE_GAME_CATALOG={}, BASE_COMPETITIVE_INFO={}, BASE_GAME_ENTITIES=[], BADGE_ENTITIES=[];
@@ -2161,10 +2161,13 @@ function emptyLevelProgress(){
 
 function activateScoresApiBase(){
   const configured=String(globalThis.ACTIVATE_TRACKER_CONFIG?.activateScoresApiBase||'').trim().replace(/\/$/,'');
-  return configured||ACTIVATE_SCORES_UPSTREAM;
+  return configured;
 }
 
 async function fetchActivateScores(path){
+  if(!ACTIVATE_SCORES_SYNC_ENABLED){
+    throw new Error('Activate Scores live sync is temporarily disabled. Open saved data or use the CSV fallback.');
+  }
   const configured=!!String(globalThis.ACTIVATE_TRACKER_CONFIG?.activateScoresApiBase||'').trim();
   try{
     const response=await fetch(activateScoresApiBase()+path,{headers:{Accept:'application/json'},cache:'no-store'});
@@ -2292,16 +2295,41 @@ async function syncActivatePlayer(rawName,{preferredLocationId=null}={}){
   if(!playerName)throw new Error('Enter your Activate player name.');
   persistActivePlayer();
   const encoded=encodeURIComponent(playerName);
-  const remoteLocations=await fetchActivateScores(`/api/activate/playerlocations/${encoded}`);
-  if(!Array.isArray(remoteLocations)||!remoteLocations.length)throw new Error('No Activate player was found with that name.');
-
-  const [playerResults,remoteBadges]=await Promise.all([
-    Promise.all(remoteLocations.map(async remote=>({
-      remote,
-      data:await fetchActivateScores(`/api/activate/players/player/${encoded}/location/${encodeURIComponent(remote.id)}`)
-    }))),
-    fetchActivateScores(`/api/activate/badges/${encoded}`).catch(()=>[])
+  const [locationDirectory,locationHistory,remoteBadges]=await Promise.all([
+    fetchActivateScores('/api/public/activate/locations'),
+    fetchActivateScores(`/api/public/activate/player/${encoded}/locations`),
+    fetchActivateScores(`/api/public/activate/badges/${encoded}`).catch(()=>[])
   ]);
+  if(!Array.isArray(locationHistory)||!locationHistory.length)throw new Error('No Activate player was found with that name.');
+
+  const directoryById=new Map((Array.isArray(locationDirectory)?locationDirectory:[])
+    .map(location=>[String(location?.id),location]));
+  const remoteLocations=locationHistory.map(entry=>{
+    const id=entry&&typeof entry==='object'?(entry.id??entry.locationId):entry;
+    const directory=directoryById.get(String(id));
+    return {id:Number(id),name:String(entry?.name||directory?.name||`Activate ${id}`).trim()};
+  }).filter(location=>Number.isFinite(location.id));
+  if(!remoteLocations.length)throw new Error('No valid Activate locations were returned for that player.');
+
+  const playerResults=await Promise.all(remoteLocations.map(async remote=>{
+    const [data,games]=await Promise.all([
+      fetchActivateScores(`/api/public/activate/player/${encoded}/location/${encodeURIComponent(remote.id)}`),
+      fetchActivateScores(`/api/public/activate/location/${encodeURIComponent(remote.id)}/games`)
+    ]);
+    const gamesById=new Map((Array.isArray(games)?games:[]).map(game=>[String(game?.id),game]));
+    const scores=(Array.isArray(data?.scores)?data.scores:[]).map(score=>{
+      const game=gamesById.get(String(score?.gameId));
+      return {
+        ...score,
+        gameName:String(game?.name||'').trim(),
+        roomName:String(game?.room?.name||'').trim()
+      };
+    });
+    return {
+      remote,
+      data:{...data,scores,totalScore:scores.reduce((sum,score)=>sum+(Number(score.highScore)||0),0)}
+    };
+  }));
 
   const key=playerKey(playerName);
   if(state.playerProfiles[key] && state.activePlayerKey!==key){
@@ -2375,8 +2403,9 @@ function renderPlayerSetup(mode=playerSetupMode,{message='',showOffline=false}={
     title.textContent=mode==='add'?'Add another player':'Connect your player';
     lead.textContent=message||'Please enter your Activate username to configure your tracker.';
     form.classList.remove('hidden');
-    $('playerSetupStatus').textContent='';
+    $('playerSetupStatus').textContent=ACTIVATE_SCORES_SYNC_ENABLED?'':'Live sync is temporarily disabled. Use manual setup or the CSV fallback in Settings.';
     $('playerSetupManual').classList.toggle('hidden',mode==='add');
+    $('playerSetupSubmit').disabled=!ACTIVATE_SCORES_SYNC_ENABLED;
     const input=$('activatePlayerName');
     input.value=mode==='add'?'':normalisePlayerName(state?.playerProfile?.name||state?.playerName);
     setTimeout(()=>input.focus(),0);
@@ -3259,7 +3288,7 @@ function bindEvents(){
     }catch(err){
       console.error('Activate Scores sync failed',err);
       renderPlayerSetup(wasFirst?'first':'add',{message:err?.message||'Could not connect to Activate Scores.'});
-    }finally{submit.disabled=false}
+    }finally{submit.disabled=!ACTIVATE_SCORES_SYNC_ENABLED}
   });
   listen('playerSetupModal','click',async e=>{
     const removeButton=e.target.closest('[data-remove-player]');
@@ -3486,6 +3515,6 @@ function bindEvents(){
   onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();ensureContentState();applyContentCatalog();renderAll();setPlayerSetupOpen(true)}});
 }
 
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1413',{updateViaCache:'none'}).catch(console.error));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1415',{updateViaCache:'none'}).catch(console.error));
 init();
 installBackGuard();

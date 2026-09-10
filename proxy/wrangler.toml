@@ -4,3 +4,11 @@ compatibility_date = "2026-09-07"
 
 [vars]
 ALLOWED_ORIGINS = "https://djsmartyp.github.io"
+
+[[ratelimits]]
+name = "ACTIVATE_RATE_LIMITER"
+namespace_id = "141418"
+
+[ratelimits.simple]
+limit = 18
+period = 60
