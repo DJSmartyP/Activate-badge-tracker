@@ -20,7 +20,7 @@ test('forwards a player lookup with the required upstream origin',async()=>{
     }),{});
     assert.equal(response.status,200);
     assert.equal(response.headers.get('Access-Control-Allow-Origin'),'https://djsmartyp.github.io');
-    assert.equal(forwarded.url,'https://activate-scores-be.herokuapp.com/api/activate/playerlocations/DJ%20Smarty');
+    assert.equal(forwarded.url,'https://www.activate-scores.ca/api/activate/playerlocations/DJ%20Smarty');
     assert.equal(forwarded.options.headers.Origin,'https://www.activate-scores.ca');
   }finally{
     globalThis.fetch=originalFetch;

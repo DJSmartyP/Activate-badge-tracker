@@ -1,4 +1,4 @@
-const UPSTREAM='https://activate-scores-be.herokuapp.com';
+const UPSTREAM='https://www.activate-scores.ca';
 
 function allowedPath(pathname){
   return /^\/api\/activate\/playerlocations\/[^/]+$/.test(pathname)
