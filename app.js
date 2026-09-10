@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='14.14.2';
+const VERSION='14.14.3';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 const ACTIVATE_SCORES_UPSTREAM='https://activate-scores-be.herokuapp.com';
@@ -2190,12 +2190,25 @@ function mergeOnlineLocation(remoteLocation,playerData){
   const id=onlineLocationId(remoteLocation.id);
   const existing=state.locations.find(l=>l.id===id);
   const roomNames=[...new Set((playerData.scores||[]).map(x=>String(x.roomName||'').trim()).filter(r=>ROOMS.includes(r)))];
+  const priorActivateRooms=Array.isArray(existing?.activateRooms)?existing.activateRooms:roomNames;
+  const selectedRooms=new Set(Array.isArray(existing?.rooms)?existing.rooms:[]);
+  const manuallyAddedRooms=existing
+    ? [...selectedRooms].filter(room=>!priorActivateRooms.includes(room))
+    : [];
+  const manuallyRemovedRooms=existing
+    ? priorActivateRooms.filter(room=>!selectedRooms.has(room))
+    : [];
+  const rooms=[...new Set([
+    ...roomNames.filter(room=>!manuallyRemovedRooms.includes(room)),
+    ...manuallyAddedRooms
+  ])].filter(room=>ROOMS.includes(room));
   const imported={
     ...(existing||{}),
     id,
     activateLocationId:Number(remoteLocation.id),
     name:String(remoteLocation.name||`Activate ${remoteLocation.id}`).trim(),
-    rooms:roomNames,
+    rooms,
+    activateRooms:roomNames,
     games:Array.isArray(existing?.games)?existing.games:[],
     excludedGames:Array.isArray(existing?.excludedGames)?existing.excludedGames:[],
     roomCopies:existing?.roomCopies||{},
@@ -3183,11 +3196,12 @@ function bindEvents(){
     const loc=e.target.closest('[data-location]');if(loc){state.activeLocation=loc.dataset.location;renderAll();return}
     const rt=e.target.closest('[data-room-toggle]');if(rt){
       const l=activeLocation(),r=rt.dataset.roomToggle;
+      const removing=l.rooms.includes(r);
       if(l.rooms.includes(r)){
         l.rooms=l.rooms.filter(x=>x!==r);
         l.excludedGames=(l.excludedGames||[]).filter(g=>inferredGamesForLocation(l).some(e=>e.game===g));
       }else l.rooms=[...l.rooms,r];
-      renderAll();return
+      save();renderAll();toast(`${r} ${removing?'removed from':'added to'} ${l.name}`);return
     }
     const gt=e.target.closest('[data-game-toggle]');if(gt){
       const l=activeLocation(),g=gt.dataset.gameToggle;
@@ -3472,6 +3486,6 @@ function bindEvents(){
   onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();ensureContentState();applyContentCatalog();renderAll();setPlayerSetupOpen(true)}});
 }
 
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1412',{updateViaCache:'none'}).catch(console.error));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1413',{updateViaCache:'none'}).catch(console.error));
 init();
 installBackGuard();
