@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='14.14.10';
+const VERSION='14.14.11';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 const ACTIVATE_SCORES_SYNC_ENABLED=true;
@@ -1182,7 +1182,7 @@ function renderHome(){
         <div class="metrics">
           <div class="metric"><span class="label">Earned global</span><b>${n}</b></div>
           <div class="metric"><span class="label">Platinum here</span><b>${localPlatinum.percent}%</b></div>
-          <div class="metric"><span class="label">Location</span><b style="font-size:15px">${esc(l.name)}</b></div>
+          <div class="metric home-location-metric"><span class="label">Location</span><b class="home-location-name">${esc(l.name)}</b></div>
         </div>
       </div>
 
@@ -3558,6 +3558,6 @@ function bindEvents(){
   onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();ensureContentState();applyContentCatalog();renderAll();setPlayerSetupOpen(true)}});
 }
 
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1420',{updateViaCache:'none'}).catch(console.error));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1421',{updateViaCache:'none'}).catch(console.error));
 init();
 installBackGuard();

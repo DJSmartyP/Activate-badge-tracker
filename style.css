@@ -12530,6 +12530,21 @@ button{
   }
 }
 
+/* Keep venue names readable in the compact Home dashboard metrics row. */
+.home-trophy-main .metrics{
+  grid-template-columns:minmax(0,.85fr) minmax(0,.85fr) minmax(108px,1.3fr) !important;
+}
+
+.home-location-metric .home-location-name{
+  display:block;
+  font-size:clamp(12px,1.5vw,15px) !important;
+  line-height:1.25;
+  letter-spacing:0 !important;
+  overflow-wrap:normal !important;
+  word-break:normal !important;
+  hyphens:none;
+}
+
 /* v14.14.7 — visible community attribution */
 .credits-spotlight{
   position:relative;
