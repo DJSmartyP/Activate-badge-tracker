@@ -12599,15 +12599,17 @@ button{
   text-shadow:0 0 12px rgba(255,106,138,.75);
 }
 .credits-spotlight h2{
+  flex:1 1 auto;
   margin:0 0 10px;
   color:#fff;
-  max-width:850px;
+  max-width:none;
   font-size:clamp(25px,3.2vw,38px);
   line-height:1.08;
   text-shadow:0 0 16px rgba(26,217,255,.18);
 }
 .credits-original-copy{
-  max-width:980px;
+  width:100%;
+  max-width:none;
   margin:3px 0 0;
   padding:17px 19px;
   border:1px solid rgba(143,247,255,.24);
