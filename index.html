@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bruno+Ace+SC&amp;family=Tektur:wght@700;800;900&amp;family=Tilt+Neon&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=1413">
+  <link rel="stylesheet" href="style.css?v=1414">
   <link rel="stylesheet" href="typography-v1412.css?v=1412">
 </head>
 <body>
@@ -70,6 +70,35 @@
 
 
     <section id="home" class="view active">
+      <aside class="credits-spotlight" aria-labelledby="communityCreditsTitle">
+        <div class="credits-glow" aria-hidden="true"></div>
+        <div class="credits-heading-row">
+          <div>
+            <div class="credits-kicker">★ Community powered ★</div>
+            <h2 id="communityCreditsTitle">A huge thank you to the people who made this possible</h2>
+          </div>
+          <div class="credits-heart" aria-hidden="true">♥</div>
+        </div>
+        <p class="credits-intro">Activate Tracker is built on knowledge, research and access generously shared by members of the Activate community. This app could not exist without their hard work.</p>
+        <div class="credits-contributors">
+          <div class="credits-person">
+            <span>Activate Master Document</span>
+            <strong>Sweaty Spaghetti &amp; HaveAHydrox</strong>
+            <p>For creating and maintaining the badge information and insights that power the tracker.</p>
+          </div>
+          <div class="credits-person">
+            <span>Community knowledge</span>
+            <strong>The Activate Discord</strong>
+            <p>For sharing discoveries, experience and insight with players across the community.</p>
+          </div>
+          <div class="credits-person">
+            <span>Public badge API endpoint</span>
+            <strong>Gondim</strong>
+            <p>For providing the approved API access that makes connected badge tracking possible.</p>
+          </div>
+        </div>
+        <p class="credits-thanks">Thank you for sharing your work with the community and making this tracker possible.</p>
+      </aside>
       <div class="hero">
         <div class="card hero-card" id="homeSummary"></div>
         <div class="card">
@@ -86,12 +115,6 @@
       <div id="trophies" class="trophy-grid"></div>
       <div class="section-title"><h2>Recent achievements</h2></div>
       <div id="recent" class="stack"></div>
-      <aside class="credits-spotlight" aria-labelledby="communityCreditsTitle">
-        <div class="credits-glow" aria-hidden="true"></div>
-        <div class="credits-kicker">Community credits</div>
-        <h2 id="communityCreditsTitle">Powered by the Activate community</h2>
-        <p>Badge info and insights are from the <strong>Activate Master Document</strong>, created by <strong>Sweaty Spaghetti</strong> and <strong>HaveAHydrox</strong>, and the <strong>Activate Discord</strong>. Badge API endpoint provided by <strong>Gondim</strong>.</p>
-      </aside>
     </section>
 
 
@@ -257,7 +280,7 @@
 
 <div class="card">
         <h2>Settings</h2>
-        <p class="sub">Version <strong>14.14.7</strong> — community credits.</p>
+        <p class="sub">Version <strong>14.14.8</strong> — expanded community recognition.</p>
 
         <div class="player-personalisation top-gap">
           <div class="player-name-setting">
@@ -375,7 +398,7 @@
   </div>
 
   <script src="config.js?v=1410"></script>
-  <script src="app.js?v=1417" defer></script>
+  <script src="app.js?v=1418" defer></script>
   <script src="levels-accordion-v1412.js?v=1412" defer></script>
 </body>
 </html>
