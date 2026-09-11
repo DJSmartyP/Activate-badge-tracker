@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bruno+Ace+SC&amp;family=Tektur:wght@700;800;900&amp;family=Tilt+Neon&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=1412">
+  <link rel="stylesheet" href="style.css?v=1413">
   <link rel="stylesheet" href="typography-v1412.css?v=1412">
 </head>
 <body>
@@ -86,6 +86,12 @@
       <div id="trophies" class="trophy-grid"></div>
       <div class="section-title"><h2>Recent achievements</h2></div>
       <div id="recent" class="stack"></div>
+      <aside class="credits-spotlight" aria-labelledby="communityCreditsTitle">
+        <div class="credits-glow" aria-hidden="true"></div>
+        <div class="credits-kicker">Community credits</div>
+        <h2 id="communityCreditsTitle">Powered by the Activate community</h2>
+        <p>Badge info and insights are from the <strong>Activate Master Document</strong>, created by <strong>Sweaty Spaghetti</strong> and <strong>HaveAHydrox</strong>, and the <strong>Activate Discord</strong>. Badge API endpoint provided by <strong>Gondim</strong>.</p>
+      </aside>
     </section>
 
 
@@ -118,6 +124,7 @@
 
   <div class="section-title"><h2>Badges</h2><span id="badgeCount" class="sub"></span></div>
   <div id="badgeList" class="badge-list"></div>
+  <footer class="view-credit-footer">Badge info and insights: <strong>Activate Master Document</strong> by <strong>Sweaty Spaghetti</strong> and <strong>HaveAHydrox</strong>, plus the <strong>Activate Discord</strong> · Badge API endpoint: <strong>Gondim</strong></footer>
 </section>
 
 
@@ -155,6 +162,7 @@
       </div>
     </div>
   </div>
+  <footer class="view-credit-footer">Badge info and insights: <strong>Activate Master Document</strong> by <strong>Sweaty Spaghetti</strong> and <strong>HaveAHydrox</strong>, plus the <strong>Activate Discord</strong> · Badge API endpoint: <strong>Gondim</strong></footer>
 </section>
 
 <section id="competitive" class="view">
@@ -177,6 +185,7 @@
 
   <p class="sub">Built automatically from the rooms selected for this location. Games manually marked unavailable in Locations are excluded.</p>
   <div id="competitiveList" class="badge-list"></div>
+  <footer class="view-credit-footer">Badge info and insights: <strong>Activate Master Document</strong> by <strong>Sweaty Spaghetti</strong> and <strong>HaveAHydrox</strong>, plus the <strong>Activate Discord</strong> · Badge API endpoint: <strong>Gondim</strong></footer>
 </section>
 
 
@@ -205,13 +214,14 @@
         <option value="played">Played</option>
         <option value="unplayed">Not played</option>
       </select>
-    </div></div><div id="levelsList" class="stack top-gap"></div></section>
+    </div></div><div id="levelsList" class="stack top-gap"></div><footer class="view-credit-footer">Badge info and insights: <strong>Activate Master Document</strong> by <strong>Sweaty Spaghetti</strong> and <strong>HaveAHydrox</strong>, plus the <strong>Activate Discord</strong> · Badge API endpoint: <strong>Gondim</strong></footer></section>
 <section id="stats" class="view">
       <div id="statsCards" class="stats-grid"></div>
       <div class="hero top-gap">
         <div class="card"><h2>Earned by room</h2><div id="roomStats" class="stack"></div></div>
         <div class="card"><h2>Achievement history</h2><div id="historyList" class="stack"></div></div>
       </div>
+      <footer class="view-credit-footer">Badge info and insights: <strong>Activate Master Document</strong> by <strong>Sweaty Spaghetti</strong> and <strong>HaveAHydrox</strong>, plus the <strong>Activate Discord</strong> · Badge API endpoint: <strong>Gondim</strong></footer>
     </section>
 
     <section id="settings" class="view">
@@ -247,7 +257,7 @@
 
 <div class="card">
         <h2>Settings</h2>
-        <p class="sub">Version <strong>14.14.6</strong> — single-venue sync with venue high scores.</p>
+        <p class="sub">Version <strong>14.14.7</strong> — community credits.</p>
 
         <div class="player-personalisation top-gap">
           <div class="player-name-setting">
@@ -270,6 +280,7 @@
         <h2>Regional trophy information</h2>
         <p class="sub">Prizes and rewards are intentionally not shown because they can vary by country and location.</p>
       </div>
+      <footer class="view-credit-footer">Badge info and insights: <strong>Activate Master Document</strong> by <strong>Sweaty Spaghetti</strong> and <strong>HaveAHydrox</strong>, plus the <strong>Activate Discord</strong> · Badge API endpoint: <strong>Gondim</strong></footer>
     </section>
   </main>
 
@@ -364,7 +375,7 @@
   </div>
 
   <script src="config.js?v=1410"></script>
-  <script src="app.js?v=1416" defer></script>
+  <script src="app.js?v=1417" defer></script>
   <script src="levels-accordion-v1412.js?v=1412" defer></script>
 </body>
 </html>
