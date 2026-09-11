@@ -74,7 +74,7 @@
   {
     "name": "Adrenaline Junkie",
     "how": "Lose 4 lives before scoring a point, then beat Zap level 8",
-    "room": "Mega Laser / Trench",
+    "room": "Mega Laser",
     "game": "Zap",
     "level": "8",
     "tip": "Fewer players is easier. Designate one person to lose the four lives first."
@@ -382,7 +382,7 @@
   {
     "name": "One By One",
     "how": "Complete Defuse level 5 with 3 players by only completing one target at a time",
-    "room": "Mega Laser / Trench",
+    "room": "Mega Laser",
     "game": "Defuse",
     "level": "5",
     "tip": "If a wave times out, the badge will not award."
@@ -693,7 +693,7 @@
   {
     "name": "Untouchable 8.0",
     "how": "Win level 8 of Defuse without losing a life",
-    "room": "Mega Laser / Trench",
+    "room": "Mega Laser",
     "game": "Defuse",
     "level": "8"
   },
