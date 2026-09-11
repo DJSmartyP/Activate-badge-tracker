@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='14.14.5';
+const VERSION='14.14.6';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 const ACTIVATE_SCORES_SYNC_ENABLED=true;
@@ -15,6 +15,7 @@ let focusContext={source:'single',indices:[]};
 let showPlayerSetupAfterLoad=false;
 let playerSetupMode='first';
 let suspendPlayerCapture=false;
+let pendingPlayerDiscovery=null;
 
 let levelsDisplayMode='levels';
 let contentManagerTab='rooms';
@@ -1335,6 +1336,7 @@ function renderBadges(){
 
 function renderLocations(){
   const l=activeLocation();
+  const visibleLocations=state.locations.filter(location=>!location.activateLocationId||location.id===l.id);
 
   $('selectedVenueBanner').innerHTML=`<span class="label">Current venue</span><strong>${esc(l.name)}</strong>`;
   if($('locationCatalogReview')){
@@ -1346,7 +1348,7 @@ function renderLocations(){
       </div>`:'';
   }
 
-  $('locationList').innerHTML=state.locations.map(x=>`<button class="item location-choice ${x.id===l.id?'active selected-location':''}" data-location="${x.id}">
+  $('locationList').innerHTML=visibleLocations.map(x=>`<button class="item location-choice ${x.id===l.id?'active selected-location':''}" data-location="${x.id}">
     <div class="row between">
       <div>
         <b>${esc(x.name)}</b>
@@ -2295,41 +2297,27 @@ async function syncActivatePlayer(rawName,{preferredLocationId=null}={}){
   if(!playerName)throw new Error('Enter your Activate player name.');
   persistActivePlayer();
   const encoded=encodeURIComponent(playerName);
-  const [locationDirectory,locationHistory,remoteBadges]=await Promise.all([
-    fetchActivateScores('/api/public/activate/locations'),
-    fetchActivateScores(`/api/public/activate/player/${encoded}/locations`),
-    fetchActivateScores(`/api/public/activate/badges/${encoded}`).catch(()=>[])
-  ]);
-  if(!Array.isArray(locationHistory)||!locationHistory.length)throw new Error('No Activate player was found with that name.');
-
-  const directoryById=new Map((Array.isArray(locationDirectory)?locationDirectory:[])
-    .map(location=>[String(location?.id),location]));
-  const remoteLocations=locationHistory.map(entry=>{
-    const id=entry&&typeof entry==='object'?(entry.id??entry.locationId):entry;
-    const directory=directoryById.get(String(id));
-    return {id:Number(id),name:String(entry?.name||directory?.name||`Activate ${id}`).trim()};
-  }).filter(location=>Number.isFinite(location.id));
-  if(!remoteLocations.length)throw new Error('No valid Activate locations were returned for that player.');
-
-  const playerResults=await Promise.all(remoteLocations.map(async remote=>{
-    const [data,games]=await Promise.all([
-      fetchActivateScores(`/api/public/activate/player/${encoded}/location/${encodeURIComponent(remote.id)}`),
-      fetchActivateScores(`/api/public/activate/location/${encodeURIComponent(remote.id)}/games`)
+  let discovery=pendingPlayerDiscovery?.playerName===playerName?pendingPlayerDiscovery:null;
+  if(!discovery){
+    const [locationDirectory,locationHistory,remoteBadges]=await Promise.all([
+      fetchActivateScores('/api/public/activate/locations'),
+      fetchActivateScores(`/api/public/activate/player/${encoded}/locations`),
+      fetchActivateScores(`/api/public/activate/badges/${encoded}`).catch(()=>[])
     ]);
-    const gamesById=new Map((Array.isArray(games)?games:[]).map(game=>[String(game?.id),game]));
-    const scores=(Array.isArray(data?.scores)?data.scores:[]).map(score=>{
-      const game=gamesById.get(String(score?.gameId));
-      return {
-        ...score,
-        gameName:String(game?.name||'').trim(),
-        roomName:String(game?.room?.name||'').trim()
-      };
-    });
-    return {
-      remote,
-      data:{...data,scores,totalScore:scores.reduce((sum,score)=>sum+(Number(score.highScore)||0),0)}
-    };
-  }));
+    if(!Array.isArray(locationHistory)||!locationHistory.length)throw new Error('No Activate player was found with that name.');
+
+    const directoryById=new Map((Array.isArray(locationDirectory)?locationDirectory:[])
+      .map(location=>[String(location?.id),location]));
+    const remoteLocations=locationHistory.map(entry=>{
+      const id=entry&&typeof entry==='object'?(entry.id??entry.locationId):entry;
+      const directory=directoryById.get(String(id));
+      return {id:Number(id),name:String(entry?.name||directory?.name||`Activate ${id}`).trim()};
+    }).filter(location=>Number.isFinite(location.id));
+    if(!remoteLocations.length)throw new Error('No valid Activate locations were returned for that player.');
+    discovery={playerName,remoteLocations,remoteBadges};
+    pendingPlayerDiscovery=discovery;
+  }
+  const {remoteLocations,remoteBadges}=discovery;
 
   const key=playerKey(playerName);
   if(state.playerProfiles[key] && state.activePlayerKey!==key){
@@ -2350,25 +2338,72 @@ async function syncActivatePlayer(rawName,{preferredLocationId=null}={}){
     && manualLocations[0].id==='home'
     && manualLocations[0].name==='My Activate'
     && !manualLocations[0].rooms.length;
-  const onlineLocations=playerResults.map(x=>mergeOnlineLocation(x.remote,x.data));
+  const onlineLocations=remoteLocations.map(remote=>{
+    const existing=state.locations.find(location=>location.id===onlineLocationId(remote.id));
+    if(existing)return {...existing,activateLocationId:Number(remote.id),name:remote.name};
+    const location={
+      id:onlineLocationId(remote.id),activateLocationId:Number(remote.id),name:remote.name,
+      rooms:[],games:[],roomCopies:{},roomInstances:[],
+      venueMap:{Entrance:{front:null,left:null,right:null,back:null},Exit:{front:null,left:null,right:null,back:null}}
+    };
+    ensureLocationShape(location);
+    return location;
+  });
   state.locations=[...onlineLocations,...(isEmptyStarter?[]:manualLocations)];
-
-  let completedLevels=0;
-  playerResults.forEach((x,index)=>{completedLevels+=importOnlineProgress(onlineLocations[index],x.data,playerName)});
-  const preferred=playerResults.reduce((best,x)=>!best||Number(x.data.totalScore)>Number(best.data.totalScore)?x:best,null);
-  const preferredId=remoteLocations.some(x=>String(x.id)===String(preferredLocationId))
-    ? preferredLocationId
-    : (preferred?.remote?.id||remoteLocations[0].id);
-  state.activeLocation=onlineLocationId(preferredId);
   state.playerName=playerName;
-  state.playerProfile={name:playerName,source:'Activate-scores.ca',syncedAt:new Date().toISOString()};
+  state.playerProfile={...(state.playerProfile||{}),name:playerName,source:'Activate-scores.ca'};
   state.setupMode='online';
   const badges=importOnlineBadges(remoteBadges);
   state.activePlayerKey=key;
   state.playerProfiles[key]=state.playerProfiles[key]||{};
+
+  if(preferredLocationId===null || preferredLocationId===undefined){
+    save();
+    renderAll();
+    return {playerName,locations:remoteLocations.length,completedLevels:0,badgesImported:badges.imported,badgesUnmatched:badges.unmatched,awaitingLocation:true};
+  }
+
+  const selectedRemote=remoteLocations.find(location=>String(location.id)===String(preferredLocationId));
+  if(!selectedRemote)throw new Error('That venue is not available for this player.');
+  const [data,games]=await Promise.all([
+    fetchActivateScores(`/api/public/activate/player/${encoded}/location/${encodeURIComponent(selectedRemote.id)}`),
+    fetchActivateScores(`/api/public/activate/location/${encodeURIComponent(selectedRemote.id)}/games`)
+  ]);
+  const gameList=Array.isArray(games)?games:[];
+  const gamesById=new Map(gameList.map(game=>[String(game?.id),game]));
+  const roomIds=[...new Set(gameList.map(game=>Number(game?.room?.id)).filter(Number.isFinite))];
+  const highScoreRoomIds=roomIds.slice(0,13);
+  const roomHighScores=await Promise.all(highScoreRoomIds.map(roomId=>
+    fetchActivateScores(`/api/public/activate/location/${encodeURIComponent(selectedRemote.id)}/rooms/${encodeURIComponent(roomId)}/highscores`).catch(()=>[])
+  ));
+  const venueHighByLevel=new Map();
+  roomHighScores.flat().forEach(score=>{
+    venueHighByLevel.set(`${score?.gameId}||${score?.levelId}`,Math.max(0,Number(score?.highScore)||0));
+  });
+  const playerScoresByLevel=new Map((Array.isArray(data?.scores)?data.scores:[])
+    .map(score=>[`${score?.gameId}||${score?.levelId}`,score]));
+  const scoreKeys=new Set([...playerScoresByLevel.keys(),...venueHighByLevel.keys()]);
+  const scores=[...scoreKeys].map(key=>{
+    const [gameId,levelId]=key.split('||').map(Number);
+    const score=playerScoresByLevel.get(key)||{gameId,levelId,highScore:0};
+    const game=gamesById.get(String(score?.gameId));
+    return {
+      ...score,
+      gameName:String(game?.name||'').trim(),
+      roomName:String(game?.room?.name||'').trim(),
+      topScore:venueHighByLevel.get(`${score?.gameId}||${score?.levelId}`)||0
+    };
+  });
+  const playerData={...data,scores,totalScore:scores.reduce((sum,score)=>sum+(Number(score.highScore)||0),0)};
+  const selectedLocation=mergeOnlineLocation(selectedRemote,playerData);
+  state.locations=state.locations.map(location=>location.id===selectedLocation.id?selectedLocation:location);
+  const completedLevels=importOnlineProgress(selectedLocation,playerData,playerName);
+  state.activeLocation=selectedLocation.id;
+  state.playerProfile={...state.playerProfile,syncedAt:new Date().toISOString()};
+  pendingPlayerDiscovery=null;
   save();
   renderAll();
-  return {playerName,locations:onlineLocations.length,completedLevels,badgesImported:badges.imported,badgesUnmatched:badges.unmatched};
+  return {playerName,locations:remoteLocations.length,completedLevels,badgesImported:badges.imported,badgesUnmatched:badges.unmatched,venueHighRooms:highScoreRoomIds.length,venueHighRoomsAvailable:roomIds.length};
 }
 
 function renderPlayerSetup(mode=playerSetupMode,{message='',showOffline=false}={}){
@@ -2391,7 +2426,7 @@ function renderPlayerSetup(mode=playerSetupMode,{message='',showOffline=false}={
     title.textContent=`Choose ${playerDisplayName()}’s location`;
     lead.textContent=message||'Your tracker will refresh before it opens.';
     locations.classList.remove('hidden');
-    locations.innerHTML=state.locations.map(l=>`<button class="item player-launch-choice" type="button" data-setup-location="${esc(l.id)}"><strong>${esc(l.name)}</strong><span class="sub">Location profile • ${l.rooms.length} rooms</span></button>`).join('');
+    locations.innerHTML=state.locations.map(l=>`<button class="item player-launch-choice" type="button" data-setup-location="${esc(l.id)}"><strong>${esc(l.name)}</strong><span class="sub">${l.activateLocationId?'Choose to load only this venue':`Saved manual location • ${l.rooms.length} rooms`}</span></button>`).join('');
     footer.classList.remove('hidden');
     if(showOffline)offline.classList.remove('hidden');
   }else if(mode==='loading'){
@@ -3275,16 +3310,11 @@ function bindEvents(){
     const name=input?.value||'';
     const wasFirst=!Object.keys(state.playerProfiles||{}).length;
     submit.disabled=true;
-    renderPlayerSetup('loading',{message:'Finding your player and importing locations…'});
+    renderPlayerSetup('loading',{message:'Finding your available Activate venues…'});
     try{
       const result=await syncActivatePlayer(name);
-      toast(`Connected as ${result.playerName}`);
-      if(wasFirst){
-        $('playerSetupLoadingText').textContent=`Ready — ${result.locations} location${result.locations===1?'':'s'}, ${result.completedLevels} completed levels and ${result.badgesImported} badges loaded.`;
-        setTimeout(()=>setPlayerSetupOpen(false),900);
-      }else{
-        renderPlayerSetup('locations',{message:'Player added. Choose a location to open.'});
-      }
+      toast(`Found ${result.locations} venue${result.locations===1?'':'s'}`);
+      renderPlayerSetup('locations',{message:'Choose one venue to load. Other venues will not be requested.'});
     }catch(err){
       console.error('Activate Scores sync failed',err);
       renderPlayerSetup(wasFirst?'first':'add',{message:err?.message||'Could not connect to Activate Scores.'});
@@ -3318,7 +3348,15 @@ function bindEvents(){
       const key=playerButton.dataset.setupPlayer;
       if(loadPlayerProfile(key)){
         renderAll();
-        renderPlayerSetup('locations');
+        renderPlayerSetup('loading',{message:`Finding ${playerDisplayName()}’s available venues…`});
+        try{
+          const result=await syncActivatePlayer(state.playerProfile?.name||state.playerName);
+          renderPlayerSetup('locations',{message:`Choose one of ${result.locations} venues to load. Only that venue will be requested.`});
+        }catch(err){
+          console.error('Venue lookup failed',err);
+          renderAll();
+          renderPlayerSetup('locations',{message:`Could not refresh venue choices: ${err?.message||'Unknown error'}`,showOffline:true});
+        }
       }
       return;
     }
@@ -3328,11 +3366,16 @@ function bindEvents(){
       if(!locationRecord)return;
       state.activeLocation=locationRecord.id;
       save();
+      if(!locationRecord.activateLocationId){
+        setPlayerSetupOpen(false);
+        toast(`Opened ${locationRecord.name} from saved data`);
+        return;
+      }
       renderPlayerSetup('loading',{message:`Refreshing ${playerDisplayName()} at ${locationRecord.name}…`});
       try{
-        await syncActivatePlayer(state.playerProfile?.name||state.playerName,{preferredLocationId:locationRecord.activateLocationId});
+        const result=await syncActivatePlayer(state.playerProfile?.name||state.playerName,{preferredLocationId:locationRecord.activateLocationId});
         setPlayerSetupOpen(false);
-        toast('Tracker refreshed');
+        toast(`Loaded ${locationRecord.name} • ${result.venueHighRooms} high-score rooms`);
       }catch(err){
         console.error('Launch refresh failed',err);
         renderAll();
@@ -3515,6 +3558,6 @@ function bindEvents(){
   onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();ensureContentState();applyContentCatalog();renderAll();setPlayerSetupOpen(true)}});
 }
 
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1415',{updateViaCache:'none'}).catch(console.error));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1416',{updateViaCache:'none'}).catch(console.error));
 init();
 installBackGuard();
