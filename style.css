@@ -12591,44 +12591,16 @@ button{
   line-height:1.08;
   text-shadow:0 0 16px rgba(26,217,255,.18);
 }
-.credits-intro{
-  max-width:920px;
-  margin:2px 0 19px;
-  color:#e3e9f7;
-  font-size:clamp(16px,1.7vw,19px);
-  line-height:1.58;
-}
-.credits-contributors{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:10px;
-}
-.credits-person{
-  padding:15px 16px;
-  border:1px solid rgba(143,247,255,.18);
+.credits-original-copy{
+  max-width:980px;
+  margin:3px 0 0;
+  padding:17px 19px;
+  border:1px solid rgba(143,247,255,.24);
   border-radius:15px;
-  background:rgba(7,11,24,.52);
-}
-.credits-person span{
-  display:block;
-  margin-bottom:6px;
-  color:#8ff7ff;
-  font-size:11px;
-  font-weight:900;
-  letter-spacing:.10em;
-  text-transform:uppercase;
-}
-.credits-person strong{
-  display:block;
-  color:#fff;
-  font-size:17px;
-  line-height:1.25;
-}
-.credits-person p{
-  margin:7px 0 0;
-  color:#aebbd2;
-  font-size:13px;
-  line-height:1.48;
+  color:#e3e9f7;
+  background:rgba(7,11,24,.50);
+  font-size:clamp(16px,1.7vw,19px);
+  line-height:1.62;
 }
 .credits-thanks{
   margin:17px 0 0;
@@ -12662,10 +12634,7 @@ button{
   .credits-kicker{font-size:11px}
   .credits-spotlight h2{font-size:26px}
   .credits-heart{width:44px;height:44px;border-radius:14px;font-size:23px}
-  .credits-intro{font-size:15px}
-  .credits-contributors{grid-template-columns:1fr}
-  .credits-person strong{font-size:16px}
-  .credits-person p{font-size:13px}
+  .credits-original-copy{padding:15px;font-size:15px}
   .credits-thanks{font-size:14px;text-align:left}
   .view-credit-footer{margin-top:26px;font-size:11px}
 }
