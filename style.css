@@ -13023,3 +13023,15 @@ button{
     font-size:19px !important;
   }
 }
+
+/* A wrapped load confirmation can be taller than the toast's 80px exit offset.
+   Hide the whole message after its brief display, regardless of its height. */
+.toast{
+  visibility:hidden;
+  opacity:0;
+  pointer-events:none;
+}
+.toast.show{
+  visibility:visible;
+  opacity:1;
+}
