@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='14.14.13';
+const VERSION='14.14.14';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 const ACTIVATE_SCORES_SYNC_ENABLED=true;
@@ -2189,6 +2189,10 @@ async function fetchActivateScores(path){
   }
 }
 
+function isVenueHighScore(score,topScore){
+  return Number(score)>0 && Number(topScore)>0 && Number(score)===Number(topScore);
+}
+
 function onlineLocationId(remoteId){return `activate-${remoteId}`}
 
 function mergeOnlineLocation(remoteLocation,playerData){
@@ -2373,11 +2377,18 @@ async function syncActivatePlayer(rawName,{preferredLocationId=null}={}){
   const gamesById=new Map(gameList.map(game=>[String(game?.id),game]));
   const roomIds=[...new Set(gameList.map(game=>Number(game?.room?.id)).filter(Number.isFinite))];
   const highScoreRoomIds=roomIds.slice(0,13);
-  const roomHighScores=await Promise.all(highScoreRoomIds.map(roomId=>
-    fetchActivateScores(`/api/public/activate/location/${encodeURIComponent(selectedRemote.id)}/rooms/${encodeURIComponent(roomId)}/highscores`).catch(()=>[])
-  ));
+  const roomHighScoreResults=await Promise.all(highScoreRoomIds.map(async roomId=>{
+    try{
+      const scores=await fetchActivateScores(`/api/public/activate/location/${encodeURIComponent(selectedRemote.id)}/rooms/${encodeURIComponent(roomId)}/highscores`);
+      return {scores:Array.isArray(scores)?scores:[],checked:Array.isArray(scores)};
+    }catch{
+      return {scores:[],checked:false};
+    }
+  }));
+  const venueHighRoomsChecked=roomHighScoreResults.filter(({checked})=>checked).length;
+  const roomHighScores=roomHighScoreResults.flatMap(({scores})=>scores);
   const venueHighByLevel=new Map();
-  roomHighScores.flat().forEach(score=>{
+  roomHighScores.forEach(score=>{
     venueHighByLevel.set(`${score?.gameId}||${score?.levelId}`,Math.max(0,Number(score?.highScore)||0));
   });
   const playerScoresByLevel=new Map((Array.isArray(data?.scores)?data.scores:[])
@@ -2394,6 +2405,11 @@ async function syncActivatePlayer(rawName,{preferredLocationId=null}={}){
       topScore:venueHighByLevel.get(`${score?.gameId}||${score?.levelId}`)||0
     };
   });
+  const playerVenueHighScores=scores.filter(score=>isVenueHighScore(score.highScore,score.topScore));
+  const venueHighScores=playerVenueHighScores.length;
+  const venueHighRooms=new Set(playerVenueHighScores.map(score=>
+    gamesById.get(String(score.gameId))?.room?.id
+  ).filter(roomId=>roomId!==null&&roomId!==undefined)).size;
   const playerData={...data,scores,totalScore:scores.reduce((sum,score)=>sum+(Number(score.highScore)||0),0)};
   const selectedLocation=mergeOnlineLocation(selectedRemote,playerData);
   state.locations=state.locations.map(location=>location.id===selectedLocation.id?selectedLocation:location);
@@ -2403,7 +2419,7 @@ async function syncActivatePlayer(rawName,{preferredLocationId=null}={}){
   pendingPlayerDiscovery=null;
   save();
   renderAll();
-  return {playerName,locations:remoteLocations.length,completedLevels,badgesImported:badges.imported,badgesUnmatched:badges.unmatched,venueHighRooms:highScoreRoomIds.length,venueHighRoomsAvailable:roomIds.length};
+  return {playerName,locations:remoteLocations.length,completedLevels,badgesImported:badges.imported,badgesUnmatched:badges.unmatched,venueHighScores,venueHighRooms,venueHighRoomsChecked,venueHighRoomsAvailable:roomIds.length};
 }
 
 function renderPlayerSetup(mode=playerSetupMode,{message='',showOffline=false}={}){
@@ -2864,7 +2880,7 @@ function renderLevels(){
         const done=!!info.complete;
         const score=Number(info.score)||0;
         const topScore=Number(info.topScore)||0;
-        const isHighScore=score>0 && topScore>0 && score===topScore;
+        const isHighScore=isVenueHighScore(score,topScore);
 
         totalLevels++;
         if(done)completeLevels++;
@@ -3375,7 +3391,11 @@ function bindEvents(){
       try{
         const result=await syncActivatePlayer(state.playerProfile?.name||state.playerName,{preferredLocationId:locationRecord.activateLocationId});
         setPlayerSetupOpen(false);
-        toast(`Loaded ${locationRecord.name} • ${result.venueHighRooms} high-score rooms`);
+        const highScoreSummary=`${result.venueHighScores} venue high ${result.venueHighScores===1?'score':'scores'} across ${result.venueHighRooms} ${result.venueHighRooms===1?'room':'rooms'}`;
+        const coverage=result.venueHighRoomsChecked<result.venueHighRoomsAvailable
+          ? ` • ${result.venueHighRoomsChecked}/${result.venueHighRoomsAvailable} rooms checked`
+          : '';
+        toast(`Loaded ${locationRecord.name} • ${highScoreSummary}${coverage}`);
       }catch(err){
         console.error('Launch refresh failed',err);
         renderAll();
@@ -3558,6 +3578,6 @@ function bindEvents(){
   onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();ensureContentState();applyContentCatalog();renderAll();setPlayerSetupOpen(true)}});
 }
 
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1423',{updateViaCache:'none'}).catch(console.error));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1424',{updateViaCache:'none'}).catch(console.error));
 init();
 installBackGuard();
