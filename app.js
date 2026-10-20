@@ -2195,21 +2195,17 @@ function isVenueHighScore(score,topScore){
 
 function onlineLocationId(remoteId){return `activate-${remoteId}`}
 
-function mergeOnlineLocation(remoteLocation,playerData){
+function mergeOnlineLocation(remoteLocation,venueGames){
   const id=onlineLocationId(remoteLocation.id);
   const existing=state.locations.find(l=>l.id===id);
-  const roomNames=[...new Set((playerData.scores||[]).map(x=>String(x.roomName||'').trim()).filter(r=>ROOMS.includes(r)))];
-  const priorActivateRooms=Array.isArray(existing?.activateRooms)?existing.activateRooms:roomNames;
+  const roomNames=[...new Set((venueGames||[]).map(game=>String(game?.room?.name||'').trim()).filter(r=>ROOMS.includes(r)))];
+  const priorActivateRooms=Array.isArray(existing?.activateRooms)?existing.activateRooms:[];
   const selectedRooms=new Set(Array.isArray(existing?.rooms)?existing.rooms:[]);
-  const manuallyAddedRooms=existing
-    ? [...selectedRooms].filter(room=>!priorActivateRooms.includes(room))
-    : [];
-  const manuallyRemovedRooms=existing
-    ? priorActivateRooms.filter(room=>!selectedRooms.has(room))
-    : [];
+  // Remember previously offered rooms so a sparse refresh cannot undo a manual removal.
+  const manuallyRemovedRooms=priorActivateRooms.filter(room=>!selectedRooms.has(room));
   const rooms=[...new Set([
     ...roomNames.filter(room=>!manuallyRemovedRooms.includes(room)),
-    ...manuallyAddedRooms
+    ...selectedRooms
   ])].filter(room=>ROOMS.includes(room));
   const imported={
     ...(existing||{}),
@@ -2217,7 +2213,7 @@ function mergeOnlineLocation(remoteLocation,playerData){
     activateLocationId:Number(remoteLocation.id),
     name:String(remoteLocation.name||`Activate ${remoteLocation.id}`).trim(),
     rooms,
-    activateRooms:roomNames,
+    activateRooms:[...new Set([...priorActivateRooms,...roomNames])],
     games:Array.isArray(existing?.games)?existing.games:[],
     excludedGames:Array.isArray(existing?.excludedGames)?existing.excludedGames:[],
     roomCopies:existing?.roomCopies||{},
@@ -2411,7 +2407,7 @@ async function syncActivatePlayer(rawName,{preferredLocationId=null}={}){
     gamesById.get(String(score.gameId))?.room?.id
   ).filter(roomId=>roomId!==null&&roomId!==undefined)).size;
   const playerData={...data,scores,totalScore:scores.reduce((sum,score)=>sum+(Number(score.highScore)||0),0)};
-  const selectedLocation=mergeOnlineLocation(selectedRemote,playerData);
+  const selectedLocation=mergeOnlineLocation(selectedRemote,gameList);
   state.locations=state.locations.map(location=>location.id===selectedLocation.id?selectedLocation:location);
   const completedLevels=importOnlineProgress(selectedLocation,playerData,playerName);
   state.activeLocation=selectedLocation.id;
