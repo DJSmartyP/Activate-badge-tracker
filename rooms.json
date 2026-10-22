@@ -49,7 +49,6 @@
     "Flip",
     "Frequency",
     "Gauntlet",
-    "Gem Rush",
     "Gems",
     "Grid",
     "Gridlock",
@@ -258,7 +257,6 @@
     },
     "Press": {
       "competitive": [
-        "Gem Rush",
         "Mosh Pit",
         "Paris"
       ],
@@ -431,11 +429,6 @@
       "room": "Mega Laser",
       "game": "Flash Fight",
       "description": "Memorize the position of each of your coloured targets, then once they all disappear, shoot all of your coloured targets the fastest to win."
-    },
-    "Press||Gem Rush": {
-      "room": "Press",
-      "game": "Gem Rush",
-      "description": "Look at the four buttons in the top middle of the room. Each player tries to find those four buttons on their board the fastest. After 15 seconds, whoever found the most correct buttons wins the round. In a tie, both players get a point for the round. Whoever wins 3 rounds first wins the game."
     },
     "Press||Mosh Pit": {
       "room": "Press",

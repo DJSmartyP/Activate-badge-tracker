@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION='14.14.14';
+const VERSION='14.14.15';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 const ACTIVATE_SCORES_SYNC_ENABLED=true;
@@ -2195,8 +2195,72 @@ function isVenueHighScore(score,topScore){
 
 function onlineLocationId(remoteId){return `activate-${remoteId}`}
 
-function mergeOnlineLocation(remoteLocation,venueGames){
-  const id=onlineLocationId(remoteLocation.id);
+const venueRoomRequests=new Map();
+let venueRoomDirectoryPromise=null;
+
+async function populateVenueRooms(locationId=state.activeLocation){
+  const locationRecord=state.locations.find(l=>l.id===locationId);
+  if(!locationRecord || locationRecord.venueRoomsLoadedAt || !ACTIVATE_SCORES_SYNC_ENABLED)return;
+  const ownerState=state,ownerPlayer=state.activePlayerKey;
+  const requestedName=locationRecord.name;
+  const initialRooms=[...(locationRecord.rooms||[])];
+  const requestKey=JSON.stringify([ownerPlayer,locationId]);
+  if(venueRoomRequests.has(requestKey))return venueRoomRequests.get(requestKey);
+  const request=Promise.resolve().then(async()=>{
+    try{
+      let remoteId=locationRecord.activateLocationId||locationRecord.roomSourceLocationId;
+      let remoteName=locationRecord.name;
+      if(!remoteId){
+        // Manual venues must match an actual venue name; never guess from a partial name.
+        if(!locationRecord.name || locationRecord.name==='My Activate' || locationRecord.name==='New location')return;
+        if(!venueRoomDirectoryPromise){
+          venueRoomDirectoryPromise=fetchActivateScores('/api/public/activate/locations').catch(err=>{
+            venueRoomDirectoryPromise=null;
+            throw err;
+          });
+        }
+        const directory=await venueRoomDirectoryPromise;
+        const matches=(Array.isArray(directory)?directory:[]).filter(l=>
+          String(l.name||'').trim().toLowerCase()===String(locationRecord.name).trim().toLowerCase());
+        if(matches.length!==1){
+          venueRoomDirectoryPromise=null;
+          return;
+        }
+        remoteId=matches[0].id;
+        remoteName=matches[0].name;
+      }
+      const games=await fetchActivateScores(`/api/public/activate/location/${encodeURIComponent(remoteId)}/games`);
+      if(!Array.isArray(games) || !games.some(g=>ROOMS.includes(String(g?.room?.name||'').trim())))return;
+      // A player switch or venue deletion while fetching must not change the new profile.
+      if(state!==ownerState || state.activePlayerKey!==ownerPlayer)return;
+      const latest=state.locations.find(l=>l.id===locationId);
+      if(latest!==locationRecord || latest.name!==requestedName)return;
+      const merged=mergeOnlineLocation({id:remoteId,name:remoteName},games,locationId);
+      const removedWhileLoading=initialRooms.filter(room=>!latest.rooms.includes(room));
+      merged.rooms=merged.rooms.filter(room=>!removedWhileLoading.includes(room));
+      if(!latest.activateLocationId){
+        delete merged.activateLocationId;
+        merged.roomSourceLocationId=Number(remoteId);
+        merged.name=latest.name;
+      }
+      state.locations=state.locations.map(l=>l.id===locationId?merged:l);
+      save();
+      renderAll();
+    }catch(err){
+      console.warn('Venue room lookup failed',err);
+      if(state===ownerState && state.activePlayerKey===ownerPlayer && state.activeLocation===locationId){
+        toast('Could not load venue rooms. Saved rooms are available; select the venue again to retry.');
+      }
+    }finally{
+      venueRoomRequests.delete(requestKey);
+    }
+  });
+  venueRoomRequests.set(requestKey,request);
+  return request;
+}
+
+function mergeOnlineLocation(remoteLocation,venueGames,locationId=onlineLocationId(remoteLocation.id)){
+  const id=locationId;
   const existing=state.locations.find(l=>l.id===id);
   const roomNames=[...new Set((venueGames||[]).map(game=>String(game?.room?.name||'').trim()).filter(r=>ROOMS.includes(r)))];
   const priorActivateRooms=Array.isArray(existing?.activateRooms)?existing.activateRooms:[];
@@ -2214,6 +2278,7 @@ function mergeOnlineLocation(remoteLocation,venueGames){
     name:String(remoteLocation.name||`Activate ${remoteLocation.id}`).trim(),
     rooms,
     activateRooms:[...new Set([...priorActivateRooms,...roomNames])],
+    venueRoomsLoadedAt:roomNames.length?new Date().toISOString():existing?.venueRoomsLoadedAt,
     games:Array.isArray(existing?.games)?existing.games:[],
     excludedGames:Array.isArray(existing?.excludedGames)?existing.excludedGames:[],
     roomCopies:existing?.roomCopies||{},
@@ -2991,6 +3056,7 @@ async function init(){
     bindEvents();
     renderAll();
     if(showPlayerSetupAfterLoad)setPlayerSetupOpen(true,playerSetupMode);
+    else void populateVenueRooms();
 }catch(err){
     console.error(err);
     
@@ -3269,7 +3335,7 @@ function bindEvents(){
       l.excludedGames=l.excludedGames.includes(g)?l.excludedGames.filter(x=>x!==g):[...l.excludedGames,g];
       renderAll();return
     }
-    const loc=e.target.closest('[data-location]');if(loc){state.activeLocation=loc.dataset.location;renderAll();return}
+    const loc=e.target.closest('[data-location]');if(loc){state.activeLocation=loc.dataset.location;renderAll();void populateVenueRooms();return}
     const rt=e.target.closest('[data-room-toggle]');if(rt){
       const l=activeLocation(),r=rt.dataset.roomToggle;
       const removing=l.rooms.includes(r);
@@ -3380,6 +3446,8 @@ function bindEvents(){
       save();
       if(!locationRecord.activateLocationId){
         setPlayerSetupOpen(false);
+        renderAll();
+        void populateVenueRooms(locationRecord.id);
         toast(`Opened ${locationRecord.name} from saved data`);
         return;
       }
@@ -3429,7 +3497,17 @@ function bindEvents(){
   listen('targetRoom','change',renderBadges);
   listen('badgeStatus','change',renderBadges);
   listen('badgeAvailability','change',renderBadges);
-  listen('locationName','input',e=>{activeLocation().name=e.target.value;save();renderHome()});
+  listen('locationName','input',e=>{
+    const locationRecord=activeLocation();
+    if(!locationRecord.activateLocationId && locationRecord.name!==e.target.value){
+      // A renamed manual venue must resolve its new name before using a saved source ID.
+      delete locationRecord.roomSourceLocationId;
+      delete locationRecord.venueRoomsLoadedAt;
+      delete locationRecord.activateRooms;
+    }
+    locationRecord.name=e.target.value;
+    save();renderHome();
+  });
   listen('playerDisplayName','input',e=>{
     state.playerName=normalisePlayerName(e.target.value);
     renderPlayerBrand();
@@ -3574,6 +3652,6 @@ function bindEvents(){
   onClick('resetApp',()=>{if(confirm('Reset all app data?')){state=defaultState();ensureContentState();applyContentCatalog();renderAll();setPlayerSetupOpen(true)}});
 }
 
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1424',{updateViaCache:'none'}).catch(console.error));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=1425',{updateViaCache:'none'}).catch(console.error));
 init();
 installBackGuard();
