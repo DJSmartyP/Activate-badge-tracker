@@ -486,7 +486,7 @@ function applyBadgeCatalog(){
 
   BADGE_ENTITIES=records;
   BADGES=records.map(x=>x.badge);
-  BASE_BADGE_COUNT=BADGES.filter(b=>!b?._archived).length;
+  BASE_BADGE_COUNT=BADGES.filter(b=>!b?._archived&&!isUpcomingBadge(b)).length;
   ensureBadgeAwardState();
 }
 
@@ -691,8 +691,15 @@ function applyContentCatalog(){
   syncTrophies();
 }
 
+function isUpcomingBadge(b){
+  if(!b?.availableFrom)return false;
+  const now=new Date();
+  const today=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  return today<b.availableFrom;
+}
+
 function activeTrackedBadgeIndices(){
-  return BADGES.map((b,i)=>[b,i]).filter(([b])=>!b?._archived).map(([,i])=>i);
+  return BADGES.map((b,i)=>[b,i]).filter(([b])=>!b?._archived&&!isUpcomingBadge(b)).map(([,i])=>i);
 }
 
 function replaceDelimitedName(value,oldName,newName){
@@ -1043,7 +1050,7 @@ function ensureLocationShape(l){
 }
 
 function availableAtLocation(b,l=activeLocation()){
-  if(b?._archived||!l)return false;
+  if(b?._archived||isUpcomingBadge(b)||!l)return false;
   const type=b?.availabilityType||defaultBadgeAvailabilityType(b,b?.room,b?.game);
 
   // Any Room includes venue-relative rules such as Riddle 7.0.
@@ -1323,12 +1330,12 @@ function renderBadges(){
 
   $('badgeCount').textContent=`${rows.length} shown`;
   $('badgeList').innerHTML=rows.length?rows.map(([b,i])=>`<article class="badge target-card clickable-badge ${availableHere(b)?'available-here':'other-location'} ${state.earned[i]?'done completed-target':''} ${state.pins.includes(i)?'pinned-target':''}" data-open-focus-badge="${i}" data-focus-source="badges">
-    <button class="checkbtn" data-toggle-earned="${i}">${state.earned[i]?'✓':''}</button>
+    <button class="checkbtn" data-toggle-earned="${i}" ${isUpcomingBadge(b)?'disabled title="Available 28 October"':''}>${state.earned[i]?'✓':''}</button>
     <div><h3>${esc(b.name)}</h3><p>${esc(b.how)}</p>${badgeProgressMarkup(i)}<div class="tags">
       <span class="tag">${isEasterEggBadge(b)?'Badge • Easter Egg':isRiddleBadge(b)?'Badge • Riddle':'Badge'}</span>
       <span class="tag">${esc(badgeScopeLabel(b))}</span>
       ${awardTermsChanged(i)?'<span class="tag award-legacy-tag">Earned under earlier terms</span>':''}
-      <span class="tag availability-tag ${availableHere(b)?'ok':'away'}">${availableHere(b)?'Available here':'Other location'}</span>
+       <span class="tag availability-tag ${availableHere(b)?'ok':'away'}">${isUpcomingBadge(b)?'Preview · Available 28 October':availableHere(b)?'Available here':'Other location'}</span>
     </div></div>
     <div class="row"><button type="button" class="mini pin-button ${state.pins.includes(i)?'active':''}" data-pin-badge="${i}" aria-pressed="${state.pins.includes(i)?'true':'false'}" aria-label="${state.pins.includes(i)?'Unpin':'Pin'} ${esc(b.name)}" title="${state.pins.includes(i)?'Unpin badge':'Pin badge'}">${state.pins.includes(i)?'📌':'📍'}</button><button class="mini" data-open-focus-badge="${i}" title="Open badge">›</button></div>
   </article>`).join(''):'<div class="item sub">No badges match those filters.</div>';
@@ -1906,6 +1913,7 @@ function toggleContentArchived(type,id){
 function renderAll(){ensureLevelProgress();renderPlayerBrand();renderHome();renderBadges();renderLocations();renderCompetitive();renderLevels();renderStats();renderContentManager();renderPlayerSyncInfo();save()}
 
 function toggleEarn(i){
+  if(isUpcomingBadge(BADGES[i]))return;
   if(state.earned[i]){
     delete state.earned[i];
     state.history=state.history.filter(h=>Number(h.badge)!==Number(i));
@@ -1927,6 +1935,7 @@ function openBadge(i){
   const award=state.badgeAwards?.[badgeIdAt(i)];
   $('modalBody').innerHTML=`
     <div class="detail"><strong>How to earn</strong>${esc(b.how)}</div>
+    ${isUpcomingBadge(b)?'<div class="detail"><strong>Preview</strong>Expected to become earnable on 28 October 2026.</div>':''}
     ${badgeProgressMarkup(i,{detail:true})}
     ${badgeRequirementMarkup(b)}
     ${state.earned[i]&&awardTermsChanged(i)?`<div class="detail award-legacy-detail"><strong>Earned under earlier terms</strong>This badge remains earned. Award recorded ${esc(award?.earnedAt||'previously')}.</div>`:''}
@@ -1934,7 +1943,7 @@ function openBadge(i){
     ${b.hint?`<div class="detail"><strong>Hint</strong>${esc(b.hint)}</div>`:''}
     ${b.solution?`<div class="detail"><strong>Spoiler solution</strong><button id="revealSolution" class="btn ghost">Reveal</button><div id="solutionText" style="display:none;margin-top:8px">${esc(b.solution)}</div></div>`:''}`;
   $('modalEarn').textContent=state.earned[i]?'Mark not earned':'Mark earned';
-  $('modalEarn').disabled=false;
+  $('modalEarn').disabled=isUpcomingBadge(b);
   $('modalPin').textContent=state.pins.includes(i)?'Unpin':'Pin';
   $('badgeModal').classList.add('open');
   if($('revealSolution'))$('revealSolution').onclick=()=>{$('solutionText').style.display='block';$('revealSolution').style.display='none'};
@@ -2086,7 +2095,8 @@ function openBadgeFocus(i,opts={}){
     <div class="focus-meta">${esc(b.room||'Any room')}${b.game?' • '+esc(b.game):''}${b.level?' • Level '+esc(b.level):''}</div>
     <h2 class="focus-title">${esc(b.name)}</h2>
     ${achieved?'<div class="focus-achieved-banner"><span class="focus-achieved-symbol">★</span><span>ACHIEVED</span></div>':''}
-    <p class="focus-requirement">${esc(b.how)}</p>
+     <p class="focus-requirement">${esc(b.how)}</p>
+     ${isUpcomingBadge(b)?'<div class="detail"><strong>Preview</strong>Expected to become earnable on 28 October 2026.</div>':''}
     ${badgeProgressMarkup(badgeIndex,{detail:true})}
   </section>
   <section>
@@ -2100,7 +2110,7 @@ function openBadgeFocus(i,opts={}){
 
   const completeBtn=$('focusComplete');
   if(completeBtn){
-    completeBtn.disabled=achieved || isTrophy(b);
+     completeBtn.disabled=achieved || isTrophy(b) || isUpcomingBadge(b);
     completeBtn.classList.toggle('achieved-locked',achieved);
     completeBtn.classList.toggle('trophy-locked',isTrophy(b)&&!achieved);
 

@@ -50,6 +50,7 @@
     "Frequency",
     "Gauntlet",
     "Gems",
+    "Globe",
     "Grid",
     "Gridlock",
     "Hunt",
@@ -61,6 +62,7 @@
     "Laser Relay",
     "Link",
     "Lollipop",
+    "Loop",
     "Match",
     "Maze",
     "Mega Grid",
@@ -83,6 +85,7 @@
     "Reveal",
     "Rings",
     "Runner",
+    "Scan Rush",
     "Scramble",
     "Sectors",
     "Seeker",
@@ -106,6 +109,7 @@
     "Tile Relay",
     "Trip Wire",
     "Trivial",
+    "Traverse",
     "Undercover",
     "Whack-A-Hold",
     "Words",
@@ -169,7 +173,11 @@
     },
     "Grip": {
       "competitive": [],
-      "cooperative": []
+      "cooperative": [
+        "Globe",
+        "Loop",
+        "Traverse"
+      ]
     },
     "Hide": {
       "competitive": [
@@ -204,7 +212,8 @@
         "Chopper",
         "Sneak",
         "Laser Maze",
-        "Photon Rush"
+        "Photon Rush",
+        "Scan Rush"
       ]
     },
     "Mega Grid": {
