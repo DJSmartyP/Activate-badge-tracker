@@ -309,8 +309,7 @@
   {
     "name": "Go For Gold",
     "how": "Qualify for a tournament",
-    "tip": "The document clarifies that this means the Tournament of Champions: top 30 yearly scores at your location at year end.",
-    "availableFrom": "2026-10-28"
+    "tip": "The document clarifies that this means the Tournament of Champions: top 30 yearly scores at your location at year end."
   },
   {
     "name": "Halfway Mark",
@@ -728,197 +727,171 @@
     "name": "Easter Egg Bullet Train",
     "how": "Find the egg, win the level",
     "room": "Press",
-    "game": "Bullet Train",
-    "availableFrom": "2026-10-28"
+    "game": "Bullet Train"
   },
   {
     "name": "Easter Egg Relay",
     "how": "Find the egg, win the level",
     "room": "Hide",
-    "game": "Relay",
-    "availableFrom": "2026-10-28"
+    "game": "Relay"
   },
   {
     "name": "Easter Egg Zap",
     "how": "Find the egg, win the level",
     "room": "Mega Laser",
-    "game": "Zap",
-    "availableFrom": "2026-10-28"
+    "game": "Zap"
   },
   {
     "name": "Arrondissements",
     "how": "Have the winner of Paris collect all pairs of one colour before collecting another colour",
     "room": "Press",
-    "game": "Paris",
-    "availableFrom": "2026-10-28"
+    "game": "Paris"
   },
   {
     "name": "Atlas Answers",
     "how": "Win Globe level 7 by completing every country in alphabetical order",
     "room": "Grip",
     "game": "Globe",
-    "level": "7",
-    "availableFrom": "2026-10-28"
+    "level": "7"
   },
   {
     "name": "Bumper Stars",
     "how": "Win Bumper level 1 without any tank firing twice in a row",
     "room": "Control",
     "game": "Bumper",
-    "level": "1",
-    "availableFrom": "2026-10-28"
+    "level": "1"
   },
   {
     "name": "Clocking Shots",
     "how": "Score an average of 25 or more baskets per player in Shot Clock",
     "room": "Hoops",
-    "game": "Shot Clock",
-    "availableFrom": "2026-10-28"
+    "game": "Shot Clock"
   },
   {
     "name": "Final Countdown",
     "how": "End Mosh Pit with the final scores of 5, 4, 3, 2, 1 in any order",
     "room": "Press",
-    "game": "Mosh Pit",
-    "availableFrom": "2026-10-28"
+    "game": "Mosh Pit"
   },
   {
     "name": "Gridlocked",
     "how": "Win Gridlock without stepping on any green safe zone tile",
     "room": "Mega Grid",
-    "game": "Gridlock",
-    "availableFrom": "2026-10-28"
+    "game": "Gridlock"
   },
   {
     "name": "Joint Pain",
     "how": "Win Undercover level 1 by hitting only the corner button of every shape",
     "room": "Press",
     "game": "Undercover",
-    "level": "1",
-    "availableFrom": "2026-10-28"
+    "level": "1"
   },
   {
     "name": "Real Collectors",
     "how": "Win Collect level 10 with every player collecting the same number of objectives",
     "room": "Control",
     "game": "Collect",
-    "level": "10",
-    "availableFrom": "2026-10-28"
+    "level": "10"
   },
   {
     "name": "Relay Runners",
     "how": "Win Runner level 5 with 5 players reaching the goal in lane order from left to right in every section",
     "room": "Control",
     "game": "Runner",
-    "level": "5",
-    "availableFrom": "2026-10-28"
+    "level": "5"
   },
   {
     "name": "Scan Fever",
     "how": "Win Scan Rush level 4 with every player scanning the same number of scans",
     "room": "Laser",
     "game": "Scan Rush",
-    "level": "4",
-    "availableFrom": "2026-10-28"
+    "level": "4"
   },
   {
     "name": "Sharpshot",
     "how": "Complete Sharpshooter level 6 by switching sides of the room for every bullet you shoot",
     "room": "Mega Grid",
     "game": "Sharpshooter",
-    "level": "6",
-    "availableFrom": "2026-10-28"
+    "level": "6"
   },
   {
     "name": "Sold Out Crowd",
     "how": "Get every pit tile lit up in Colosseum",
     "room": "Grid",
-    "game": "Colosseum",
-    "availableFrom": "2026-10-28"
+    "game": "Colosseum"
   },
   {
     "name": "Tic-Tac-Toe",
     "how": "Win Spellinator level 2 using only words that contain an O or an X",
     "room": "Hide",
     "game": "Spellinator",
-    "level": "2",
-    "availableFrom": "2026-10-28"
+    "level": "2"
   },
   {
     "name": "Tri-Fecta",
     "how": "Win any level in Mines while hitting 3 different multi-hit targets with a single mine",
     "room": "Press",
-    "game": "Mines",
-    "availableFrom": "2026-10-28"
+    "game": "Mines"
   },
   {
     "name": "Vegetable Farmer",
     "how": "Win Loop level 6 while grabbing only vegetables",
     "room": "Grip",
     "game": "Loop",
-    "level": "6",
-    "availableFrom": "2026-10-28"
+    "level": "6"
   },
   {
     "name": "Wrong Game",
     "how": "Win Globe level 8 without touching the red floor",
     "room": "Grip",
     "game": "Globe",
-    "level": "8",
-    "availableFrom": "2026-10-28"
+    "level": "8"
   },
   {
     "name": "Wrong Way",
     "how": "Win Traverse level 2 while completing the holds on the first section in reverse order",
     "room": "Grip",
     "game": "Traverse",
-    "level": "2",
-    "availableFrom": "2026-10-28"
+    "level": "2"
   },
   {
     "name": "Home and Back Again",
     "how": "Win Flash Mines level 4 by stepping on the green safe zone before collecting any blue tiles in every section",
     "room": "Grid",
     "game": "Flash Mines",
-    "level": "4",
-    "availableFrom": "2026-10-28"
+    "level": "4"
   },
   {
     "name": "Last Chance",
     "how": "Win Sharpshooter level 7 by completing every section with the last bullet",
     "room": "Mega Grid",
     "game": "Sharpshooter",
-    "level": "7",
-    "availableFrom": "2026-10-28"
+    "level": "7"
   },
   {
     "name": "Layer by Layer",
     "how": "Win Inside Out level 4 with each screen fully scanned before starting the next one",
     "room": "Scan",
     "game": "Inside Out",
-    "level": "4",
-    "availableFrom": "2026-10-28"
+    "level": "4"
   },
   {
     "name": "One Wall at a Time",
     "how": "Win Clockstoppers level 2 by clearing every clock on one wall before clearing a clock on another wall",
     "room": "Pipes",
     "game": "Clockstoppers",
-    "level": "2",
-    "availableFrom": "2026-10-28"
+    "level": "2"
   },
   {
     "name": "Top Half",
     "how": "Finish the game 100 where every player has more than 50 points left",
     "room": "Mega Grid",
-    "game": "100",
-    "availableFrom": "2026-10-28"
+    "game": "100"
   },
   {
     "name": "2% Relay",
     "how": "Win any level of Tile Relay where during one round you only step on objective tiles",
     "room": "Grid",
-    "game": "Tile Relay",
-    "availableFrom": "2026-10-28"
+    "game": "Tile Relay"
   }
 ]
