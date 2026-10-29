@@ -47,6 +47,61 @@ test('empty game response does not clear saved rooms or their history',()=>{
   });
 });
 
+test('venue game list records exact room and game pairs and survives an empty refresh',()=>{
+  const context={
+    state:{locations:[]},ROOMS:['Control','Hide'],
+    onlineLocationId:id=>`activate-${id}`,ensureLocationShape:()=>{}
+  };
+  const mergeOnlineLocation=vm.runInNewContext(`${mergeSource}\nmergeOnlineLocation`,context);
+  const initial=mergeOnlineLocation({id:7,name:'Test venue'},[
+    {name:'Sprint',room:{name:'Control'}},
+    {name:'Connections',room:{name:'Hide'}}
+  ]);
+  assert.deepEqual(Array.from(initial.activateGameKeys),['Control||Sprint','Hide||Connections']);
+  context.state.locations=[initial];
+  const refreshed=mergeOnlineLocation({id:7,name:'Test venue'},[]);
+  assert.deepEqual(Array.from(refreshed.activateGameKeys),['Control||Sprint','Hide||Connections']);
+});
+
+test('new games use the actual venue list without changing other game availability',()=>{
+  const start=source.indexOf('function roomGameEntries(');
+  const end=source.indexOf('\nfunction enabledGameNames(',start);
+  const context={
+    GAME_CATALOG:{
+      Control:{competitive:['Sprint','Tails'],cooperative:[]},
+      Press:{competitive:['Gem Rush'],cooperative:[]}
+    },
+    VENUE_SPECIFIC_GAME_KEYS:new Set(['Control||Sprint']),
+    activeLocation:()=>null
+  };
+  const inferred=vm.runInNewContext(`${source.slice(start,end)}\ninferredGamesForLocation`,context);
+  const withSprint={rooms:['Control','Press'],activateLocationId:7,activateGameKeys:['Control||Sprint']};
+  const withoutSprint={rooms:['Control','Press'],activateLocationId:8,activateGameKeys:[]};
+  assert.deepEqual(Array.from(inferred(withSprint),x=>x.game),['Sprint','Tails','Gem Rush']);
+  assert.deepEqual(Array.from(inferred(withoutSprint),x=>x.game),['Tails','Gem Rush']);
+  assert.deepEqual(Array.from(inferred({rooms:['Control','Press']}),x=>x.game),['Sprint','Tails','Gem Rush']);
+});
+
+test('competitive and level views omit a new game absent from the venue',()=>{
+  const venue={rooms:['Control'],excludedGames:[],activateLocationId:8,activateGameKeys:[]};
+  const catalog={Control:{competitive:['Sprint','Tails'],cooperative:[]}};
+  const offered=(l,room,game)=>game!=='Sprint'||l.activateGameKeys.includes(`${room}||${game}`);
+  const competitiveStart=source.indexOf('function competitiveEntries(');
+  const competitiveEnd=source.indexOf('\nconst isTrophy=',competitiveStart);
+  const competitive=vm.runInNewContext(`${source.slice(competitiveStart,competitiveEnd)}\ncompetitiveEntries`,{
+    activeLocation:()=>venue,GAME_CATALOG:catalog,gameOfferedAtLocation:offered
+  });
+  assert.deepEqual(Array.from(competitive(),x=>x.game),['Tails']);
+
+  const levelStart=source.indexOf('function progressEntries(');
+  const levelEnd=source.indexOf('\nfunction gamePlayEntries(',levelStart);
+  const levels=vm.runInNewContext(`${source.slice(levelStart,levelEnd)}\nprogressEntries`,{
+    activeLocation:()=>venue,activeLevelProgress:()=>({games:{},competitive:{}}),
+    gameModesForRoom:room=>catalog[room],gameOfferedAtLocation:offered
+  });
+  assert.deepEqual(Array.from(levels(),x=>x.game),['Tails']);
+});
+
 test('a deliberate clear of all rooms remains cleared on refresh',()=>{
   const existing={id:'activate-7',rooms:[],activateRooms:['Arena','Grid']};
   assert.deepEqual(merge(existing,['Arena','Grid']),{

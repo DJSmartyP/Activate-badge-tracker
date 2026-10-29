@@ -38,17 +38,21 @@
     "Clockstoppers",
     "Collect",
     "Colosseum",
+    "Connections",
     "Danger Zones",
     "Dartmouth",
     "Darvill Dash",
     "Defuse",
     "Digby",
+    "Drainage",
     "Flash Fight",
     "Flash Fire",
     "Flash Mines",
+    "Firewall",
     "Flip",
     "Frequency",
     "Gauntlet",
+    "Gem Zap",
     "Gems",
     "Globe",
     "Grid",
@@ -97,18 +101,22 @@
     "Sneak",
     "Spellinator",
     "Spot",
+    "Sprint",
     "Statues",
     "Stopwatch",
     "Strategy",
     "Supermarket",
     "Swat",
     "Switch",
+    "Swarm",
     "Tails",
     "Technique",
     "Terminal",
     "Tile Relay",
+    "Tomb Dash",
     "Trip Wire",
     "Trivial",
+    "Trivia",
     "Traverse",
     "Undercover",
     "Whack-A-Hold",
@@ -147,6 +155,7 @@
       "competitive": [
         "Bop Clock",
         "Frequency",
+        "Sprint",
         "Tails"
       ],
       "cooperative": [
@@ -174,6 +183,9 @@
     "Grip": {
       "competitive": [],
       "cooperative": [
+        "Drainage",
+        "Firewall",
+        "Gem Zap",
         "Globe",
         "Loop",
         "Traverse"
@@ -184,6 +196,7 @@
         "Numbers"
       ],
       "cooperative": [
+        "Connections",
         "Numbers",
         "Relay",
         "Sequence",
@@ -201,7 +214,8 @@
         "15 Green",
         "Barrage",
         "Simon Says",
-        "Trivial"
+        "Trivial",
+        "Trivia"
       ]
     },
     "Laser": {
@@ -240,6 +254,7 @@
       ],
       "cooperative": [
         "Defuse",
+        "Flash Fire",
         "Gauntlet",
         "Laser Relay",
         "Maze",
@@ -288,7 +303,9 @@
       ]
     },
     "Scan": {
-      "competitive": [],
+      "competitive": [
+        "Tomb Dash"
+      ],
       "cooperative": [
         "Inside Out",
         "Spot",
@@ -305,6 +322,7 @@
         "Dartmouth",
         "Flip",
         "Seeker",
+        "Swarm",
         "Terminal"
       ]
     },

@@ -4,6 +4,12 @@ const VERSION='14.14.15';
 const STORAGE_KEY='activateBadgeTracker_v8';
 const MAX_PINS=5;
 const ACTIVATE_SCORES_SYNC_ENABLED=true;
+// These games vary by venue, so an online location needs an exact /games match.
+const VENUE_SPECIFIC_GAME_KEYS=new Set([
+  'Hoops||Trivia','Hide||Connections','Mega Laser||Flash Fire',
+  'Control||Sprint','Strike||Swarm','Scan||Tomb Dash',
+  'Grip||Firewall','Grip||Gem Zap','Grip||Drainage'
+]);
 let BADGES=[], ROOMS=[], GAMES=[], GAME_CATALOG={}, COMPETITIVE_INFO={}, BASE_BADGE_COUNT=0;
 let TROPHIES=[];
 let BASE_BADGES=[], BASE_ROOMS=[], BASE_GAMES=[], BASE_GAME_CATALOG={}, BASE_COMPETITIVE_INFO={}, BASE_GAME_ENTITIES=[], BADGE_ENTITIES=[];
@@ -948,9 +954,16 @@ function roomGameEntries(room){
   });
   return out;
 }
+function gameOfferedAtLocation(l,room,game){
+  const key=`${room}||${game}`;
+  if(!VENUE_SPECIFIC_GAME_KEYS.has(key))return true;
+  if(!l?.activateLocationId && !l?.roomSourceLocationId)return true;
+  return Array.isArray(l.activateGameKeys) && l.activateGameKeys.includes(key);
+}
 function inferredGamesForLocation(l=activeLocation()){
   const entries=[];
   (l.rooms||[]).forEach(r=>roomGameEntries(r).forEach(x=>{
+    if(!gameOfferedAtLocation(l,r,x.game))return;
     if(!entries.some(e=>e.game===x.game&&e.room===r))entries.push({...x,room:r});
   }));
   return entries;
@@ -979,7 +992,7 @@ function competitiveEntries(l=activeLocation()){
   (l.rooms||[]).forEach(r=>{
     const c=GAME_CATALOG[r]||{};
     (c.competitive||[]).forEach(g=>{
-      if(!excluded.has(g))rows.push({room:r,game:g});
+      if(!excluded.has(g) && gameOfferedAtLocation(l,r,g))rows.push({room:r,game:g});
     });
   });
   return rows;
@@ -2200,7 +2213,7 @@ let venueRoomDirectoryPromise=null;
 
 async function populateVenueRooms(locationId=state.activeLocation){
   const locationRecord=state.locations.find(l=>l.id===locationId);
-  if(!locationRecord || locationRecord.venueRoomsLoadedAt || !ACTIVATE_SCORES_SYNC_ENABLED)return;
+  if(!locationRecord || (locationRecord.venueRoomsLoadedAt && Array.isArray(locationRecord.activateGameKeys)) || !ACTIVATE_SCORES_SYNC_ENABLED)return;
   const ownerState=state,ownerPlayer=state.activePlayerKey;
   const requestedName=locationRecord.name;
   const initialRooms=[...(locationRecord.rooms||[])];
@@ -2263,6 +2276,13 @@ function mergeOnlineLocation(remoteLocation,venueGames,locationId=onlineLocation
   const id=locationId;
   const existing=state.locations.find(l=>l.id===id);
   const roomNames=[...new Set((venueGames||[]).map(game=>String(game?.room?.name||'').trim()).filter(r=>ROOMS.includes(r)))];
+  const activateGameKeys=roomNames.length
+    ? [...new Set((venueGames||[]).map(game=>{
+        const room=String(game?.room?.name||'').trim();
+        const name=String(game?.name||'').trim();
+        return ROOMS.includes(room)&&name?`${room}||${name}`:null;
+      }).filter(Boolean))]
+    : existing?.activateGameKeys;
   const priorActivateRooms=Array.isArray(existing?.activateRooms)?existing.activateRooms:[];
   const selectedRooms=new Set(Array.isArray(existing?.rooms)?existing.rooms:[]);
   // Remember previously offered rooms so a sparse refresh cannot undo a manual removal.
@@ -2278,6 +2298,7 @@ function mergeOnlineLocation(remoteLocation,venueGames,locationId=onlineLocation
     name:String(remoteLocation.name||`Activate ${remoteLocation.id}`).trim(),
     rooms,
     activateRooms:[...new Set([...priorActivateRooms,...roomNames])],
+    activateGameKeys,
     venueRoomsLoadedAt:roomNames.length?new Date().toISOString():existing?.venueRoomsLoadedAt,
     games:Array.isArray(existing?.games)?existing.games:[],
     excludedGames:Array.isArray(existing?.excludedGames)?existing.excludedGames:[],
@@ -2823,7 +2844,7 @@ function progressEntries(){
     modes.cooperative.forEach(game=>{
       // Location availability is authoritative for Levels too.
       // Keep any saved progress, but do not render unavailable games.
-      if(excluded.has(game))return;
+      if(excluded.has(game) || !gameOfferedAtLocation(l,room,game))return;
 
       const x=progress.games[room+'||'+game]||{};
       const levels={...(x.levels||{})};
@@ -2837,7 +2858,7 @@ function progressEntries(){
     modes.competitive.forEach(game=>{
       // Same rule as the Competitive page: unavailable means hidden,
       // not merely shown as "Not played".
-      if(excluded.has(game))return;
+      if(excluded.has(game) || !gameOfferedAtLocation(l,room,game))return;
 
       entries.push({
         room,game,mode:'competitive',
